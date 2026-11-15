@@ -205,7 +205,9 @@ The 21 interfaces cover all three FS90MG seats, the arm hub / horn / cap clearan
 
 ## Licence
 
-Hardware (CAD, STLs, mechanical documentation, electronics design notes) is licensed under the [CERN Open Hardware Licence Version 2 — Permissive](LICENSE-CERN-OHL-P). Scripts and other software in this tree are licensed under the [MIT Licence](LICENSE-MIT). See [LICENSE.md](LICENSE.md).
+Everything in this repository (CAD, STLs, BOM, renders, documentation and scripts) is licensed under the [MIT License](LICENSE).
+
+The clips in `media/` are generated concept videos, not footage of a built unit.
 
 ## Repository layout
 

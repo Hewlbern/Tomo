@@ -1,0 +1,198 @@
+{
+ "centre_meeting": {
+  "c40": {
+   "pad_to_pad_mm": 8.127,
+   "core_to_core_mm": 15.637,
+   "padL_min_x": 4.063,
+   "padR_max_x": -4.063
+  },
+  "c44": {
+   "pad_to_pad_mm": 1.317,
+   "core_to_core_mm": 8.263,
+   "padL_min_x": 0.658,
+   "padR_max_x": -0.658
+  },
+  "c45.0": {
+   "pad_to_pad_mm": -0.3,
+   "core_to_core_mm": 6.5,
+   "padL_min_x": -0.15,
+   "padR_max_x": 0.15
+  },
+  "c46.0": {
+   "pad_to_pad_mm": -1.977,
+   "core_to_core_mm": 4.459,
+   "padL_min_x": -1.171,
+   "padR_max_x": 1.171
+  },
+  "tip_face_L_yz_range": [
+   [
+    55.8,
+    54.0
+   ],
+   [
+    69.0,
+    70.0
+   ]
+  ],
+  "tip_face_R_yz_range": [
+   [
+    55.8,
+    54.0
+   ],
+   [
+    69.0,
+    70.0
+   ]
+  ],
+  "tip_face_overlap_area_mm2": 211.2,
+  "pad_proxy": "soft non-printed foam template: tip pad 3.40 mm, strap-face pad 4.20 mm thick; stiffness UNKNOWN",
+  "design_pad_overlap_at_th_c_mm": 0.3,
+  "design_pad_into_strap_at_th_c_mm": 0.2,
+  "nominal_core_gap_at_th_c_mm": 6.5,
+  "pad_stack_overlap_at_stop_mm": 2.342
+ },
+ "strap_56x12": {
+  "c0": {
+   "padL_to_strap": 34.486,
+   "padR_to_strap": 34.486,
+   "armL_core_to_strap": 35.857,
+   "armR_core_to_strap": 35.857,
+   "sleeveL_to_strap": 46.832
+  },
+  "c45.0": {
+   "padL_to_strap": -0.2,
+   "padR_to_strap": -0.2,
+   "armL_core_to_strap": 4.0,
+   "armR_core_to_strap": 3.54,
+   "sleeveL_to_strap": 4.044
+  },
+  "c46.0": {
+   "padL_to_strap": -1.221,
+   "padR_to_strap": -1.22,
+   "armL_core_to_strap": 3.037,
+   "armR_core_to_strap": 3.005,
+   "sleeveL_to_strap": 3.296
+  },
+  "fur_proxy_to_strap": 0.074,
+  "torso_back_to_strap": 4.064
+ },
+ "loop_topology": {
+  "c0": {
+   "enclosed_as_modelled": false,
+   "largest_escape_gap_mm": ">12 (open)"
+  },
+  "c17": {
+   "enclosed_as_modelled": false,
+   "largest_escape_gap_mm": ">12 (open)"
+  },
+  "c20": {
+   "enclosed_as_modelled": false,
+   "largest_escape_gap_mm": ">12 (open)"
+  },
+  "c30": {
+   "enclosed_as_modelled": false,
+   "largest_escape_gap_mm": ">12 (open)"
+  },
+  "c40": {
+   "enclosed_as_modelled": false,
+   "largest_escape_gap_mm": 7.5
+  },
+  "c44": {
+   "enclosed_as_modelled": false,
+   "largest_escape_gap_mm": 1.29
+  },
+  "c45.0": {
+   "enclosed_as_modelled": true,
+   "largest_escape_gap_mm": 0.0,
+   "loop_interior_bbox": [
+    -75.7,
+    13.6,
+    75.7,
+    62.5
+   ],
+   "loop_interior_area_mm2": 4327.0
+  },
+  "c46.0": {
+   "enclosed_as_modelled": true,
+   "largest_escape_gap_mm": 0.0,
+   "loop_interior_bbox": [
+    -75.5,
+    13.5,
+    75.5,
+    62.2
+   ],
+   "loop_interior_area_mm2": 4236.5
+  },
+  "method": "xy footprint (projection) of torso, brackets, arms and pads; a straight vertical strap spanning z20..110 can only move laterally through gaps in that footprint. largest_escape_gap = 2 x the smallest dilation that closes the loop = widest slot an edge-on strap would need. Flexible strap snaking between heights is NOT analysed."
+ },
+ "entry_exit_corridor_open": {
+  "c0": {
+   "arm_L": 26.68,
+   "arm_R": 26.64,
+   "paw_pad_L": 21.28,
+   "paw_pad_R": 21.27,
+   "sleeve_proxy_L": 49.08,
+   "sleeve_proxy_R": 44.71
+  },
+  "c_open_stop": {
+   "arm_L": 30.55,
+   "arm_R": 30.52,
+   "paw_pad_L": 25.14,
+   "paw_pad_R": 25.13,
+   "sleeve_proxy_L": 52.19,
+   "sleeve_proxy_R": 47.79
+  },
+  "definition": "clearance to a 56 mm wide corridor x in [-28,28], y>=44, z 20..110 (strap path in/out); >0 = strap can enter/exit",
+  "largest_clasp_deg_with_corridor_clear": 17.0
+ },
+ "fur_sleeve_proxy_clearance_mm": {
+  "c-3.0": {
+   "sleeveL_to_fur": 25.12,
+   "sleeveR_to_fur": 25.15,
+   "padL_to_fur": 48.28,
+   "armL_to_fur": 6.54
+  },
+  "c4.0": {
+   "sleeveL_to_fur": 26.19,
+   "sleeveR_to_fur": 26.09,
+   "padL_to_fur": 44.82,
+   "armL_to_fur": 6.51
+  },
+  "c11.0": {
+   "sleeveL_to_fur": 26.89,
+   "sleeveR_to_fur": 26.92,
+   "padL_to_fur": 40.69,
+   "armL_to_fur": 6.56
+  },
+  "c18.0": {
+   "sleeveL_to_fur": 27.38,
+   "sleeveR_to_fur": 27.45,
+   "padL_to_fur": 35.88,
+   "armL_to_fur": 6.53
+  },
+  "c25.0": {
+   "sleeveL_to_fur": 27.75,
+   "sleeveR_to_fur": 27.88,
+   "padL_to_fur": 30.45,
+   "armL_to_fur": 6.55
+  },
+  "c32.0": {
+   "sleeveL_to_fur": 27.99,
+   "sleeveR_to_fur": 28.09,
+   "padL_to_fur": 24.39,
+   "armL_to_fur": 6.53
+  },
+  "c39.0": {
+   "sleeveL_to_fur": 26.46,
+   "sleeveR_to_fur": 26.46,
+   "padL_to_fur": 17.88,
+   "armL_to_fur": 6.67
+  },
+  "c46.0": {
+   "sleeveL_to_fur": 21.0,
+   "sleeveR_to_fur": 21.01,
+   "padL_to_fur": 10.94,
+   "armL_to_fur": 6.54
+  }
+ }
+}

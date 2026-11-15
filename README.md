@@ -1,0 +1,199 @@
+# Evokin
+
+[![Evokin — 10-second concept ad](media/evokin_preview.gif)](media/evokin_demo_ad_v3_real.mp4)
+
+**[Watch the 10-second photoreal ad (MP4, 3.3 MB)](media/evokin_demo_ad_v3_real.mp4)** · [Mirumi-style take](media/evokin_demo_ad_v2.mp4) · [First hatch take](media/evokin_demo_ad.mp4)
+
+Evokin is an open-source plush robot companion: a small orange, Mirumi-style bear whose head turns and whose paws clasp together in the middle. Inside the fur is a 3D-printed shell, two Feetech FS90MG servos, a cord-drum arm drive and a planned ESP32-S3 brain with a camera and a voice. This repository holds the v3 CAD, the printable STLs, the bill of materials and a short concept video.
+
+The clip above is a **generated concept advertisement**, not footage of a built unit. The [Blender renders](#how-it-looks) and the CAD are the design source of truth. Nothing has been printed, assembled or purchased. The project is a bench prototype: not child-ready, not waterproof, and not a production kit.
+
+## How it looks
+
+Arms open, from the v3 fur model in Blender:
+
+[![Evokin with arms open](renders/web/01_hero_open.jpg)](renders/blender/01_hero_open.png)
+
+Paws clasped:
+
+[![Evokin with paws clasped](renders/web/02_hero_clasp.jpg)](renders/blender/02_hero_clasp.png)
+
+Cutaway of the printed shell, yaw stack, servos, speaker and arm drive:
+
+[![Cutaway of the v3 mechanism](renders/web/03_cutaway.jpg)](renders/blender/03_cutaway.png)
+
+Exploded CAD (new thrust washer in red, assumed horn envelope in yellow, speaker / amp / mic in teal):
+
+[![Exploded v3 CAD](renders/web/v3_exploded_fixes.jpg)](renders/cad/v3_exploded_fixes.png)
+
+Yaw and servo section:
+
+[![Yaw and servo section](renders/web/v3_yaw_and_servo_section.jpg)](renders/cad/v3_yaw_and_servo_section.png)
+
+Full-resolution PNGs live in [`renders/blender/`](renders/blender/) and [`renders/cad/`](renders/cad/). The Blender scene is [`renders/blender/critter_v3_fur.blend`](renders/blender/critter_v3_fur.blend).
+
+A slightly more polished landing page, with the video playing inline, is in [`docs/index.html`](docs/index.html) (intended for GitHub Pages served from `/docs`).
+
+## How it works
+
+Two metal-gear micro servos do all of the motion.
+
+- **Head yaw.** An FS90MG in the `yaw_collar` turns a coupler blade in a slot in the head. A printed 0.8 mm thrust washer takes the axial load. Software should clamp yaw to about ±42° so the hard stop is not a running face.
+- **Arm clasp.** A second FS90MG turns a cord drum 1:1 with the horn. 0–45° of arm close is 6.28 mm of cord, which is 35.12° of servo travel (38.24° stop-to-stop). Soft foam pads on the paws are meant to meet in the middle; the pad stiffness, and therefore the grip force, is unknown.
+- **Fail-open** is a requirement, not a finished feature. The electronics plan is to cut the 5 V servo rail when the paws are parked, or when a current sensor sees a child pulling the arms apart, so the FS90MG can back-drive and the paws go limp. A mechanical weak link in the cord has not been designed or rated.
+
+The shells close on a male/female registration lip (0.25 mm FDM clearance) with one fastener scheme: M2.5 at 2.8 mm clearance / 2.1 mm pilot. Print the [`stl/coupon.stl`](stl/coupon.stl) test piece first if you print anything.
+
+Naming: `arm_L`, `shoulder_bracket_L` and `paw_pad_L` are the **critter’s own left** (+x). Units are millimetres. The CAD frame is z up, −y face, +y strap / wearer.
+
+## Bill of materials
+
+**Nothing has been bought.** Every price below is a planned or suggested figure in AUD, from November 2026 supplier quotes, and may be out of date. Fasteners, fur, foam, cord, a battery and filament are still unsourced. The full table, including unsourced lines and custom-board targets, is in [`BOM.csv`](BOM.csv).
+
+### Priced mechanical (keep these)
+
+| ID | Item | Qty | Unit | Line | Supplier |
+|---|---|---:|---:|---:|---|
+| M1 | Feetech FS90MG (head yaw) | 1 | 7.40 | 7.40 | Core Electronics |
+| M2 | Feetech FS90MG (arm clasp) | 1 | 7.40 | 7.40 | Core Electronics |
+| M16 | Adafruit 3351 mono enclosed speaker, 3 W 4 Ω | 1 | 8.95 | 8.95 | Core Electronics / [Adafruit](https://www.adafruit.com/product/3351) |
+| | **Subtotal** | | | **23.75** | |
+
+Official servo drawing: [`datasheets/FS90MG.pdf`](datasheets/FS90MG.pdf). The included M2.5×4 horn screw is too short for the yaw coupler — plan on an 8–10 mm M2.5 and measure the horn on arrival. Sixteen M2.5 shell screws, two M2 retainer screws, Dyneema cord, return elastic, foam pads and the orange fur skin are on the BOM but not priced.
+
+### Electronics — pick one planned path
+
+**Option A**, a project buy (one prototype brain plus spare modules for a later custom board): about **A$88.40** electronics, or **A$92.90** with an optional TP4056, or about **A$112–117** once the priced servos and speaker are included.
+
+| Item | Qty | Line AUD | Supplier |
+|---|---:|---:|---|
+| Seeed XIAO ESP32S3 Sense | 1 | 22.58 | DigiKey Australia ([Seeed](https://www.seeedstudio.com/XIAO-ESP32S3-Sense-p-5639.html)) |
+| ESP32-S3-WROOM-1U-N16R8 | 4 | 43.92 | DigiKey Australia (free shipping on this line, about A$66.50 with the Sense) |
+| MAX98357A breakout (clone) | 1 | 7.95 | AuscomTech |
+| INA219 breakout (clone) | 1 | 7.00 | AuscomTech |
+| XL6009 boost, set to 5 V | 1 | 6.95 | AuscomTech |
+| TP4056 charger (optional) | 1 | 4.50 | MakerStore |
+
+**Option B**, cheaper and quicker if the pinout checks out: about **A$51.18** electronics, or about **A$75** with the priced servos and speaker (A$75–85 with postage).
+
+| Item | Qty | Line AUD | Supplier |
+|---|---:|---:|---|
+| DFRobot ESP32-S3 AI Camera DFR1154 (OV3660, PDM mic, MAX98357, no charger) | 1 | 37.23 | Core Electronics |
+| INA219 breakout (clone) | 1 | 7.00 | AuscomTech |
+| XL6009 boost, set to 5 V | 1 | 6.95 | AuscomTech |
+
+The DFR1154’s two spare GPIOs, needed to drive both servos alongside the camera, mic and amp, are **still unverified**. Confirm before ordering. It has no charger.
+
+Name-brand alternatives at Core Electronics: MAX98357A A$10.65, INMP441 A$12.30, BQ24074 breakout A$28.25, Pololu S13V20F5 A$29.55, INA219 A$17.30.
+
+A later **custom 65 × 55 mm 4-layer ESP32-S3 board** (WROOM-1-N16R8, BQ24074, TPS63020, TPS61088, INA219, TPS259241 eFuse, OV2640/OV3660, INMP441, MAX98357A) is estimated at about **A$120** at JLCPCB for two assembled boards plus three bare, and about **A$60** of local peripherals including a 2000 mAh LiPo. That board has not been designed. The 55 mm depth is larger than the current tray dummy and will need a fit check.
+
+Cautions: prefer a protected 5 V regulator over an XL6009 or MT3608; many bare TP4056 boards have no protection IC; clone INMP441 modules are often fake; measure the real servo current before setting an INA219 trip threshold.
+
+## STL files
+
+[Download all STLs as a zip](docs/downloads/evokin-stls.zip) (about 1.5 MB). Printable parts live in [`stl/`](stl/). Foam-cut templates are in [`stl/templates/`](stl/templates/). Fit dummies and fur/sleeve proxies are in [`stl/reference/`](stl/reference/) and are not printed for the robot.
+
+FDM in PLA or PETG is the intended process. No layer height or infill has been validated; the coupon is the place to start. A passing coupon is **not** a full fit-check.
+
+| Part | File | Material / print notes | Qty |
+|---|---|---|---:|
+| Torso front | [stl/torso_front.stl](stl/torso_front.stl) | FDM, PLA or PETG. Print seam-down (front face on the bed). 0.40 mm outer chamfer for elephant-foot. M2.5 clearance 2.8 mm. Female registration groove. | 1 |
+| Torso back | [stl/torso_back.stl](stl/torso_back.stl) | Same. Male registration lip, 1.2 mm. M2.5 pilots 2.1 mm. | 1 |
+| Tray | [stl/tray.stl](stl/tray.stl) | FDM. Clasp-servo shelf with 1.7 mm pilots; 10 mm tabs into 10.6 mm torso pockets. Amp pocket on the spine. | 1 |
+| Yaw collar | [stl/yaw_collar.stl](stl/yaw_collar.stl) | FDM. Yaw-servo hangers, 1.7 mm pilots, stepped Ø34 bore for horn / coupler / ribbon from above. | 1 |
+| Yaw retainer A | [stl/yaw_retainer_A.stl](stl/yaw_retainer_A.stl) | FDM. M2 clearance 2.3 mm. | 1 |
+| Yaw retainer B | [stl/yaw_retainer_B.stl](stl/yaw_retainer_B.stl) | Pair with A. | 1 |
+| Yaw coupler | [stl/yaw_coupler.stl](stl/yaw_coupler.stl) | FDM. 2.0 mm blade in a 2.7 mm head slot. Needs a longer M2.5 horn screw. | 1 |
+| Yaw thrust washer | [stl/yaw_thrust_washer.stl](stl/yaw_thrust_washer.stl) | FDM, 0.8 mm. Print flat on the bed, no supports. ID 35, OD 43. | 1 |
+| Head front | [stl/head_front.stl](stl/head_front.stl) | FDM. Same lip/groove and M2.5 scheme as the torso. Camera and bezel seats. | 1 |
+| Head back | [stl/head_back.stl](stl/head_back.stl) | FDM. Print skirt-down. Underside is a 30°-from-vertical cone so a 35° support threshold should not land supports on a flat thrust face — the flat face is the washer. | 1 |
+| Arm L (critter’s left, +x) | [stl/arm_L.stl](stl/arm_L.stl) | FDM. Geometry unchanged from v2. | 1 |
+| Arm R (critter’s right, −x) | [stl/arm_R.stl](stl/arm_R.stl) | FDM. Unchanged from v2. | 1 |
+| Shoulder bracket L | [stl/shoulder_bracket_L.stl](stl/shoulder_bracket_L.stl) | FDM. 2.8 mm screw holes. | 1 |
+| Shoulder bracket R | [stl/shoulder_bracket_R.stl](stl/shoulder_bracket_R.stl) | FDM. | 1 |
+| Clasp drum | [stl/clasp_drum.stl](stl/clasp_drum.stl) | FDM. Ø3.2 access hole for the horn screw. 1:1 on the FS90MG horn. | 1 |
+| Eye bezel | [stl/bezel.stl](stl/bezel.stl) | FDM. Single bezel; print two (left and right are mirrors in the assembly). | 2 |
+| Shutter | [stl/shutter.stl](stl/shutter.stl) | FDM. Camera shutter. | 1 |
+| Test coupon (optional) | [stl/coupon.stl](stl/coupon.stl) | Print this first. Journal + skirt, washer, tab/pocket, FS90MG seat. | 1 |
+| Paw pad templates | [stl/templates/paw_pad_L.stl](stl/templates/paw_pad_L.stl), [paw_pad_R.stl](stl/templates/paw_pad_R.stl) | **Not printed.** Cut soft closed-cell foam from these templates and glue to the paws. | 2 |
+
+## Electronics overview
+
+The planned brain is an **ESP32-S3**, not the Raspberry Pi Zero that the v3 tray dummy still describes. Two first-article paths are shortlisted above; a custom 65 × 55 mm board is a later target. See [`electronics/esp32-board-notes.md`](electronics/esp32-board-notes.md) for the block diagram, GPIO cautions, bring-up checklist and CAD-fit notes.
+
+In short:
+
+- Brain: XIAO ESP32S3 Sense, or DFRobot DFR1154, or a WROOM-1-N16R8 custom board (16 MB flash, 8 MB Octal PSRAM).
+- Camera: OV2640 or OV3660 on a 24-pin FPC, as a loose U-bend through the neck — do not twist the ribbon around the yaw axis. On N16R8 modules, do not use GPIO 33–37.
+- Audio: MAX98357A into the Adafruit 3351; I2S/PDM mic onboard or INMP441.
+- Power: a 5 V servo rail separate from 3.3 V, with bulk capacitance. Prefer BQ24074 over a bare TP4056, and TPS61088 (or a protected module) over MT3608 / a bare XL6009.
+- Fail-open: INA219 on the servo rail plus an eFuse or load switch. Measure the real servo current before setting a trip.
+
+## Build notes
+
+CAD only. Do not treat these STLs as a fit-check or a print-ready kit.
+
+1. Print `stl/coupon.stl` first and check the journal running fit, the tab/pocket and the FS90MG seat.
+2. **Clasp assembly.** Drop the clasp FS90MG onto the tray, tabs on the shelf (the shelf is *under* the tabs). Drive the self-tappers from above into the 1.7 mm pilots *before* the horn and drum go on. Fit the horn, then the drum. Slide the tray into the torso pockets and close the shells.
+3. **Yaw assembly.** Drop the yaw FS90MG into the collar hangers from below; self-tappers from below. Screw the collar onto the torso (M2.5 clearance in the collar, pilots in the torso). From above, through the Ø34 bore: horn, coupler, longer M2.5 horn screw. Drop the thrust washer onto the journal. Lower the head; retainers go in from the side into 1.7 mm pilots in the skirt.
+4. Close the torso and head shells on the registration lip; M2.5 from the front (2.8 mm) into the back (2.1 mm pilots).
+5. Keep the first electrical bring-up on a bench supply. Portable power is unresolved. Fail-open is not a designed, rated function yet.
+
+Detailed seats, clearances and FS90MG drawing flags are in [`cad/README.md`](cad/README.md). Rebuild from the OpenSCAD sources with:
+
+```bash
+# from the repository root; needs OpenSCAD 2021.01+ and, for the audits, Python 3 with trimesh
+python3 scripts/design_params.py
+bash scripts/build_stl.sh
+python3 scripts/fit_audit.py
+python3 scripts/sim_v3.py          # dense imposed-motion sweep, several minutes
+python3 scripts/metrics_v3.py
+python3 scripts/render_v3.py
+```
+
+Set `OPENSCAD=/path/to/openscad` if it is not on your `PATH`. `EXPORT_CHECK=1 bash scripts/build_stl.sh` also writes posed intermediates to `check/` for the sweep (those files are not checked in).
+
+## Validation (CAD only)
+
+The v3 audit is measurements and an imposed-motion collision sweep on the exported STLs. **Nothing has been printed or physically tested.** Summary from [`results/validation_summary.json`](results/validation_summary.json):
+
+| Check | Result |
+|---|---|
+| Fit-audit interfaces | **18 / 18 pass**, 0 marginal, 0 fail |
+| Imposed-motion sweep | 529 poses, 149,178 pair tests, 13,721 booleans |
+| Rigid overlaps in travel | **0** |
+| Contact at 45° clasp | 0.30 mm pad overlap, 6.5 mm core gap, 0.20 mm pad-into-strap (foam stiffness unknown; no force claimed) |
+| Printable meshes | Watertight |
+| Drive | 6.2832 mm of cord = 35.122° of servo for 0–45° of arm close |
+
+The 18 interfaces cover both FS90MG seats, horn/drum clearance, torso and head seams, the yaw journal, thrust washer, retainers, coupler blade, tray tab pockets, speaker / amp / mic seats, the camera ribbon path, the board envelope, the cord geometry, the test coupon, and mesh watertightness. Full tables: [`results/fit_audit_table.csv`](results/fit_audit_table.csv), [`results/fit_audit.json`](results/fit_audit.json).
+
+## Status
+
+- **Prototype, CAD complete for v3.** Unprinted. Motion, grip force, fail-open and wear are untested.
+- **Nothing has been ordered or purchased.** The electronics lines are a shortlist only.
+- Power is bench-tethered only. Portable power is unresolved.
+- Breakaway / fail-open is a requirement, not a designed or rated part.
+- Horn size, tooth count (drawing says 20T; some Feetech pages say 21T) and the included screws must be measured on arrival.
+- **Not production, not child-ready, not waterproof.**
+
+## Licence
+
+Hardware (CAD, STLs, mechanical documentation, electronics design notes) is licensed under the [CERN Open Hardware Licence Version 2 — Permissive](LICENSE-CERN-OHL-P). Scripts and other software in this tree are licensed under the [MIT Licence](LICENSE-MIT). See [LICENSE.md](LICENSE.md).
+
+## Repository layout
+
+```
+README.md                 This page
+BOM.csv                   Full mechanical + electronics bill of materials
+cad/                      OpenSCAD sources and the detailed v3 engineering note
+stl/                      Printable parts, plus templates/ and reference/
+scripts/                  Export, fit audit, sweep, metrics, renders
+renders/                  Blender heroes, CAD stills, web-sized previews
+media/                    Concept videos and the README GIF preview
+electronics/              ESP32-S3 planning notes
+datasheets/               Official FS90MG drawing
+results/                  v3 validation JSON/CSV
+docs/                     GitHub Pages landing page (serve from /docs)
+```

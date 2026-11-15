@@ -1,0 +1,255 @@
+{
+ "tolerance_mm3": 0.05,
+ "naming": "arm_L/bracket_L/pad_L = critter's own LEFT = +x; arm_R = -x",
+ "note": "Washer is fixed on the collar journal (does not yaw). Seam lips are NOT excluded: any front/back overlap is a defect.",
+ "transform_validation_max_dev_mm": [
+  [
+   "arm_L",
+   0,
+   -3.0,
+   0.001
+  ],
+  [
+   "arm_L",
+   0,
+   45.0,
+   0.0
+  ],
+  [
+   "arm_L",
+   0,
+   46.0,
+   0.0
+  ],
+  [
+   "arm_R",
+   0,
+   -3.0,
+   0.0
+  ],
+  [
+   "arm_R",
+   0,
+   45.0,
+   0.0
+  ],
+  [
+   "arm_R",
+   0,
+   46.0,
+   0.0
+  ],
+  [
+   "clasp_drum",
+   0,
+   -3.0,
+   0.0
+  ],
+  [
+   "clasp_drum",
+   0,
+   45.0,
+   0.0
+  ],
+  [
+   "clasp_drum",
+   0,
+   46.0,
+   0.0
+  ],
+  [
+   "head_back",
+   45,
+   45,
+   0.0
+  ],
+  [
+   "head_front",
+   45,
+   45,
+   0.0
+  ],
+  [
+   "paw_pad_L",
+   0,
+   -3.0,
+   0.0
+  ],
+  [
+   "paw_pad_L",
+   0,
+   45.0,
+   0.0
+  ],
+  [
+   "paw_pad_L",
+   0,
+   46.0,
+   0.0
+  ],
+  [
+   "paw_pad_R",
+   0,
+   -3.0,
+   0.0
+  ],
+  [
+   "paw_pad_R",
+   0,
+   45.0,
+   0.0
+  ],
+  [
+   "paw_pad_R",
+   0,
+   46.0,
+   0.0
+  ],
+  [
+   "yaw_coupler",
+   45,
+   45,
+   0.0
+  ]
+ ],
+ "sweep": {
+  "poses": 529,
+  "pair_tests": 149178,
+  "aabb_passed_to_boolean": 13721,
+  "seconds": 250.2,
+  "head_yaw_range": [
+   -48,
+   48,
+   0.5
+  ],
+  "arm_range": [
+   -6,
+   50,
+   0.25
+  ],
+  "cross_grid": "yaw -45..45 step 7.5 x clasp 0..45 step 5",
+  "excluded_pairs": {
+   "paw_pad_L|arm_L": "pad glued on own paw",
+   "paw_pad_R|arm_R": "pad glued on own paw",
+   "sleeve_proxy_L|arm_L": "sleeve envelope contains own beam",
+   "sleeve_proxy_R|arm_R": "sleeve envelope contains own beam",
+   "sleeve_proxy_L|paw_pad_L": "same arm",
+   "sleeve_proxy_R|paw_pad_R": "same arm",
+   "fur_proxy_torso|torso_front": "fur on shell",
+   "fur_proxy_torso|torso_back": "fur on shell",
+   "yaw_coupler|head_back": "blade in slot",
+   "yaw_retainer_A|yaw_collar": "retainer under lip",
+   "yaw_retainer_B|yaw_collar": "retainer under lip",
+   "yaw_retainer_A|head_back": "screwed",
+   "yaw_retainer_B|head_back": "screwed",
+   "yaw_thrust_washer|yaw_collar": "washer sits on journal top",
+   "yaw_coupler|dummy_horn_yaw": "coupler on horn",
+   "clasp_drum|dummy_horn_clasp": "drum on horn",
+   "dummy_horn_yaw|dummy_servo_yaw": "horn on boss",
+   "dummy_horn_clasp|dummy_servo_clasp": "horn on boss",
+   "dummy_cam|head_front": "camera mount",
+   "dummy_cam|head_back": "camera mount",
+   "dummy_speaker|torso_front": "speaker in pocket",
+   "dummy_amp|tray": "amp in pocket",
+   "dummy_mic|torso_front": "mic in pocket",
+   "dummy_servo_yaw|yaw_collar": "yaw servo seated under hangers",
+   "dummy_servo_clasp|tray": "clasp servo seated under shelf",
+   "dummy_pi|tray": "Pi on standoffs",
+   "yaw_coupler|dummy_servo_yaw": "coupler above servo",
+   "clasp_drum|dummy_servo_clasp": "drum above servo"
+  },
+  "compliant_pairs": {
+   "paw_pad_L|paw_pad_R": "designed soft paw-to-paw meeting",
+   "paw_pad_L|strap_env": "pad on strap",
+   "paw_pad_R|strap_env": "pad on strap",
+   "sleeve_proxy_L|strap_env": "sleeve on strap",
+   "sleeve_proxy_R|strap_env": "sleeve on strap"
+  }
+ },
+ "rigid_overlaps_in_travel": [],
+ "compliant_contacts_in_travel_first": {
+  "paw_pad_L|paw_pad_R": {
+   "first_clasp": 45.0,
+   "vol_at_first": 63.37
+  },
+  "paw_pad_L|strap_env": {
+   "first_clasp": 44.75,
+   "vol_at_first": 8.648
+  },
+  "paw_pad_R|strap_env": {
+   "first_clasp": 44.75,
+   "vol_at_first": 8.648
+  }
+ },
+ "stop_engagement": {
+  "yaw_pos": {
+   "yaw": 47.0,
+   "clasp": 0.0,
+   "a": "yaw_collar",
+   "b": "head_back",
+   "vol_mm3": 0.619,
+   "compliant": ""
+  },
+  "yaw_neg": {
+   "yaw": -47.0,
+   "clasp": 0.0,
+   "a": "yaw_collar",
+   "b": "head_back",
+   "vol_mm3": 0.619,
+   "compliant": ""
+  },
+  "clasp_close": {
+   "yaw": 0.0,
+   "clasp": 46.25,
+   "a": "arm_L",
+   "b": "shoulder_bracket_L",
+   "vol_mm3": 0.232,
+   "compliant": ""
+  },
+  "clasp_open": {
+   "yaw": 0.0,
+   "clasp": -3.25,
+   "a": "arm_L",
+   "b": "shoulder_bracket_L",
+   "vol_mm3": 0.232,
+   "compliant": ""
+  }
+ },
+ "static_pair_volumes": [
+  {
+   "a": "torso_front",
+   "b": "torso_back",
+   "vol_mm3": 0.0,
+   "note": "seam lip/groove should clear 0.25 mm",
+   "ok": true
+  },
+  {
+   "a": "head_front",
+   "b": "head_back",
+   "vol_mm3": 0.0,
+   "note": "seam lip/groove should clear 0.25 mm",
+   "ok": true
+  },
+  {
+   "a": "yaw_thrust_washer",
+   "b": "head_back",
+   "vol_mm3": 0.0,
+   "note": "designed 0.30 mm axial gap",
+   "ok": true
+  },
+  {
+   "a": "tray",
+   "b": "torso_front",
+   "vol_mm3": 0.0,
+   "note": "tabs in pockets",
+   "ok": true
+  },
+  {
+   "a": "tray",
+   "b": "torso_back",
+   "vol_mm3": 0.0,
+   "note": "tabs in pockets",
+   "ok": true
+  }
+ ]
+}

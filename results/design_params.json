@@ -1,0 +1,69 @@
+{
+ "L": {
+  "drum_pt": [
+   1.4764029915845602,
+   9.856887351190457
+  ],
+  "pulley_pt": [
+   56.847685469982785,
+   17.91657572590013
+  ],
+  "phi_t": 98.28165208514811,
+  "drum_phi": -81.71834791485186,
+  "anchor_local": 30.28165208514811,
+  "wrap_closed": 23.0,
+  "wrap_open": 68.0,
+  "free_len_xy": 55.95478085025444
+ },
+ "R": {
+  "drum_pt": [
+   2.1264232325816375,
+   30.027004748973496
+  ],
+  "pulley_pt": [
+   59.65964740103933,
+   17.825954926028096
+  ],
+  "phi_t": 78.0266955194411,
+  "drum_phi": 78.02669551944112,
+  "anchor_local": 11.200000000000003,
+  "wrap_closed": 21.826695519441103,
+  "wrap_open": 66.8266955194411,
+  "free_len_xy": 58.81273246500285
+ },
+ "checks": {
+  "L": {
+   "drum_CW_pulls_in": true,
+   "closing_moment_arm_mm": 8.0
+  },
+  "R": {
+   "drum_CW_pulls_in": true,
+   "closing_moment_arm_mm": 8.0
+  }
+ },
+ "pillar_close_ang": 42.0133944239485,
+ "pillar_open_ang": -39.0133944239485,
+ "r_d": 10.25,
+ "r_q": 8.0,
+ "th_c": 45.0,
+ "th_stop_c": 46.0,
+ "th_stop_o": -3.0,
+ "root_local": -20.0,
+ "pillar_r": 14.5,
+ "drum_ratio_deg_per_deg": 0.7804878048780488,
+ "drum_wrap_open_deg": 40.0,
+ "drum_anchor_L": -121.71834791485186,
+ "drum_anchor_R": 61.97330448055888,
+ "clasp_to_drum": {
+  "r_d": 10.25,
+  "r_q": 8.0,
+  "travel_0_to_45_mm": 6.2832,
+  "drum_deg_0_to_45": 35.122,
+  "servo_deg_0_to_45": 35.122,
+  "travel_stop_to_stop_mm": 6.8417,
+  "drum_deg_stop_to_stop": 38.2439,
+  "within_180": true,
+  "ratio": 0.7804878048780488,
+  "note": "Drum xy unchanged from v2; clasp_top lowered to 51 so grooves still straddle zq=63.5 after the 4.0 mm horn gap. Fleet \u00b11.8 deg."
+ }
+}

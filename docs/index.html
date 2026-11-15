@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evokin — an open-source plush robot companion</title>
+  <meta name="description" content="Evokin is a small orange, Mirumi-style plush robot whose head turns and whose paws clasp in the middle. Open-source CAD, STLs and a planned ESP32-S3 brain.">
+  <meta property="og:title" content="Evokin">
+  <meta property="og:description" content="An open-source plush robot companion. Head turns, paws clasp.">
+  <meta property="og:image" content="media/evokin_poster.jpg">
+  <link rel="icon" type="image/jpeg" href="media/evokin_poster.jpg">
+  <style>
+    :root {
+      --bg: #110e0b;
+      --bg-2: #1a1511;
+      --card: #221c16;
+      --line: rgba(240, 184, 120, 0.16);
+      --ink: #f6eee4;
+      --muted: #b9a498;
+      --orange: #f08a3a;
+      --orange-2: #ffb06a;
+      --cyan: #6ee0e8;
+      --good: #9ad07a;
+      --warn: #e6c36a;
+      --radius: 18px;
+      --max: 1080px;
+      --sans: "Avenir Next", "Segoe UI", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(240, 138, 58, 0.16), transparent 55%),
+        radial-gradient(900px 500px at -10% 20%, rgba(110, 224, 232, 0.06), transparent 50%),
+        var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    a { color: var(--orange-2); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    a:hover { color: #fff; }
+    .wrap { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; }
+    header.top {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(16px);
+      background: rgba(17, 14, 11, 0.78);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 14px 0;
+    }
+    .brand {
+      font-family: var(--serif);
+      font-size: 1.35rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .brand span { color: var(--orange); }
+    nav.links { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.92rem; }
+    nav.links a { color: var(--muted); text-decoration: none; }
+    nav.links a:hover { color: var(--ink); }
+    .hero { padding: 48px 0 24px; }
+    .kicker {
+      color: var(--cyan);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin: 0 0 12px;
+    }
+    h1 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(2.4rem, 6vw, 4.4rem);
+      line-height: 1.05;
+      margin: 0 0 16px;
+      letter-spacing: -0.02em;
+    }
+    .lede { font-size: 1.15rem; color: var(--muted); max-width: 42rem; margin: 0 0 22px; }
+    .flags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; }
+    .flag {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .flag.alert { color: var(--warn); border-color: rgba(230,195,106,0.35); }
+    .player {
+      background: #000;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+    }
+    .player video { display: block; width: 100%; height: auto; vertical-align: middle; }
+    .caption { color: var(--muted); font-size: 0.88rem; margin: 10px 0 0; }
+    section { padding: 56px 0 8px; }
+    h2 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      margin: 0 0 8px;
+    }
+    .sub { color: var(--muted); margin: 0 0 24px; max-width: 44rem; }
+    .gallery {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .gallery figure { margin: 0; }
+    .gallery img, .wide img {
+      width: 100%; height: auto; display: block;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: #1a1511;
+    }
+    .gallery figcaption, .wide figcaption {
+      color: var(--muted); font-size: 0.85rem; padding: 8px 4px 0;
+    }
+    .wide { margin-top: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+    .card h3 { margin: 0 0 8px; font-size: 1.05rem; }
+    .card p, .card li { color: var(--muted); }
+    .card ul { margin: 0; padding-left: 1.15rem; }
+    table {
+      width: 100%; border-collapse: collapse; font-size: 0.92rem;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    th, td { text-align: left; padding: 10px 12px; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { color: var(--orange-2); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; background: #2a221b; }
+    td.num, th.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    tr:last-child th, tr:last-child td { border-bottom: 0; }
+    tfoot td { color: var(--ink); font-weight: 650; }
+    .scroll { overflow-x: auto; margin: 0 0 22px; border-radius: var(--radius); }
+    .note {
+      color: var(--warn);
+      background: rgba(230, 195, 106, 0.08);
+      border: 1px solid rgba(230, 195, 106, 0.25);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 0 0 22px;
+      font-size: 0.95rem;
+    }
+    .ok { color: var(--good); font-weight: 650; }
+    .btnrow { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 22px; }
+    .btn {
+      display: inline-block;
+      background: var(--orange);
+      color: #1a0e06;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 10px 16px;
+      border-radius: 999px;
+    }
+    .btn:hover { color: #1a0e06; filter: brightness(1.08); }
+    .btn.ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    footer {
+      margin-top: 64px;
+      padding: 28px 0 48px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    @media (max-width: 760px) {
+      .gallery, .grid-2 { grid-template-columns: 1fr; }
+      nav.links { display: none; }
+      .wrap { width: min(var(--max), calc(100% - 28px)); }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap nav">
+      <a class="brand" href="#top">Evo<span>kin</span></a>
+      <nav class="links">
+        <a href="#looks">Looks</a>
+        <a href="#works">Mechanism</a>
+        <a href="#bom">BOM</a>
+        <a href="#stls">STLs</a>
+        <a href="#electronics">Electronics</a>
+        <a href="#validation">Validation</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap">
+        <p class="kicker">Open-source plush robot</p>
+        <h1>A small orange bear that turns its head and clasps its paws.</h1>
+        <p class="lede">Evokin is a Mirumi-style companion: a furry shell around a printed yaw joint, a cord-drum arm drive, two Feetech FS90MG servos, and a planned ESP32-S3 brain with a camera and a voice.</p>
+        <div class="flags">
+          <span class="flag">v3 CAD</span>
+          <span class="flag">18 / 18 CAD checks passed</span>
+          <span class="flag alert">Prototype — nothing printed or purchased</span>
+          <span class="flag alert">Not child-ready</span>
+        </div>
+        <div class="player">
+          <video controls playsinline preload="metadata" poster="media/evokin_poster.jpg" width="1280" height="720">
+            <source src="media/evokin_demo_ad_v3_real.mp4" type="video/mp4">
+            Your browser cannot play this video. <a href="media/evokin_demo_ad_v3_real.mp4">Download the MP4</a>.
+          </video>
+        </div>
+        <p class="caption">A 10-second generated concept advertisement, not footage of a built unit. The CAD and the renders below are the design source of truth. Earlier takes live in the repository’s <code>media/</code> folder.</p>
+      </div>
+    </section>
+
+    <section id="looks">
+      <div class="wrap">
+        <h2>How it looks</h2>
+        <p class="sub">Blender Cycles renders of the v3 fur model, plus CAD stills of the mechanism. Click for the same frame at this page’s resolution; full-size PNGs are in the repository.</p>
+        <div class="gallery">
+          <figure>
+            <a href="renders/01_hero_open.jpg"><img src="renders/01_hero_open.jpg" width="960" height="720" alt="Evokin, an orange furry bear-like robot, with its arms open"></a>
+            <figcaption>Arms open.</figcaption>
+          </figure>
+          <figure>
+            <a href="renders/02_hero_clasp.jpg"><img src="renders/02_hero_clasp.jpg" width="960" height="720" alt="Evokin with its paws clasped together in the middle"></a>
+            <figcaption>Paws clasped.</figcaption>
+          </figure>
+          <figure>
+            <a href="renders/03_cutaway.jpg"><img src="renders/03_cutaway.jpg" width="960" height="720" alt="Colour-coded cutaway of Evokin showing the head, yaw stack, servos, speaker and arms"></a>
+            <figcaption>Cutaway of the printed shell, yaw stack, servos, speaker and arm drive.</figcaption>
+          </figure>
+          <figure>
+            <a href="renders/v3_exploded_fixes.jpg"><img src="renders/v3_exploded_fixes.jpg" width="960" height="552" alt="Exploded CAD view of Evokin v3"></a>
+            <figcaption>Exploded CAD. Red is the new thrust washer; yellow is the assumed horn envelope; teal is the speaker, amp and mic.</figcaption>
+          </figure>
+        </div>
+        <figure class="wide">
+          <a href="renders/v3_yaw_and_servo_section.jpg"><img src="renders/v3_yaw_and_servo_section.jpg" width="960" height="504" alt="Section through the yaw joint and servo seats"></a>
+          <figcaption>Section through the yaw joint and the two FS90MG seats.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="works">
+      <div class="wrap">
+        <h2>How it works</h2>
+        <p class="sub">Two metal-gear micro servos do all of the motion. The shells are FDM-printed and closed on a registration lip. Fail-open is a requirement, not a finished feature.</p>
+        <div class="grid-2">
+          <article class="card">
+            <h3>Head yaw</h3>
+            <p>An FS90MG in the yaw collar turns a coupler blade in a slot in the head. A printed 0.8&nbsp;mm thrust washer takes the axial load. Software should clamp yaw to about ±42° so the hard stop is not a running face.</p>
+          </article>
+          <article class="card">
+            <h3>Arm clasp</h3>
+            <p>A second FS90MG turns a cord drum 1:1 with the horn. 0–45° of arm close is 6.28&nbsp;mm of cord, which is 35.12° of servo travel. Soft foam pads are meant to meet in the middle; pad stiffness, and therefore grip force, is unknown.</p>
+          </article>
+          <article class="card">
+            <h3>Fail-open</h3>
+            <p>The plan is to cut the 5&nbsp;V servo rail when the paws are parked, or when a current sensor sees a child pulling the arms apart, so the servos can back-drive and the paws go limp. A mechanical weak link in the cord has not been designed or rated.</p>
+          </article>
+          <article class="card">
+            <h3>Shells and fasteners</h3>
+            <p>Male lip on the back half, female groove on the front, 0.25&nbsp;mm FDM clearance, 0.40&nbsp;mm elephant-foot chamfer. One scheme everywhere: M2.5 at 2.8&nbsp;mm clearance / 2.1&nbsp;mm pilot. Print the test coupon first.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="bom">
+      <div class="wrap">
+        <h2>Bill of materials</h2>
+        <p class="sub">Prices are in Australian dollars, from November 2026 supplier quotes, and may have changed. The complete table, including unsourced fasteners, fur and the custom-board target, is in the repository as <a href="https://github.com/Hewlbern/evokin/blob/main/BOM.csv">BOM.csv</a>.</p>
+        <p class="note">Nothing has been purchased. Every line below is planned or suggested only. Fasteners, fur, foam, cord, a battery and filament are still unsourced.</p>
+
+        <h3 style="margin-top:0">Priced mechanical</h3>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr><th>Item</th><th class="num">Qty</th><th class="num">Unit</th><th class="num">Line</th><th>Supplier</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Feetech FS90MG (head yaw)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
+              <tr><td>Feetech FS90MG (arm clasp)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
+              <tr><td>Adafruit 3351 mono enclosed speaker, 3&nbsp;W 4&nbsp;Ω</td><td class="num">1</td><td class="num">8.95</td><td class="num">8.95</td><td>Core Electronics / Adafruit</td></tr>
+            </tbody>
+            <tfoot>
+              <tr><td>Subtotal</td><td></td><td></td><td class="num">23.75</td><td></td></tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <h3>Option A — project buy</h3>
+        <p class="sub">One first-article brain plus spare modules for a later custom board. About A$88.40 electronics, or A$92.90 with the optional TP4056, or about A$112–117 with the priced servos and speaker.</p>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr><th>Item</th><th class="num">Qty</th><th class="num">Line</th><th>Supplier</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Seeed XIAO ESP32S3 Sense</td><td class="num">1</td><td class="num">22.58</td><td>DigiKey Australia</td></tr>
+              <tr><td>ESP32-S3-WROOM-1U-N16R8</td><td class="num">4</td><td class="num">43.92</td><td>DigiKey Australia (line with the Sense about A$66.50, free shipping)</td></tr>
+              <tr><td>MAX98357A breakout (clone)</td><td class="num">1</td><td class="num">7.95</td><td>AuscomTech</td></tr>
+              <tr><td>INA219 breakout (clone)</td><td class="num">1</td><td class="num">7.00</td><td>AuscomTech</td></tr>
+              <tr><td>XL6009 boost, set to 5&nbsp;V</td><td class="num">1</td><td class="num">6.95</td><td>AuscomTech</td></tr>
+              <tr><td>TP4056 charger (optional)</td><td class="num">1</td><td class="num">4.50</td><td>MakerStore</td></tr>
+            </tbody>
+            <tfoot>
+              <tr><td>Electronics subtotal (without optional charger)</td><td></td><td class="num">88.40</td><td></td></tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <h3>Option B — cheaper first build, if the pinout checks out</h3>
+        <p class="sub">About A$51.18 electronics, or about A$75 with the priced servos and speaker (A$75–85 with postage). The DFR1154’s two spare servo GPIOs are still unverified, and the board has no charger.</p>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr><th>Item</th><th class="num">Qty</th><th class="num">Line</th><th>Supplier</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>DFRobot ESP32-S3 AI Camera DFR1154 (OV3660, PDM mic, MAX98357, no charger)</td><td class="num">1</td><td class="num">37.23</td><td>Core Electronics</td></tr>
+              <tr><td>INA219 breakout (clone)</td><td class="num">1</td><td class="num">7.00</td><td>AuscomTech</td></tr>
+              <tr><td>XL6009 boost, set to 5&nbsp;V</td><td class="num">1</td><td class="num">6.95</td><td>AuscomTech</td></tr>
+            </tbody>
+            <tfoot>
+              <tr><td>Electronics subtotal</td><td></td><td class="num">51.18</td><td></td></tr>
+            </tfoot>
+          </table>
+        </div>
+        <p class="caption">Name-brand alternatives at Core Electronics: MAX98357A A$10.65, INMP441 A$12.30, BQ24074 A$28.25, Pololu S13V20F5 A$29.55, INA219 A$17.30. A later custom 65×55&nbsp;mm 4-layer board is estimated at about A$120 at JLCPCB plus about A$60 of local parts, and has not been designed.</p>
+      </div>
+    </section>
+
+    <section id="stls">
+      <div class="wrap">
+        <h2>Printable STLs</h2>
+        <p class="sub">FDM in PLA or PETG is the intended process. No layer height or infill has been validated. Print the coupon first. A passing coupon is not a full fit-check.</p>
+        <div class="btnrow">
+          <a class="btn" href="downloads/evokin-stls.zip">Download all STLs (zip, 1.5 MB)</a>
+          <a class="btn ghost" href="https://github.com/Hewlbern/evokin/tree/main/stl">Browse on GitHub</a>
+        </div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr><th>Part</th><th>File</th><th>Print notes</th><th class="num">Qty</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Torso front</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/torso_front.stl">torso_front.stl</a></td><td>Seam-down. 0.40 mm chamfer. M2.5 clearance 2.8 mm. Female groove.</td><td class="num">1</td></tr>
+              <tr><td>Torso back</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/torso_back.stl">torso_back.stl</a></td><td>Male lip, 1.2 mm. M2.5 pilots 2.1 mm.</td><td class="num">1</td></tr>
+              <tr><td>Tray</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/tray.stl">tray.stl</a></td><td>Clasp-servo shelf, 1.7 mm pilots, 10 mm tabs.</td><td class="num">1</td></tr>
+              <tr><td>Yaw collar</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/yaw_collar.stl">yaw_collar.stl</a></td><td>Servo hangers, stepped Ø34 bore.</td><td class="num">1</td></tr>
+              <tr><td>Yaw retainers</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/yaw_retainer_A.stl">yaw_retainer_A.stl</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/yaw_retainer_B.stl">B</a></td><td>M2 clearance 2.3 mm.</td><td class="num">1+1</td></tr>
+              <tr><td>Yaw coupler</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/yaw_coupler.stl">yaw_coupler.stl</a></td><td>2.0 mm blade. Needs a longer M2.5 horn screw.</td><td class="num">1</td></tr>
+              <tr><td>Thrust washer</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/yaw_thrust_washer.stl">yaw_thrust_washer.stl</a></td><td>0.8 mm. Print flat, no supports.</td><td class="num">1</td></tr>
+              <tr><td>Head front / back</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/head_front.stl">head_front.stl</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/head_back.stl">head_back.stl</a></td><td>Back prints skirt-down, 30° cone.</td><td class="num">1+1</td></tr>
+              <tr><td>Arms L / R</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/arm_L.stl">arm_L.stl</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/arm_R.stl">arm_R.stl</a></td><td>Critter’s own left is +x. Unchanged from v2.</td><td class="num">1+1</td></tr>
+              <tr><td>Shoulder brackets</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/shoulder_bracket_L.stl">L</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/shoulder_bracket_R.stl">R</a></td><td>2.8 mm screw holes.</td><td class="num">1+1</td></tr>
+              <tr><td>Clasp drum</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/clasp_drum.stl">clasp_drum.stl</a></td><td>1:1 on the FS90MG horn. Ø3.2 screw access.</td><td class="num">1</td></tr>
+              <tr><td>Eye bezel</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/bezel.stl">bezel.stl</a></td><td>Print two (left and right are mirrors).</td><td class="num">2</td></tr>
+              <tr><td>Shutter</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/shutter.stl">shutter.stl</a></td><td>Camera shutter.</td><td class="num">1</td></tr>
+              <tr><td>Test coupon</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/coupon.stl">coupon.stl</a></td><td>Print first. Journal, washer, tab, servo seat.</td><td class="num">1</td></tr>
+              <tr><td>Paw pad templates</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/templates/paw_pad_L.stl">paw_pad_L.stl</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/templates/paw_pad_R.stl">R</a></td><td>Not printed — cut foam from these.</td><td class="num">2</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="electronics">
+      <div class="wrap">
+        <h2>Electronics</h2>
+        <p class="sub">The planned brain is an ESP32-S3, not the Raspberry Pi Zero still drawn as a tray dummy in the v3 CAD. Planning notes, GPIO cautions and a bring-up checklist are in <a href="https://github.com/Hewlbern/evokin/blob/main/electronics/esp32-board-notes.md">electronics/esp32-board-notes.md</a>.</p>
+        <div class="grid-2">
+          <article class="card">
+            <h3>Prototype paths</h3>
+            <ul>
+              <li>Option A: Seeed XIAO ESP32S3 Sense, plus spare WROOM-1U-N16R8 modules.</li>
+              <li>Option B: DFRobot DFR1154, if two servo GPIOs are free — still unverified.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Custom board target</h3>
+            <ul>
+              <li>ESP32-S3-WROOM-1-N16R8, 65×55 mm, 4-layer.</li>
+              <li>BQ24074, TPS63020, TPS61088 (not MT3608), INA219, TPS259241 eFuse.</li>
+              <li>OV2640/OV3660 on a 24-pin FPC through the neck; INMP441; MAX98357A.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="validation">
+      <div class="wrap">
+        <h2>Validation and status</h2>
+        <p class="sub">The v3 audit is CAD measurements and an imposed-motion collision sweep on the exported STLs. Nothing has been printed or physically tested.</p>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Check</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>Fit-audit interfaces</td><td class="ok">18 / 18 pass, 0 marginal, 0 fail</td></tr>
+              <tr><td>Imposed-motion sweep</td><td>529 poses, 149,178 pair tests, 13,721 booleans</td></tr>
+              <tr><td>Rigid overlaps in travel</td><td class="ok">0</td></tr>
+              <tr><td>Contact at 45° clasp</td><td>0.30 mm pad overlap, 6.5 mm core gap, 0.20 mm pad-into-strap (foam stiffness unknown; no force claimed)</td></tr>
+              <tr><td>Printable meshes</td><td class="ok">Watertight</td></tr>
+              <tr><td>Drive</td><td>6.2832 mm of cord = 35.122° of servo for 0–45° of arm close</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-top:18px">
+          <h3>Status</h3>
+          <ul>
+            <li>Prototype. v3 CAD is complete and unprinted. Motion, grip force, fail-open and wear are untested.</li>
+            <li>Nothing has been ordered or purchased.</li>
+            <li>Power is bench-tethered only. Portable power is unresolved.</li>
+            <li>Not production, not child-ready, not waterproof.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>Hardware under the <a href="https://github.com/Hewlbern/evokin/blob/main/LICENSE-CERN-OHL-P">CERN Open Hardware Licence Version 2 — Permissive</a>. Scripts under the <a href="https://github.com/Hewlbern/evokin/blob/main/LICENSE-MIT">MIT Licence</a>. Designed by Mike Holborn.</p>
+      <p><a href="https://github.com/Hewlbern/evokin">github.com/Hewlbern/evokin</a></p>
+    </div>
+  </footer>
+</body>
+</html>

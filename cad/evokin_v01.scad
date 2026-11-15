@@ -1,19 +1,24 @@
-// SPDX-License-Identifier: CERN-OHL-P-2.0
-// Evokin v4 CAD. Hardware licensed under CERN-OHL-P v2. See LICENSE-CERN-OHL-P.
-// critter_v4.scad -- v4 BENCH PROTOTYPE CAD. UNPRINTED, MOTION/FORCE UNTESTED.
+// SPDX-License-Identifier: MIT
+// evoKin V.01 CAD. MIT License, see LICENSE.
+// evokin_v01.scad -- BENCH PROTOTYPE CAD. UNPRINTED, MOTION/FORCE UNTESTED.
 // Not production, not child-ready, not waterproof, power bench-tethered only.
-// v4 (Nov 2026): arms now face FORWARD and swing forward/up (one FS90MG per arm, direct drive on the
-// horn); the v3 strap clasp (drum, cord, pulleys, elastic, foam pads) is removed. Head pan is the v3
-// motorised yaw stack (FS90MG in the collar), unchanged. 3x FS90MG in total.
-// v3 source is in git history (commit 237c37d, cad/critter_v3.scad).
+// V.01 (Nov 2026): CLASP AROUND THE MIDDLE. Each arm keeps its own FS90MG on the v4 shoulder axis
+// (x axis through y=13, z=60; 0 = forward, + = up). The arm is now an L: the upper arm runs forward
+// outboard of the fur, the forearm turns inward across the front of the belly and runs 18 mm PAST
+// the midline. The two forearms sit at the same radius from the shared shoulder axis, so they
+// OVERLAP across the middle (x -18..+18) and close on each other like scissor blades when the left
+// arm is above the right: grip gap = (arm_L angle - arm_R angle) x radius - blade thickness.
+// Interlock (firmware): armL - armR >= ARM_DMIN, i.e. the left forearm always passes OVER the right.
+// No new parts and no 4th servo vs v4: 3x FS90MG (head pan, arm L, arm R).
+// History: v4 = commit d8b6367 (cad/critter_v4.scad), v3 = 237c37d.
 // NAMING: arm_L / shoulder_bracket_L = the CRITTER'S OWN LEFT = +x.
 // Units mm. Frame: z up, -y = face/front, +y = back.
-// STLs export at yaw=0, armL=armR=ARM_REST (-20°, forward and slightly down).
-// openscad -D 'part="arm_L"' -o x.stl critter_v4.scad
+// STLs export at yaw=0, armL=-15, armR=-25 (forearms overlapped, 3.5 mm rigid gap).
+// openscad -D 'part="arm_L"' -o x.stl evokin_v01.scad
 part = "assembly";
 yaw = 0;
-armL = -20;   // deg, 0 = straight forward, + = up
-armR = -20;
+armL = -15;   // deg, 0 = straight forward, + = up
+armR = -25;
 $fn = 56; clr = 0.3;
 
 /* ---- official FS90MG, drawing p.5, all ±0.1 mm (verified from the PDF, not from marketing text) ----
@@ -69,13 +74,16 @@ yaw_top=84;
    in a shoulder pod moulded into torso_back. Boss passes through the cap; horn outside on the boss;
    the arm hub is screwed to the horn. */
 SH_Y=13; SH_Z=60; XC=42; CAP_T=4; XP=XC+CAP_T;        // pod / cap outer face at |x|=46
-ARM_SOFT=[-55,70];                                    // software clamp (deg); 125° of the 180° servo travel. -55 keeps the paw ≥4 mm off the desk
-ARM_REST=-20;                                         // export / hero pose
+ARM_SOFT=[-45,30];                                    // software clamp (deg). -45 keeps the forearm ≥2 mm off the desk; +30 keeps it under the eye bezels
+ARM_DMIN=7.5;                                         // interlock: armL - armR >= 7.5° (≈0.5 mm rigid blade gap at the inner edge)
+ARM_REST_L=-15; ARM_REST_R=-25;                       // export pose
 CAP_HX=21.5; CAP_HY=8.4; CAP_R=3;                     // cap half-sizes in the servo frame (long axis, width)
 POD_W=2.4; CAP_CLR=0.3; OPEN_CLR=0.35;
 CAP_SCREW=19.3;                                       // M2.5 cap screws on the servo long axis, ±19.3 from the body centre
 HUB_X0=XP+0.6; HUB_X1=HUB_X0+6; BEAM_X=[52.5,60.5];  // arm hub and beam (beam clears the 4 mm torso fur + 2 mm sleeve)
-ARM_LEN=52;                                           // shoulder axis to paw centre (paws reach ~6 mm in front of the belly at -20°)
+// V.01 forearm ("blade"): straight bar along x at FORE_R from the shoulder axis, radial depth FORE_DR,
+// tangential thickness FORE_T, running from the elbow to FORE_TIP past the midline.
+FORE_R=71; FORE_DR=10; FORE_T=8; FORE_TIP=18; FORE_RC=2.5;   // inner face at r=66 clears the 4 mm torso fur over the whole travel
 pi=[65,8.5,30]; pi_holes=[58,23]; pi_z=43;           // 8.5 mm y-envelope allows a header
 cam=[25,11.5,24]; cam_holes=[21,12.5]; eye_z=120; eye_x=13; cam_y=-20;
 // Adafruit 3351 Mono Enclosed Speaker 3 W 4 Ω (Core A$8.95): 70 x 30 x 17, holes 3.4 on 63 x 24.
@@ -149,7 +157,7 @@ module torso_cuts_shared(){
   translate([0,-26,68]) cube([SPK[0]+0.6,SPK[1]+0.6,SPK[2]+0.6],center=true);
   translate([18,-TD/2,80]) rotate([90,0,0]) cylinder(d=2.4,h=30,center=true);
   translate([18,-30.5,80]) cube([MIC[0]+0.6,2.6,MIC[1]+0.6],center=true);
-  // webbing slots (optional strap mount; the v4 arms no longer clasp a strap)
+  // webbing slots (optional strap mount on the back)
   for(z=[15.5,30.5]) translate([0,36,z]) cube([22,28,3.2],center=true);
   // bench grommet + vents (v4: vents moved inboard of the shoulder pods)
   translate([0,30,8]) rotate([-70,0,0]) cylinder(d=8,h=30,center=true);
@@ -329,23 +337,20 @@ module shoulder_bracket(side) armservo_frame(side) difference(){
 }
 // Arm in its own frame: x = world x (left side), (y,z) relative to the shoulder axis, arm along -y at angle 0.
 module arm_shape(o=0){
-  // beam: shoulder disc -> elbow -> paw, outboard of the torso fur (x 52.5..60.5)
+  // upper arm: shoulder disc -> elbow, outboard of the torso fur (x 52.5..60.5)
   hull(){
     translate([BEAM_X[0]-o,0,0]) rotate([0,90,0]) cylinder(d=22+2*o,h=BEAM_X[1]-BEAM_X[0]+2*o,$fn=40);
-    translate([BEAM_X[0]-o,-30,-2]) rotate([0,90,0]) cylinder(d=16+2*o,h=BEAM_X[1]-BEAM_X[0]+2*o,$fn=40);
+    translate([BEAM_X[0]-o,-(FORE_R-7),0]) rotate([0,90,0]) cylinder(d=FORE_T-1+2*o,h=BEAM_X[1]-BEAM_X[0]+2*o,$fn=40);   // elbow, no thicker than the blade so a pen lies flat along it
   }
-  hull(){
-    translate([BEAM_X[0]-o,-30,-2]) rotate([0,90,0]) cylinder(d=18+2*o,h=BEAM_X[1]-BEAM_X[0]+2*o,$fn=40);
-    translate([(BEAM_X[0]+BEAM_X[1])/2-0.5,-ARM_LEN,-3]) scale([5.5+o,11+o,10+o]) sphere(1,$fn=40);   // paw
-  }
+  // forearm / paw blade: across the front of the belly to FORE_TIP past the midline
+  hull() for(x=[-FORE_TIP+FORE_RC, BEAM_X[1]-FORE_RC], dy=[-1,1], dz=[-1,1])
+    translate([x+(x>0?o:-o), -FORE_R+dy*(FORE_DR/2-FORE_RC+o), dz*(FORE_T/2-FORE_RC+o)]) sphere(r=FORE_RC,$fn=24);
 }
 module arm_local(){
   difference(){
     union(){
       translate([HUB_X0,0,0]) rotate([0,90,0]) cylinder(d=26,h=HUB_X1-HUB_X0,$fn=64);            // hub on the horn
       arm_shape(0);
-      // three toe bumps on the front of the paw
-      for(dz=[-6,0,6]) translate([(BEAM_X[0]+BEAM_X[1])/2-0.5,-ARM_LEN-9.6,-3+dz]) sphere(d=4.6,$fn=20);
     }
     translate([HUB_X0-1,0,0]) rotate([0,90,0]) cylinder(d=HORN_OD+1.0,h=(XC+s_boss[1]+HORN_T)-(HUB_X0-1));  // horn pocket to horn top (48.3)
     translate([0,0,0]) rotate([0,90,0]) cylinder(d=3.2,h=200);
@@ -355,6 +360,9 @@ module arm_local(){
   }
 }
 module arm_pose(side) mir(side) translate([0,SH_Y,SH_Z]) rotate([-(side=="L"?armL:armR),0,0]) children();
+// grip test object (reference only, not printed): Ø d cylinder along x between the blades, centred at the
+// mean blade angle at r = FORE_R. Used for the clasp renders.
+module grip_pen(d=8,len=140) translate([0,SH_Y,SH_Z]) rotate([-(armL+armR)/2,0,0]) translate([-len/2,-FORE_R,0]) rotate([0,90,0]) cylinder(d=d,h=len,$fn=32);
 module arm(side) arm_pose(side) arm_local();
 module sleeve_proxy(side) arm_pose(side) arm_shape(2);
 
@@ -424,4 +432,5 @@ else if(part=="dummy_cam") dummy_cam();
 else if(part=="dummy_speaker") dummy_speaker();
 else if(part=="dummy_amp") dummy_amp();
 else if(part=="dummy_mic") dummy_mic();
+else if(part=="grip_pen") grip_pen();
 else { torso_front(); torso_back(); tray(); yaw_collar(); yaw_retainer_half(1); yaw_retainer_half(-1); yaw_coupler(); yaw_thrust_washer(); head_back(); head_front(); arm("L"); arm("R"); shoulder_bracket("L"); shoulder_bracket("R"); color("red") dummies(); }

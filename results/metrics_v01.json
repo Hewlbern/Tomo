@@ -1,0 +1,158 @@
+{
+ "assumptions": {
+  "material": "solid PLA 1.24 g/cm\u00b3 (upper bound)",
+  "sleeve_fur_g": "4 g per arm, ASSUMED (not weighed)",
+  "horn_g": "1 g, ASSUMED",
+  "stall": "2.2 kg\u00b7cm / 0.8 A at 6 V (official); 5 V not specified",
+  "cad_only": true,
+  "physically_tested": false
+ },
+ "arm_drive": {
+  "arm_print_g": 20.99,
+  "total_moving_g": 25.99,
+  "arm_com_from_axis_mm": 35.8,
+  "fur_com_from_axis_mm": 42.9,
+  "gravity_torque_max_kgcm": 0.092,
+  "fraction_of_stall_6V": 0.042,
+  "paw_force_at_stall_N": 3.04,
+  "note": "Worst case is the arm horizontal. paw_force_at_stall = 2.2 kg\u00b7cm at r=71 mm (blade centre) \u2014 the most a blade can push on a finger before the servo stalls."
+ },
+ "clasp_grip": {
+  "mechanism": "Both FS90MG arm servos drive their forearm blades toward each other about the shared shoulder axis; the object is squeezed between the blades.",
+  "stall_torque_Nm": 0.2158,
+  "pinch_force_at_stall_N": {
+   "at_r66_inner_edge": 3.27,
+   "at_r71_blade_centre": 3.04,
+   "at_r76_outer_edge": 2.84
+  },
+  "pinch_force_at_stall_pen_pose_N": 2.92,
+  "pen_pose": {
+   "armL": -3.55,
+   "armR": -16.45,
+   "gap_mm": 8
+  },
+  "gravity_torque_one_arm_horizontal_Nm": 0.00905,
+  "continuous_hold_suggestion_N": 1.52,
+  "gap_control": {
+   "slope_deg_per_mm": 0.848,
+   "offset_deg": 6.62,
+   "gap25_delta_deg": 27.8,
+   "gap0_delta_deg": 6.6
+  },
+  "closed_gap_mm": 0.98,
+  "interlock_deg": 7.5,
+  "compliance": "2 mm fur sleeve over each blade (\u22484 mm of compressible pile in the clasp). Squeeze is set by commanding the blades past contact; the servo's position loop then pushes up to stall. No spring or breakaway part.",
+  "note": "Datasheet stall torque 2.2 kg\u00b7cm at 6 V, both servos at stall; 5 V torque is not specified (expect less). Not measured. Holding a stalled FS90MG continuously heats it: grip at \u226450 % for long holds, and let the INA219 trip limit current."
+ },
+ "arm_reach": {
+  "a-45": {
+   "front_y": -42.5,
+   "top_z": 73.0,
+   "bottom_z": 4.5
+  },
+  "a-15": {
+   "front_y": -60.9,
+   "top_z": 73.0,
+   "bottom_z": 37.0
+  },
+  "a0": {
+   "front_y": -63.0,
+   "top_z": 73.0,
+   "bottom_z": 47.0
+  },
+  "a15": {
+   "front_y": -60.9,
+   "top_z": 83.0,
+   "bottom_z": 47.0
+  },
+  "a30": {
+   "front_y": -53.9,
+   "top_z": 100.5,
+   "bottom_z": 47.0
+  },
+  "note": "Torso front is y=-40, head front \u2248 y=-37. Negative y = in front of the bear. The desk is z=0 (torso bottom)."
+ },
+ "arm_travel": {
+  "software_clamp_deg": [
+   -45,
+   30
+  ],
+  "interlock": "armL - armR >= 7.5 deg (left blade over right)",
+  "servo_deg_used": 75,
+  "servo_deg_available": 180,
+  "pulse_map": "\u2248 500\u20132500 \u00b5s over 180\u00b0 (FS90MG spec); calibrate centre per servo; \u22480.85\u00b0 of differential angle per mm of grip gap"
+ },
+ "head_pan": {
+  "servo": "FS90MG in the yaw collar (unchanged from v3)",
+  "software_clamp_deg": [
+   -42,
+   42
+  ],
+  "hard_stop_deg": 47,
+  "head_printed_plus_camera_g": 59.2,
+  "inertia_about_z_g_mm2": 49607.0,
+  "accel_torque_for_60deg_in_0p12s_kgcm": 0.1471,
+  "fraction_of_stall_6V": 0.0669,
+  "tilt": "not fitted",
+  "note": "Yaw axis is vertical, so gravity does not load the pan servo; friction on the 0.35 mm journal is untested."
+ },
+ "pinch_gaps_mm": {
+  "hub_to_cap_face": 0.6,
+  "arm_to_shell_min": 0.6,
+  "sleeve_to_torso_fur_min": -1.21,
+  "clasp_blade_gap_range": [
+   0.98,
+   33.35
+  ],
+  "note": "The clasp is a deliberate pinch point: the blades close to ~1 mm and can trap a finger with up to ~3 N per the datasheet torque. Hub/shell rigid gaps are under 4 mm. Not assessed against any toy standard."
+ },
+ "shoulder_pod_vs_fur_envelope": {
+  "max_protrusion_mm": 9.6,
+  "note": "Positive = the printed pod corner pokes outside the nominal 4 mm torso fur envelope (fur skin must be patterned over it)."
+ },
+ "servo_power": {
+  "servos": 3,
+  "channels": [
+   "head pan",
+   "arm L",
+   "arm R"
+  ],
+  "stall_each_A_6V": 0.8,
+  "worst_case_all_stalled_A": 2.4,
+  "note": "Budget the 5 V servo rail for \u22652.4 A peak or stagger moves in firmware. The XL6009 module is not specified for that; the protected 2 A+ Pololu S13V20F5 is closer but still below an all-stalled peak."
+ },
+ "changed_vs_v4": {
+  "arm_L.stl": "changed (volume 13343 -> 16927 mm\u00b3)",
+  "arm_R.stl": "changed (volume 13343 -> 16927 mm\u00b3)",
+  "bezel.stl": "geometrically unchanged (bytes differ)",
+  "coupon.stl": "geometrically unchanged (bytes differ)",
+  "head_back.stl": "geometrically unchanged (bytes differ)",
+  "head_front.stl": "geometrically unchanged (bytes differ)",
+  "shoulder_bracket_L.stl": "geometrically unchanged (bytes differ)",
+  "shoulder_bracket_R.stl": "geometrically unchanged (bytes differ)",
+  "shutter.stl": "identical",
+  "torso_back.stl": "geometrically unchanged (bytes differ)",
+  "torso_front.stl": "geometrically unchanged (bytes differ)",
+  "tray.stl": "geometrically unchanged (bytes differ)",
+  "yaw_collar.stl": "geometrically unchanged (bytes differ)",
+  "yaw_coupler.stl": "geometrically unchanged (bytes differ)",
+  "yaw_retainer_A.stl": "geometrically unchanged (bytes differ)",
+  "yaw_retainer_B.stl": "geometrically unchanged (bytes differ)",
+  "yaw_thrust_washer.stl": "geometrically unchanged (bytes differ)",
+  "reference/dummies.stl": "changed (volume 83776 -> 83776 mm\u00b3)",
+  "reference/dummy_amp.stl": "identical",
+  "reference/dummy_cam.stl": "identical",
+  "reference/dummy_horn_arm_L.stl": "changed (volume 721 -> 721 mm\u00b3)",
+  "reference/dummy_horn_arm_R.stl": "changed (volume 721 -> 721 mm\u00b3)",
+  "reference/dummy_horn_yaw.stl": "geometrically unchanged (bytes differ)",
+  "reference/dummy_mic.stl": "identical",
+  "reference/dummy_pi.stl": "identical",
+  "reference/dummy_servo_arm_L.stl": "geometrically unchanged (bytes differ)",
+  "reference/dummy_servo_arm_R.stl": "geometrically unchanged (bytes differ)",
+  "reference/dummy_servo_yaw.stl": "geometrically unchanged (bytes differ)",
+  "reference/dummy_speaker.stl": "identical",
+  "reference/fur_proxy_torso.stl": "geometrically unchanged (bytes differ)",
+  "reference/sleeve_proxy_L.stl": "changed (volume 20475 -> 30717 mm\u00b3)",
+  "reference/sleeve_proxy_R.stl": "changed (volume 20475 -> 30717 mm\u00b3)"
+ }
+}

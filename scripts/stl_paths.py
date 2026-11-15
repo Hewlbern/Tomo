@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Resolve an Evokin STL whether it lives in stl/, stl/templates/ or stl/reference/."""
+"""Resolve an evoKin STL whether it lives in stl/, stl/templates/ or stl/reference/."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent

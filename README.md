@@ -1,40 +1,40 @@
-# Evokin
+# evoKin V.01
 
-[![Evokin — 10-second concept ad](media/evokin_preview.gif)](media/evokin_demo_ad_v3_real.mp4)
+[![evoKin — 10-second concept ad](media/evokin_preview.gif)](media/evokin_demo_ad_v3_real.mp4)
 
 **[Watch the 10-second photoreal ad (MP4, 3.3 MB)](media/evokin_demo_ad_v3_real.mp4)** · [Mirumi-style take](media/evokin_demo_ad_v2.mp4) · [First hatch take](media/evokin_demo_ad.mp4)
 
-Evokin is an open-source plush robot companion: a small orange, Mirumi-style bear whose head pans left and right and whose arms reach forward and up, for a hug or a wave. Inside the fur is a 3D-printed shell, three Feetech FS90MG servos (head pan, left arm, right arm) and a planned ESP32-S3 brain with a camera and a voice. This repository holds the v4 CAD, the printable STLs, the bill of materials and a short concept video.
+evoKin V.01 is an open-source plush robot companion: a small orange, Mirumi-style bear whose head pans left and right and whose forward-facing arms **clasp around its middle**, so it can hold onto a pen, a cable, a small pole or a strap. Inside the fur is a 3D-printed shell, three Feetech FS90MG servos (head pan, left arm, right arm) and a planned ESP32-S3 brain with a camera and a voice. This repository holds the V.01 CAD, the printable STLs, the bill of materials and a short concept video.
 
-The clip above is a **generated concept advertisement**, not footage of a built unit, and it still shows the **older v3 design** (backward clasping arms); it has not been regenerated for v4. The [Blender renders](#how-it-looks) and the CAD are the design source of truth. Nothing has been printed, assembled or purchased. The project is a bench prototype: not child-ready, not waterproof, and not a production kit.
+The clip above is a **generated concept advertisement**, not footage of a built unit, and it still shows the **older v3 design** (arms clasping backward around a strap); it has not been regenerated for V.01. The [Blender renders](#how-it-looks) and the CAD are the design source of truth. Nothing has been printed, assembled or purchased. The project is a bench prototype: not child-ready, not waterproof, and not a production kit.
 
 ## How it looks
 
-Front 3/4, arms forward, from the v4 fur model in Blender:
+Front 3/4, clasp closed with the paws overlapped across the middle, from the V.01 fur model in Blender:
 
-[![Evokin v4 with arms forward](renders/web/01_hero_forward.jpg)](renders/blender/01_hero_forward.png)
+[![evoKin V.01 with its clasp closed](renders/web/01_hero_clasp.jpg)](renders/blender/01_hero_clasp.png)
 
-Head panned 30°, left arm raised in a wave:
+Holding a pen-sized cylinder (Ø8 × 140 mm) against its middle, head turned 15°:
 
-[![Evokin v4 head turned 30 degrees, waving](renders/web/02_hero_head30_wave.jpg)](renders/blender/02_hero_head30_wave.png)
+[![evoKin V.01 clasping a pen](renders/web/02_clasp_pen.jpg)](renders/blender/02_clasp_pen.png)
 
 Cutaway of the printed shell, yaw stack, shoulder servos and speaker:
 
-[![Cutaway of the v4 mechanism](renders/web/03_cutaway.jpg)](renders/blender/03_cutaway.png)
+[![Cutaway of the V.01 mechanism](renders/web/03_cutaway.jpg)](renders/blender/03_cutaway.png)
 
-CAD, front 3/4 and front (arms at the −20° rest pose):
+CAD, clasping the Ø8 pen (front 3/4 and side):
 
-[![v4 CAD front 3/4](renders/web/v4_front34_assembly.jpg)](renders/cad/v4_front34_assembly.png)
+[![V.01 CAD clasping a pen](renders/web/v01_clasp_pen.jpg)](renders/cad/v01_clasp_pen.png)
 
-CAD, head panned +30° with the left arm at +60°:
+CAD, head panned +30° with the clasp open to 25 mm, and the clasp closed:
 
-[![v4 CAD head pan and wave](renders/web/v4_head30_wave.jpg)](renders/cad/v4_head30_wave.png)
+[![V.01 CAD clasp range and head pan](renders/web/v01_clasp_open_head30.jpg)](renders/cad/v01_clasp_open_head30.png)
 
-Shoulder, exploded (pod in the back shell, FS90MG, cap, horn, arm hub):
+Shoulder, exploded (pod in the back shell, FS90MG, cap, horn, arm hub — unchanged from v4):
 
-[![v4 shoulder exploded](renders/web/v4_shoulder_exploded.jpg)](renders/cad/v4_shoulder_exploded.png)
+[![V.01 shoulder exploded](renders/web/v01_shoulder_exploded.jpg)](renders/cad/v01_shoulder_exploded.png)
 
-Full-resolution PNGs live in [`renders/blender/`](renders/blender/) and [`renders/cad/`](renders/cad/). The Blender scene is [`renders/blender/evokin_v4_fur.blend`](renders/blender/evokin_v4_fur.blend).
+Full-resolution PNGs live in [`renders/blender/`](renders/blender/) and [`renders/cad/`](renders/cad/). The Blender scene is [`renders/blender/evokin_v01_fur.blend`](renders/blender/evokin_v01_fur.blend).
 
 A slightly more polished landing page, with the video playing inline, is in [`docs/index.html`](docs/index.html) (intended for GitHub Pages served from `/docs`).
 
@@ -43,28 +43,30 @@ A slightly more polished landing page, with the video playing inline, is in [`do
 Three metal-gear micro servos do all of the motion.
 
 - **Head pan.** An FS90MG in the `yaw_collar` turns a coupler blade in a slot in the head (unchanged from v3). A printed 0.8 mm thrust washer takes the axial load. Software clamps pan to ±42°; the printed hard stop is at about ±47° so it is never a running face. Head tilt is **not** fitted: there is no clean room for a second head servo beside the camera and its ribbon loop in the 64 mm head.
-- **Arms, direct drive.** One FS90MG per shoulder, case in a pod moulded into `torso_back`, held by a 4 mm `shoulder_bracket` cap (2 × M2.5). The horn sits in a pocket in the arm hub, with an axial M2.5×12 screw and two M2 horn screws. The arm swings about a left–right axis at y = 13, z = 60: 0° is straight forward, + is up. Software range is −55° (down and forward, paw 2.1 mm above the desk) to +70° (up, a wave); the STLs are exported at −20°.
-- **Fail-safe** is a requirement, not a finished feature. Direct drive has **no mechanical breakaway**: if a child forces an arm, the servo gears take the load. The electronics plan is to cut the 5 V servo rail when the arms are parked, or when the INA219 sees a stall, so the servos can back-drive. Paw force at stall is about 3.4 N at the paw (2.2 kg·cm at 63 mm), from the datasheet, not measured.
+- **Arms, direct drive.** One FS90MG per shoulder, case in a pod moulded into `torso_back`, held by a 4 mm `shoulder_bracket` cap (2 × M2.5). The horn sits in a pocket in the arm hub, with an axial M2.5×12 screw and two M2 horn screws. Both arms swing about the same left–right axis at y = 13, z = 60: 0° is straight forward, + is up. Software range is −45° to +30° per arm.
+- **Clasp around the middle (new in V.01).** Each arm is an L: the upper arm runs forward outside the fur, then the forearm turns inward across the front of the belly and runs 18 mm **past** the midline. Because both forearms sit at the same 71 mm radius from the shared shoulder axis, they overlap across the middle (36 mm) and close on each other like scissor blades when the left arm is above the right. The grip gap is set by the angle difference: about **1 mm** at the 7.5° interlock, **25 mm** at about 28°, roughly 0.85° per mm. Squeeze at datasheet stall is about **3.0 N** (2.2 kg·cm at r = 71 mm). No extra servo or part: the two arm servos push against each other.
+- **Interlock.** The blades cannot pass each other, so firmware must keep `armL − armR ≥ 7.5°` (left forearm always over the right). That also means the right arm can only rise as high as the left arm allows.
+- **Fail-safe** is a requirement, not a finished feature. Direct drive has **no mechanical breakaway**; the only compliance in the clasp is the fur on the forearm blades (about 4 mm of pile between them). The electronics plan is to cap and trip the 5 V servo rail with the INA219 when the clasp or an arm stalls or is forced, so the servos can back-drive. The clasp is a deliberate pinch point (about 3 N); keep fingers out.
 
 The shells close on a male/female registration lip (0.25 mm FDM clearance) with one fastener scheme: M2.5 at 2.8 mm clearance / 2.1 mm pilot. Print the [`stl/coupon.stl`](stl/coupon.stl) test piece first if you print anything.
 
-Naming: `arm_L` and `shoulder_bracket_L` are the **critter’s own left** (+x). Units are millimetres. The CAD frame is z up, −y face.
+Naming: `arm_L` and `shoulder_bracket_L` are the **critter’s own left** (+x); its forearm is the upper blade in the clasp. Units are millimetres. The CAD frame is z up, −y face.
 
 ## Bill of materials
 
-**Nothing has been bought.** Every price below is a planned or suggested figure in AUD, from November 2026 supplier quotes, and may be out of date. Fasteners, fur, foam, cord, a battery and filament are still unsourced. The full table, including unsourced lines and custom-board targets, is in [`BOM.csv`](BOM.csv).
+**Nothing has been bought.** Every price below is a planned or suggested figure in AUD, from November 2026 supplier quotes, and may be out of date. Fasteners, fur, a battery and filament are still unsourced. The full table, including unsourced lines and custom-board targets, is in [`BOM.csv`](BOM.csv).
 
 ### Priced mechanical (keep these)
 
 | ID | Item | Qty | Unit | Line | Supplier |
 |---|---|---:|---:|---:|---|
 | M1 | Feetech FS90MG (head pan) | 1 | 7.40 | 7.40 | Core Electronics |
-| M2 | Feetech FS90MG (left arm) | 1 | 7.40 | 7.40 | Core Electronics |
-| M3 | Feetech FS90MG (right arm, new in v4) | 1 | 7.40 | 7.40 | Core Electronics |
+| M2 | Feetech FS90MG (left arm + clasp) | 1 | 7.40 | 7.40 | Core Electronics |
+| M3 | Feetech FS90MG (right arm + clasp) | 1 | 7.40 | 7.40 | Core Electronics |
 | M13 | Adafruit 3351 mono enclosed speaker, 3 W 4 Ω | 1 | 8.95 | 8.95 | Core Electronics / [Adafruit](https://www.adafruit.com/product/3351) |
 | | **Subtotal** | | | **31.15** | |
 
-Official servo drawing: [`datasheets/FS90MG.pdf`](datasheets/FS90MG.pdf). The included M2.5×4 horn screw is too short for the yaw coupler — plan on an 8–10 mm M2.5 and measure the horn on arrival. Two M2.5×12 arm-hub screws, four M2 horn screws, sixteen M2.5 shell/cap screws, two M2 retainer screws, six servo-tab screws and the orange fur skin are on the BOM but **not yet sourced** and not priced.
+Official servo drawing: [`datasheets/FS90MG.pdf`](datasheets/FS90MG.pdf). The included M2.5×4 horn screw is too short for the yaw coupler — plan on an 8–10 mm M2.5 and measure the horn on arrival. Two M2.5×12 arm-hub screws, four M2 horn screws, sixteen M2.5 shell/cap screws, two M2 retainer screws, six servo-tab screws and the orange fur skin are on the BOM but **not yet sourced** and not priced. The V.01 clasp adds no parts.
 
 ### Electronics — pick one planned path
 
@@ -88,7 +90,7 @@ Official servo drawing: [`datasheets/FS90MG.pdf`](datasheets/FS90MG.pdf). The in
 | XL6009 boost, set to 5 V | 1 | 6.95 | AuscomTech |
 | PCA9685 16-channel I2C servo driver | 1 | not yet sourced | — |
 
-v4 needs **three** servo channels. Per the DFRobot wiki, the DFR1154 has only **GPIO43/44** free (the Gravity/UART port); the camera, PDM mic, amp, SD slot, IR LED, status LED and BOOT use the rest. So it **cannot drive three servos directly**. The plan is to run 43/44 as I2C to a PCA9685 servo driver (shared with the INA219). The XIAO ESP32S3 Sense does have enough: three servos, I2S amp and I2C INA219 use 8 of its 11 pins (D0–D10), leaving D8–D10 spare if the SD card is unused. The DFR1154 has no charger.
+V.01 needs **three** servo channels. Per the DFRobot wiki, the DFR1154 has only **GPIO43/44** free (the Gravity/UART port); the camera, PDM mic, amp, SD slot, IR LED, status LED and BOOT use the rest. So it **cannot drive three servos directly**. The plan is to run 43/44 as I2C to a PCA9685 servo driver (shared with the INA219). The XIAO ESP32S3 Sense does have enough: three servos, I2S amp and I2C INA219 use 8 of its 11 pins (D0–D10), leaving D8–D10 spare if the SD card is unused. The DFR1154 has no charger.
 
 Name-brand alternatives at Core Electronics: MAX98357A A$10.65, INMP441 A$12.30, BQ24074 breakout A$28.25, Pololu S13V20F5 A$29.55, INA219 A$17.30.
 
@@ -114,19 +116,19 @@ FDM in PLA or PETG is the intended process. No layer height or infill has been v
 | Yaw thrust washer | [stl/yaw_thrust_washer.stl](stl/yaw_thrust_washer.stl) | FDM, 0.8 mm. Print flat on the bed, no supports. ID 35, OD 43. | 1 |
 | Head front | [stl/head_front.stl](stl/head_front.stl) | FDM. Same lip/groove and M2.5 scheme as the torso. Camera and bezel seats. Unchanged. | 1 |
 | Head back | [stl/head_back.stl](stl/head_back.stl) | FDM. Print skirt-down. Underside is a 30°-from-vertical cone so a 35° support threshold should not land supports on a flat thrust face — the flat face is the washer. Unchanged. | 1 |
-| Arm L (critter’s left, +x) | [stl/arm_L.stl](stl/arm_L.stl) | FDM. **v4:** new forward-reaching arm with a Ø26 hub (horn pocket, Ø5.5 spline pocket, M2.5×12 axial screw, 2 × 1.7 mm horn pilots). Exported at −20°. Print on its flat outer face. | 1 |
-| Arm R (critter’s right, −x) | [stl/arm_R.stl](stl/arm_R.stl) | FDM. Mirror of arm L. | 1 |
+| Arm L (critter’s left, +x) | [stl/arm_L.stl](stl/arm_L.stl) | FDM, PETG preferred. **V.01:** L-shaped clasp arm. Ø26 hub (horn pocket, Ø5.5 spline pocket, M2.5×12 axial screw, 2 × 1.7 mm horn pilots), upper arm, then a 10 × 8 mm forearm blade across the belly to 18 mm past the midline. Exported at −15°. Print lying on the blade's broad side so the layers run along the blade. | 1 |
+| Arm R (critter’s right, −x) | [stl/arm_R.stl](stl/arm_R.stl) | FDM. Mirror of arm L. Exported at −25°. | 1 |
 | Shoulder cap L | [stl/shoulder_bracket_L.stl](stl/shoulder_bracket_L.stl) | FDM, 4 mm plate. **v4:** now a cap over the arm-servo pod; servo tabs screw into it (1.7 mm pilots), 2 × M2.5 (2.8 mm) into the pod. | 1 |
 | Shoulder cap R | [stl/shoulder_bracket_R.stl](stl/shoulder_bracket_R.stl) | FDM. Mirror of L. | 1 |
 | Eye bezel | [stl/bezel.stl](stl/bezel.stl) | FDM. Single bezel; print two (left and right are mirrors in the assembly). | 2 |
 | Shutter | [stl/shutter.stl](stl/shutter.stl) | FDM. Camera shutter. | 1 |
 | Test coupon (optional) | [stl/coupon.stl](stl/coupon.stl) | Print this first. Journal + skirt, washer, tab/pocket, FS90MG seat. | 1 |
 
-Removed in v4: `clasp_drum.stl`, the paw-pad foam templates, the clasp servo/horn dummies and `strap_env.stl`.
+V.01 changes only `arm_L` and `arm_R` (plus their fur sleeve proxies and the posed arm-horn dummies in `stl/reference/`); every other printable STL is geometrically unchanged from v4.
 
 ## Electronics overview
 
-The planned brain is an **ESP32-S3**, not the Raspberry Pi Zero that the tray dummy still describes. v4 needs **three servo PWM channels** (head pan, left arm, right arm). Two first-article paths are shortlisted above; a custom 65 × 55 mm board is a later target. See [`electronics/esp32-board-notes.md`](electronics/esp32-board-notes.md) for the block diagram, GPIO cautions, bring-up checklist and CAD-fit notes.
+The planned brain is an **ESP32-S3**, not the Raspberry Pi Zero that the tray dummy still describes. V.01 needs **three servo PWM channels** (head pan, left arm, right arm) — the clasp uses the two arm channels, so no fourth channel. Two first-article paths are shortlisted above; a custom 65 × 55 mm board is a later target. See [`electronics/esp32-board-notes.md`](electronics/esp32-board-notes.md) for the block diagram, GPIO cautions, bring-up checklist and CAD-fit notes.
 
 In short:
 
@@ -135,28 +137,28 @@ In short:
 - Audio: MAX98357A into the Adafruit 3351; I2S/PDM mic onboard or INMP441.
 - Power: a 5 V servo rail separate from 3.3 V, with bulk capacitance. Prefer BQ24074 over a bare TP4056, and TPS61088 (or a protected module) over MT3608 / a bare XL6009.
 - Servos: 3 × FS90MG, up to 2.4 A if all stall at once (3 × 0.8 A at 6 V). XIAO: three spare LEDC PWM pins confirmed. DFR1154: only GPIO43/44 free, so add a PCA9685 over I2C.
-- Fail-safe: INA219 on the servo rail plus an eFuse or load switch. Measure the real servo current before setting a trip.
+- Fail-safe: INA219 on the servo rail plus an eFuse or load switch; also use it to cap the clasp squeeze, since both arm servos can sit near stall while gripping. Measure the real servo current before setting a trip.
 
 ## Build notes
 
 CAD only. Do not treat these STLs as a fit-check or a print-ready kit.
 
 1. Print `stl/coupon.stl` first and check the journal running fit, the tab/pocket and the FS90MG seat.
-2. **Arm servos (each side).** Centre the servo electrically first. On the bench, screw the FS90MG tabs to the `shoulder_bracket` cap (self-tappers into the 1.7 mm pilots). Drop the servo into the pod in `torso_back` from outside, cap into its rebate, 2 × M2.5 into the pod. Press the horn on at the angle for arm −20°, screw the arm hub to the horn (2 × M2), then the M2.5×12 axial screw through the hub into the spline.
+2. **Arm servos (each side).** Centre the servo electrically first. On the bench, screw the FS90MG tabs to the `shoulder_bracket` cap (self-tappers into the 1.7 mm pilots). Drop the servo into the pod in `torso_back` from outside, cap into its rebate, 2 × M2.5 into the pod. Press the horn on at the angle for arm 0° (straight forward), screw the arm hub to the horn (2 × M2), then the M2.5×12 axial screw through the hub into the spline.
 3. **Tray.** Slide the tray tabs into the torso pockets and close the shells.
 4. **Head pan.** Drop the pan FS90MG into the collar hangers from below; self-tappers from below. Screw the collar onto the torso (M2.5 clearance in the collar, pilots in the torso). From above, through the Ø34 bore: horn, coupler, longer M2.5 horn screw. Drop the thrust washer onto the journal. Lower the head; retainers go in from the side into 1.7 mm pilots in the skirt.
 5. Close the torso and head shells on the registration lip; M2.5 from the front (2.8 mm) into the back (2.1 mm pilots).
-6. Keep the first electrical bring-up on a bench supply, with firmware clamps of ±42° (head) and −55°…+70° (arms) in place before the servos are powered. Portable power is unresolved.
+6. Keep the first electrical bring-up on a bench supply, with firmware clamps of ±42° (head), −45°…+30° (arms) and the clasp interlock `armL − armR ≥ 7.5°` in place before the servos are powered. Bring the left arm up first so the blades never meet edge-on. Portable power is unresolved.
 
 Detailed seats, clearances and FS90MG drawing flags are in [`cad/README.md`](cad/README.md). Rebuild from the OpenSCAD sources with:
 
 ```bash
 # from the repository root; needs OpenSCAD 2021.01+ and, for the audits, Python 3 with trimesh
 EXPORT_CHECK=1 bash scripts/build_stl.sh
-python3 scripts/sim_v4.py          # dense imposed-motion sweep, a few minutes
+python3 scripts/sim_v01.py         # imposed-motion sweep + clasp checks, about 6 minutes
 python3 scripts/fit_audit.py
-python3 scripts/metrics_v4.py
-python3 scripts/render_v4.py
+python3 scripts/metrics_v01.py
+python3 scripts/render_v01.py
 # or all of the above: bash scripts/run_all.sh
 # Blender fur renders: blender -b -P scripts/render_blender.py -- --final
 ```
@@ -165,22 +167,37 @@ Set `OPENSCAD=/path/to/openscad` if it is not on your `PATH`. `EXPORT_CHECK=1 ba
 
 ## Validation (CAD only)
 
-The v4 audit is measurements and an imposed-motion collision sweep on the exported STLs. **Nothing has been printed or physically tested.** Summary from [`results/validation_summary.json`](results/validation_summary.json):
+The V.01 audit is measurements and an imposed-motion collision sweep on the exported STLs. **Nothing has been printed or physically tested.** Summary from [`results/validation_summary.json`](results/validation_summary.json):
 
 | Check | Result |
 |---|---|
-| Fit-audit interfaces | **21 / 21 pass**, 0 marginal, 0 fail |
-| Imposed-motion sweep | 1,017 poses (head −48…+48°, each arm −80…+85°, plus a head × arm × arm grid), 245,097 pair tests, 22,712 booleans |
-| Rigid overlaps in travel | **0** (arms −55…+70°, head ±42°) |
+| Fit-audit interfaces | **23 / 23 pass**, 0 marginal, 0 fail |
+| Imposed-motion sweep | 988 poses (head −48…+48°, each arm −70…+60°, a head × arm × arm grid, and the clasp interlock edge), 238,108 pair tests, 64,792 booleans |
+| Rigid overlaps in travel | **0** (arms −45…+30° with `armL − armR ≥ 7.5°`, head ±42°) |
+| Clasp closure | forearms overlap 36 mm across the middle; rigid blade gap 0.98 mm at the interlock, up to 33 mm in travel; blades touch at ≈6.5° (outside travel) |
+| Grip clearance | Ø4, 8, 12, 20 and 25 mm test cylinders all fit between the blades inside travel at mean angles −30/−10/+10°, ≥0.57 mm clear of the torso shell and ≥23 mm clear of the head (a Ø20–25 object held low presses up to 2 mm into the belly fur) |
+| Grip force (datasheet, not measured) | ≈3.0 N squeeze at stall (2.2 kg·cm at 6 V, r = 71 mm); 2.9 N with the lower arm lifting its own weight |
 | Head pan hard stop | collar ↔ head contact at ±47°, 5° beyond the ±42° software clamp |
-| Arm clearances in travel | 0.6 mm to the shell and cap, 10.6 mm to the head, sleeve fur 0.58 mm off the torso fur; paw ≥ 2.1 mm above the desk |
+| Arm clearances in travel | 0.6 mm to the shell and cap, ≥17.8 mm to the head; forearm ≥4.5 mm above the desk and ≥6 mm under the eye bezels |
 | Pose transforms | posed STLs match the sweep's transforms to 0.0005 mm |
 | Printable meshes | Watertight |
-| Load (datasheet, not measured) | arm gravity torque 2.1 % of FS90MG stall; head pan accel. 6.7 % of stall for 60° in 0.12 s |
+| Load (datasheet, not measured) | arm gravity torque 4.2 % of FS90MG stall; head pan accel. 6.7 % of stall for 60° in 0.12 s |
 
-The 21 interfaces cover all three FS90MG seats, the arm hub / horn / cap clearance, the head pan joint and neck cable path, arm travel, torso and head seams, the yaw journal, thrust washer, retainers, coupler blade, tray tab pockets, speaker / amp / mic seats, the camera ribbon path, the board envelope, the test coupon, and mesh watertightness. Full tables: [`results/fit_audit_table.csv`](results/fit_audit_table.csv), [`results/fit_audit.json`](results/fit_audit.json), [`results/summary_sweep.json`](results/summary_sweep.json), [`results/metrics_v4.json`](results/metrics_v4.json).
+The 23 interfaces cover all three FS90MG seats, the arm hub / horn / cap clearance, the head pan joint and neck cable path, arm travel, clasp closure, grip clearance, torso and head seams, the yaw journal, thrust washer, retainers, coupler blade, tray tab pockets, speaker / amp / mic seats, the camera ribbon path, the board envelope, the test coupon, and mesh watertightness. Full tables: [`results/fit_audit_table.csv`](results/fit_audit_table.csv), [`results/fit_audit.json`](results/fit_audit.json), [`results/summary_sweep.json`](results/summary_sweep.json), [`results/metrics_v01.json`](results/metrics_v01.json).
 
 ## Changelog
+
+### V.01 — clasp around the middle
+
+- **The bear can hold onto things again.** The forward-facing arms now end in forearm blades that cross the front of the belly and overlap 36 mm across the middle. Closing the left arm down onto the right squeezes a pen, cable, small pole or strap between them.
+- **Grip gap** ≈1 mm (interlock) to 25 mm at Δ ≈ 28°, about 0.85° of arm-angle difference per mm. **Grip force** ≈3.0 N at datasheet stall torque; not measured.
+- **Still three FS90MG**, no new parts or fasteners: only `arm_L` and `arm_R` change. Shoulders, head pan, shells and tray are as in v4.
+- Arm travel is now −45°…+30° (was −55°…+70°): the forearm blade would hit the eye bezels above +30°. The high wave from v4 is gone.
+- Firmware interlock `armL − armR ≥ 7.5°`: the left blade always passes over the right.
+- Compliance is the fur on the blades only; there is still no mechanical breakaway.
+- New checks: clasp closure and grip clearance (23/23 fit audit, 0 rigid overlaps in a 988-pose sweep).
+- Project renamed **evoKin V.01**; repository moved to `Hewlbern/evoKin-V.01`; MIT licence only.
+- Concept videos **not** regenerated; they still show v3.
 
 ### v4 — forward-facing arms, motorised head pan
 
@@ -195,10 +212,11 @@ The 21 interfaces cover all three FS90MG seats, the arm hub / horn / cap clearan
 
 ## Status
 
-- **Prototype, CAD complete for v4.** Unprinted. Motion, arm force, fail-safe behaviour and wear are untested.
+- **Prototype, CAD complete for V.01.** Unprinted. Motion, grip force, fail-safe behaviour and wear are untested.
 - **Nothing has been ordered or purchased.** The electronics lines are a shortlist only.
 - Power is bench-tethered only. Portable power is unresolved.
-- Direct-drive arms have no mechanical breakaway; protection relies on a current trip that is not built.
+- Direct-drive arms have no mechanical breakaway; protection relies on a current trip that is not built. The clasp is a ~3 N pinch point.
+- The arms are coupled by the clasp interlock: the right arm can never rise above the left.
 - Horn size, tooth count (drawing says 20T; some Feetech pages say 21T), horn screw radius and the included screws must be measured on arrival.
 - The concept videos show the older v3 design.
 - **Not production, not child-ready, not waterproof.**
@@ -214,13 +232,13 @@ The clips in `media/` are generated concept videos, not footage of a built unit.
 ```
 README.md                 This page
 BOM.csv                   Full mechanical + electronics bill of materials
-cad/                      OpenSCAD source (critter_v4.scad) and the engineering note
+cad/                      OpenSCAD source (evokin_v01.scad) and the engineering note
 stl/                      Printable parts, plus reference/ dummies and proxies
 scripts/                  Export, fit audit, sweep, metrics, renders
 renders/                  Blender heroes, CAD stills, web-sized previews
 media/                    Concept videos and the README GIF preview
 electronics/              ESP32-S3 planning notes
 datasheets/               Official FS90MG drawing
-results/                  v4 validation JSON/CSV
+results/                  V.01 validation JSON/CSV
 docs/                     GitHub Pages landing page (serve from /docs)
 ```

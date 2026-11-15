@@ -1,17 +1,27 @@
-# Evokin CAD — v4 (forward-facing arms, motorised head pan)
+# evoKin V.01 CAD — clasp around the middle (forward-facing arms, motorised head pan)
 
 This is the detailed engineering note for the OpenSCAD model in this folder. The project README is one level up.
 
 
-**CAD only. Unprinted. Motion, arm force, fail-safe behaviour and wear are untested.
+**CAD only. Unprinted. Motion, grip force, fail-safe behaviour and wear are untested.
 Not production, not child-ready, not waterproof. Power is bench-tethered only.
 Do not treat these STLs as a fit-check or a print-ready kit.**
 
-Source: [`critter_v4.scad`](critter_v4.scad) (renamed from `critter_v3.scad`; v3 is in git history at `237c37d`). `v3_params.scad` and `scripts/design_params.py` are retired with the clasp.
+Source: [`evokin_v01.scad`](evokin_v01.scad) (renamed from `critter_v4.scad`; v4 is in git history at `d8b6367`, v3 at `237c37d`).
 
-## What changed vs v3
+## What changed vs v4 (V.01: clasp around the middle)
 
-- **Arms face forward.** v3 used one clasp servo, a cord drum and return elastics so the paws hugged backward around a strap at +y. v4 drops all of that: **one FS90MG per shoulder, direct drive**, arms swing about a left–right (x) axis at **y = 13, z = 60**. Angle convention: **0° = arm straight forward (−y), + = up**. Software clamp **−55° … +70°** (−55° leaves the paw 2.1 mm above the desk; −70° would hit it). STLs are exported at the **−20°** rest pose.
+- **Forearm blades.** Each arm is now an L. The upper arm runs forward outside the fur (x 52.5 … 60.5) to an elbow, then a forearm blade runs inward along −x across the front of the belly to **18 mm past the midline** (`FORE_TIP`). Blade cross-section: 10 mm radial (r 66 … 76 from the shoulder axis, `FORE_R = 71`, `FORE_DR = 10`) × 8 mm tangential (`FORE_T`), 2.5 mm edge radius. The elbow disc is no thicker than the blade, so a pen lies flat along it. Toe bumps removed.
+- **Scissor clasp.** Both blades sit at the same radius from the same axis, so they overlap 36 mm across x −18 … +18. With the left arm above the right, closing the angle difference Δ = armL − armR squeezes anything between the blades. Rigid gap ≈ (Δ − 6.62°) / 0.848 mm: **0.98 mm at the Δ = 7.5° interlock**, 25 mm at Δ ≈ 27.8°, up to 33 mm in travel. Blades touch at Δ ≈ 6.5°.
+- **Grip force** (datasheet stall 2.2 kg·cm at 6 V, both servos stalled, not measured): 3.27 N at r = 66, **3.04 N at r = 71**, 2.84 N at r = 76; 2.92 N at the pen pose after the lower arm's own weight. Suggested continuous hold ≤ 50 % (≈1.5 N).
+- **Interlock and clamps.** Firmware must keep **armL − armR ≥ 7.5°**. Software clamp is now **−45° … +30°** per arm: −45° keeps the forearm 4.5 mm off the desk; +30° keeps the blade top (z 100.5) under the eye bezels (z 106.5); first head contact is at +42°. STLs are exported at **armL −15°, armR −25°** (ARM_REST_L/R).
+- **Compliance.** The 2 mm fur sleeve on each blade (≈4 mm of pile between them) is the only give. No spring or breakaway part: a breakaway clutch would not fit the 26 mm hub without a new part, and a 4th servo for a hug axis does not fit inside the torso.
+- **Servo count unchanged (3).** No new parts or fasteners. Everything else is geometrically identical to v4.
+- New reference module `grip_pen(d, len)` for the Ø8 × 140 mm render/test cylinder.
+
+## What changed vs v3 (v4)
+
+- **Arms face forward.** v3 used one clasp servo, a cord drum and return elastics so the paws hugged backward around a strap at +y. v4 drops all of that: **one FS90MG per shoulder, direct drive**, arms swing about a left–right (x) axis at **y = 13, z = 60**. Angle convention: **0° = arm straight forward (−y), + = up**. v4 clamp was −55° … +70° at a −20° rest; V.01 changes it (above).
 - **Third FS90MG** (the second arm servo). Head pan servo unchanged.
 - **Head pan** unchanged from v3: FS90MG in the `yaw_collar`, coupler blade in a 2.7 mm slot in `head_back`, ±42° software clamp, hard stop ≈ ±47° (sweep confirms collar ↔ head contact at 47.0°). **No tilt**: a tilt axis would need a fourth servo and a gimbal inside the 64 mm head beside the camera and its FPC loop; it does not fit cleanly.
 - **Ears:** the model has no ears. The side shapes in earlier renders are the arms. Nothing changed.
@@ -25,11 +35,11 @@ Source: [`critter_v4.scad`](critter_v4.scad) (renamed from `critter_v3.scad`; v3
 | Cap (`shoulder_bracket_L/R`) | 4 mm plate, 43 × 16.8, servo tabs screw into it (1.7 mm pilots, blind) on the bench; boss passes through a Ø12.8 hole; 2 × M2.5 (2.8 mm) into the pod at ±19.3 |
 | Horn | assumed Ø24 × 2.0 disc/star on the boss, x 46.3 … 48.3 |
 | Arm hub | Ø26, x 46.6 … 52.6; horn pocket to 48.3; Ø5.5 spline pocket to 50.8; Ø3.2 through-hole for an **M2.5×12** axial screw, Ø5.5 counterbore; 2 × Ø1.7 horn pilots at an **assumed** r = 7 |
-| Beam | x 52.5 … 60.5, 52 mm to the paw, three toe bumps on the paw front |
-| Clearances | hub ↔ cap face 0.6 mm; arm ↔ shell min 0.6 mm in travel; arm ↔ head 10.6 mm |
-| Load | arm print 16.6 g (+4 g assumed sleeve, 1 g horn), gravity torque 0.046 kg·cm = 2.1 % of stall; paw force at stall ≈ 3.4 N at r = 63 |
+| Upper arm + forearm (V.01) | upper arm x 52.5 … 60.5 to the elbow at r ≈ 64; forearm blade r 66 … 76, 8 mm thick, from the elbow to x = ∓18 (past the midline) |
+| Clearances (V.01) | hub ↔ cap face 0.6 mm; arm ↔ shell min 0.6 mm in travel; arm ↔ head 17.8 mm; forearm ≥ 4.5 mm off the desk |
+| Load (V.01) | arm print 21.0 g (+4 g assumed sleeve, 1 g horn), gravity torque 0.092 kg·cm = 4.2 % of stall; blade force at stall ≈ 3.0 N at r = 71 |
 
-The shoulder bearing is the servo's own output bearing: the arm is cantilevered off the spline with no outboard support. Fine at 2 % of stall statically, but a child levering the arm loads the servo gears directly. There is **no breakaway**.
+The shoulder bearing is the servo's own output bearing: the arm is cantilevered off the spline with no outboard support. Fine at 4 % of stall statically, but a child levering the arm loads the servo gears directly. There is **no breakaway**.
 
 ### Other part changes
 
@@ -110,7 +120,13 @@ File: [`../datasheets/FS90MG.pdf`](../datasheets/FS90MG.pdf) (edition A/0, model
 
 `../stl/coupon.stl`: one plate with the journal + skirt (0.35 mm radial) + 0.8 mm washer, a 10 mm tab in a 10.6 mm pocket, and an FS90MG shelf with 27.7 mm span / 1.7 mm pilots. Print this first if you print at all. A passing coupon is **not** a full fit-check.
 
-## Parts that changed vs v3
+## Parts that changed vs v4 (V.01)
+
+**Geometrically changed — reprint these:** `arm_L`, `arm_R`. Reference only: `sleeve_proxy_L/R`, posed arm-horn dummies.
+
+**Unchanged:** everything else. Per-file volumes: `results/metrics_v01.json` → `changed_vs_v4`.
+
+## Parts that changed vs v3 (v4)
 
 **Geometrically changed — reprint these:** `torso_front`, `torso_back`, `tray`, `arm_L`, `arm_R`, `shoulder_bracket_L`, `shoulder_bracket_R` (now caps), `coupon` (tiny tab change).
 
@@ -118,17 +134,17 @@ File: [`../datasheets/FS90MG.pdf`](../datasheets/FS90MG.pdf) (edition A/0, model
 
 **Unchanged:** `head_front`, `head_back`, `yaw_collar`, `yaw_coupler`, `yaw_retainer_A/B`, `yaw_thrust_washer`, `bezel`, `shutter`.
 
-Per-file volumes: `results/metrics_v4.json` → `changed_vs_v3`. These STLs are CAD only.
+These STLs are CAD only.
 
 ## Rebuild / audit
 
 ```bash
 # from the repository root
 EXPORT_CHECK=1 bash scripts/build_stl.sh   # needs OpenSCAD 2021.01+; posed copies go to check/
-python3 scripts/sim_v4.py                  # imposed-motion sweep, ~1,000 poses, a few minutes
+python3 scripts/sim_v01.py                 # imposed-motion sweep + clasp checks, ~1,000 poses, ~6 minutes
 python3 scripts/fit_audit.py
-python3 scripts/metrics_v4.py
-python3 scripts/render_v4.py
+python3 scripts/metrics_v01.py
+python3 scripts/render_v01.py
 # or: bash scripts/run_all.sh
 ```
 
@@ -136,7 +152,10 @@ OpenSCAD 2021.01 or later. Set `OPENSCAD=/path/to/openscad` if it is not on your
 
 ## Residual blockers
 
-- Nothing here has been printed or assembled. The v4 audit is CAD measurements on exported STLs (21/21 fit-audit rows, 0 rigid overlaps in a 1,017-pose sweep).
+- Nothing here has been printed or assembled. The V.01 audit is CAD measurements on exported STLs (23/23 fit-audit rows, 0 rigid overlaps in a 988-pose sweep).
+- The clasp is a deliberate pinch point: it closes to ≈1 mm at ≈3 N. The blade interlock (armL − armR ≥ 7.5°) is firmware only; if it is skipped the blades crash edge-on.
+- Large objects (20–25 mm) sit between blade faces meeting at Δ ≈ 23–28°, so they are wedged outward; small objects grip best.
+- High wave is gone (arms max +30°), and the right arm can never rise above the left.
 - Direct-drive arms: no breakaway; the servo gears take any forced motion. Fail-safe relies on an INA219 trip and a load switch that are not built.
 - The arm is cantilevered on the servo's output bearing alone.
 - Shoulder pods poke up to 9.6 mm past the nominal 4 mm torso fur envelope; the fur pattern must cover them.

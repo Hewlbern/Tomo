@@ -7,7 +7,7 @@
   "servo_source": "Official Feetech FS90MG drawing p.5, edition A/0, 2021-04-30, \u00b10.1 mm. File copied to datasheets/FS90MG.pdf.",
   "horn": "ASSUMED typical 2.0 mm disc + 4-arm star, \u00d824. Not on the drawing. p.6 says No Accessories.",
   "spline_teeth": "Drawing and 6-9 say 20T/\u00d84.7; product pages say 21T. Measure on arrival.",
-  "arm_servos": "2\u00d7 FS90MG, one per arm, spline along x at y=13 z=60, direct drive on the horn (v4).",
+  "arm_servos": "2\u00d7 FS90MG, one per arm, spline along x at y=13 z=60, direct drive on the horn. Forearms overlap across the middle and clasp (V.01).",
   "speaker": "Adafruit 3351 Mono Enclosed 3W 4\u03a9, 70\u00d730\u00d717, Core A$8.95",
   "amp": "Adafruit 3006 MAX98357A 19.4\u00d717.8\u00d73.0",
   "mic": "Adafruit 3421 16.7\u00d712.7\u00d71.8 bottom-ported",
@@ -52,7 +52,7 @@
   {
    "interface": "Arm hub on horn / cap face clearance",
    "parts": "arm_L/R, dummy_horn_arm_L/R, shoulder_bracket_L/R",
-   "measured": "{'L': {'cap_face': np.float64(46.0), 'horn_inner': np.float64(46.3), 'arm_inner': np.float64(46.6), 'horn_to_cap': np.float64(0.3), 'hub_to_cap': np.float64(0.6), 'arm_horn_overlap': 0.0, 'arm_servo_overlap': 0.0}, 'R': {'cap_face': np.float64(46.0), 'horn_inner': np.float64(46.3), 'arm_inner': np.float64(46.6), 'horn_to_cap': np.float64(0.3), 'hub_to_cap': np.float64(0.6), 'arm_horn_overlap': -1.2126596023639042e-12, 'arm_servo_overlap': 0.0}}. Design: horn sits on the boss 0.3 mm proud of the cap face; hub face 0.6 mm off the cap; horn pocket \u00d825 to horn top; spline tip pocket \u00d85.5 to x=50.8; axial M2.5\u00d712 horn screw from the paw-side counterbore. Horn is an ASSUMED 2.0 mm / \u00d824 envelope.",
+   "measured": "{'L': {'cap_face': np.float64(46.0), 'horn_inner': np.float64(46.3), 'arm_inner': np.float64(46.6), 'horn_to_cap': np.float64(0.3), 'hub_to_cap': np.float64(0.6), 'arm_horn_overlap': 2.4253192047278085e-12, 'arm_servo_overlap': 0.0}, 'R': {'cap_face': np.float64(46.0), 'horn_inner': np.float64(46.3), 'arm_inner': np.float64(46.6), 'horn_to_cap': np.float64(0.3), 'hub_to_cap': np.float64(0.6), 'arm_horn_overlap': 1.2126596023639042e-12, 'arm_servo_overlap': 0.0}}. Design: horn sits on the boss 0.3 mm proud of the cap face; hub face 0.6 mm off the cap; horn pocket \u00d825 to horn top; spline tip pocket \u00d85.5 to x=50.8; axial M2.5\u00d712 horn screw from the paw-side counterbore. Horn is an ASSUMED 2.0 mm / \u00d824 envelope.",
    "verdict": "pass",
    "fix": "Measure the included horn; if its hub is taller than 2.0 mm, deepen the pocket. Horn-to-hub pilots at r=7 are assumed."
   },
@@ -143,7 +143,7 @@
   {
    "interface": "Head pan joint (motorised yaw, FS90MG in the collar)",
    "parts": "yaw_collar, yaw_coupler, head_back, head_front, dummy_servo_yaw, dummy_horn_yaw",
-   "measured": "Pan servo is the v3 collar FS90MG (unchanged): horn \u2192 coupler blade \u2192 slot in head_back. Software clamp \u00b142\u00b0 (84\u00b0 of the 180\u00b0 servo travel), hard stop \u2248 \u00b147\u00b0. Sweep: 1017 poses, rigid overlaps in travel = 0; first yaw stop contact {'yaw': 47.0, 'armL': -20.0, 'armR': -20.0, 'a': 'yaw_collar', 'b': 'head_back', 'vol_mm3': 0.619, 'compliant': ''}.",
+   "measured": "Pan servo is the v3 collar FS90MG (unchanged): horn \u2192 coupler blade \u2192 slot in head_back. Software clamp \u00b142\u00b0 (84\u00b0 of the 180\u00b0 servo travel), hard stop \u2248 \u00b147\u00b0. Sweep: 988 poses, rigid overlaps in travel = 0; first yaw stop contact {'yaw': 47.0, 'armL': -15.0, 'armR': -25.0, 'a': 'yaw_collar', 'b': 'head_back', 'vol_mm3': 0.619, 'compliant': ''}.",
    "verdict": "pass",
    "fix": "Tilt was not added: a nod yoke plus a 4th FS90MG does not fit cleanly in the 64 mm head beside the camera and FPC loop."
   },
@@ -157,9 +157,23 @@
   {
    "interface": "Arm travel (forward/up swing, direct drive)",
    "parts": "arm_L/R, sleeve_proxy_L/R, torso_back, fur_proxy_torso, head_front/back",
-   "measured": "Arm angle 0 = straight forward, + = up. Software clamp \u221255\u00b0..+70\u00b0 (125\u00b0 of the 180\u00b0 servo travel; \u221255\u00b0 keeps the paw off the desk). Sweep min clearances: {'arm_to_shell': 0.6, 'arm_to_cap': 0.6, 'arm_to_head': 10.62, 'sleeve_to_fur': 0.58, 'arm_lowest_z_mm': 2.1, 'sleeve_lowest_z_mm': 3.01, 'ok': True}.",
+   "measured": "Arm angle 0 = straight forward, + = up. Software clamp \u221245\u00b0..+30\u00b0 per arm, plus the clasp interlock armL \u2212 armR \u2265 7.5\u00b0 (the left forearm always passes over the right). \u221245\u00b0 keeps the forearm \u22652 mm off the desk; +30\u00b0 keeps it under the eye bezels. Sweep min clearances: {'arm_to_shell': 0.6, 'arm_to_cap': 0.6, 'arm_to_head': 17.83, 'sleeve_to_fur': -1.21, 'arm_lowest_z_mm': 4.49, 'sleeve_lowest_z_mm': 1.66, 'arm_top_z_under_bezels_mm': 100.53, 'ok': True}. First arm/head contact {'yaw': 0.0, 'armL': 42.0, 'armR': -25.0, 'a': 'head_front', 'b': 'arm_L', 'vol_mm3': 4.939, 'compliant': ''}.",
    "verdict": "pass",
-   "fix": "Direct drive: a child forcing the arm back-drives the FS90MG gear train. There is no breakaway yet."
+   "fix": "Direct drive: a child forcing an arm back-drives the FS90MG gear train. No mechanical breakaway."
+  },
+  {
+   "interface": "Clasp closure (forearms overlap across the middle)",
+   "parts": "arm_L, arm_R",
+   "measured": "Forearm blades overlap 35.96 mm in x across the midline. Rigid blade gap 0.98 mm at the interlock (\u0394 = 7.5\u00b0), 33.35 mm at the widest in-travel opening. Gap \u2248 (\u0394 \u2212 6.62\u00b0) / 0.848\u00b0/mm, the same at mean angles \u221230\u00b0, \u221210\u00b0 and +10\u00b0; 25 mm needs \u0394 \u2248 27.8\u00b0. Blade contact in the sweep at \u0394 \u2248 6.5\u00b0 (outside travel).",
+   "verdict": "pass",
+   "fix": "Firmware must enforce armL \u2212 armR \u2265 7.5\u00b0 before either servo moves; the blades cannot pass each other."
+  },
+  {
+   "interface": "Grip clearance (pen / cable / small pole in the clasp)",
+   "parts": "arm_L, arm_R, torso_front, torso_back, fur_proxy_torso, head_front/back",
+   "measured": "Test cylinders \u00d84/8/12/20/25 \u00d7 140 mm along x, centred between the blades at r = 71 mm, mean angles \u221230/\u221210/+10\u00b0: 15/15 reachable inside travel. Opening needed: \u00d84 \u2192 \u0394 9.65\u00b0, \u00d88 \u2192 \u0394 12.9\u00b0, \u00d812 \u2192 \u0394 16.15\u00b0, \u00d820 \u2192 \u0394 22.67\u00b0, \u00d825 \u2192 \u0394 26.83\u00b0. Worst clearance to the torso shell 0.57 mm, to the 4 mm torso fur -1.98 mm, to the head 23.33 mm.",
+   "verdict": "pass",
+   "fix": "Faces are flat and parallel to each blade, so they meet at an angle \u0394 (\u224813\u00b0 for a pen, \u224828\u00b0 at 25 mm): large objects are squeezed outward."
   },
   {
    "interface": "Test coupon",
@@ -177,8 +191,8 @@
   }
  ],
  "summary": {
-  "n": 21,
-  "pass_n": 21,
+  "n": 23,
+  "pass_n": 23,
   "marginal_n": 0,
   "fail_n": 0,
   "cad_only": true,

@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: MIT
 #!/usr/bin/env python3
-"""Photoreal Cycles renders of Evokin v4 (orange furry teddy, forward-facing arms, head pan).
+"""Photoreal Cycles renders of evoKin V.01 (orange furry teddy, clasp around the middle, head pan).
 
-STLs are in millimetres, Z-up, -Y face, exported at yaw=0, both arms at -20° (0 = forward, + = up).
+STLs are in millimetres, Z-up, -Y face, exported at yaw=0, arm L -15°, arm R -25° (0 = forward, + = up).
 This script scales them 0.001 (Blender metres) and poses moving parts with the
-same imposed kinematics as scripts/sim_v4.py.
+same imposed kinematics as scripts/sim_v01.py.
 
 Usage (from any cwd):
   blender -b -P render_blender.py -- --preview
   blender -b -P render_blender.py -- --final
-  blender -b -P render_blender.py -- --shot hero_forward --final
+  blender -b -P render_blender.py -- --shot clasp_pen --final
 """
 from __future__ import annotations
 
@@ -35,15 +35,19 @@ def resolve_stl(filename):
         if candidate.is_file():
             return candidate
     raise FileNotFoundError(f"{name} not found under {STL}")
-BLEND = OUT / "evokin_v4_fur.blend"
+BLEND = OUT / "evokin_v01_fur.blend"
 S = 0.001  # mm -> m
 
 # Official / CAD numbers (mm)
 EYE_X, EYE_Z, HD = 13.0, 120.0, 74.0
 # Flange just proud of the head surface (~y=-35.1 at the eye)
 BEZEL_Y = -36.2
-SH = (0.0, 13.0, 60.0)      # v4 shoulder axis (x direction) through y=13, z=60
-ARM_REST = -20.0            # STL export pose (deg); 0 = forward, + = up
+SH = (0.0, 13.0, 60.0)      # shoulder axis (x direction) through y=13, z=60
+REST_L, REST_R = -15.0, -25.0   # STL export pose (deg); 0 = forward, + = up
+ARM_REST = REST_L
+FORE_R = 71.0               # forearm blade centre radius from the shoulder axis
+CLASP_L, CLASP_R = -6.25, -13.75    # closed clasp: interlock delta 7.5° at mean -10° (≈1 mm blade gap)
+PEN_L, PEN_R = -3.55, -16.45        # Ø8 pen between the blades at mean -10° (from results/summary_sweep.json)
 
 HEAD_PARTS = {
     "head_back", "head_front", "yaw_coupler", "yaw_retainer_A", "yaw_retainer_B",
@@ -73,7 +77,7 @@ def parse_args():
     p.add_argument("--preview", action="store_true")
     p.add_argument("--final", action="store_true")
     p.add_argument("--shot", default="all",
-                   choices=["all", "hero_forward", "hero_head30", "cutaway"])
+                   choices=["all", "hero_clasp", "clasp_pen", "cutaway"])
     p.add_argument("--samples", type=int, default=0)
     p.add_argument("--width", type=int, default=0)
     p.add_argument("--skip-hair", action="store_true")
@@ -115,9 +119,9 @@ def pose_matrix(name, yaw, arm_l, arm_r):
     if name in HEAD_PARTS:
         return rot_z_about(yaw, (0, 0, 0))
     if name in ARM_L_PARTS:
-        return rot_x_about(-(arm_l - ARM_REST), SH)
+        return rot_x_about(-(arm_l - REST_L), SH)
     if name in ARM_R_PARTS:
-        return rot_x_about(-(arm_r - ARM_REST), SH)
+        return rot_x_about(-(arm_r - REST_R), SH)
     return Matrix.Identity(4)
 
 
@@ -599,23 +603,14 @@ def inflate_mesh(obj, offset_m):
 
 
 def make_solid_arm_emitter(src, name):
-    """Closed plump sock from the printed arm: convex hull + voxel remesh.
+    """Plump sock from the printed arm: voxel remesh + light smooth + 2 mm inflate.
 
-    The CAD arm is a thin open linkage. Emitting hair from its inner and
-    outer faces made a ghostly cloud, and a flat inner plate read as a
-    pale slab. A solid hull gives a teddy-like volume with one outer skin.
+    V.01 arms are an L (upper arm + forearm blade across the belly), so a convex
+    hull would fill the triangle in front of the body. Remesh the solid arm itself.
     """
     import bmesh
     bm = bmesh.new()
     bm.from_mesh(src.data)
-    ret = bmesh.ops.convex_hull(bm, input=bm.verts[:], use_existing_faces=False)
-    hull_faces = [g for g in ret.get("geom", []) if isinstance(g, bmesh.types.BMFace)]
-    keep = set()
-    for f in hull_faces:
-        keep.update(f.verts)
-    stray = [v for v in bm.verts if v not in keep]
-    if stray:
-        bmesh.ops.delete(bm, geom=stray, context="VERTS")
     mesh = bpy.data.meshes.new(name + "_mesh")
     bm.to_mesh(mesh)
     bm.free()
@@ -637,7 +632,7 @@ def make_solid_arm_emitter(src, name):
         print("remesh apply failed", e, flush=True)
     sm = em.modifiers.new("arm_smooth", "SMOOTH")
     sm.factor = 1.0
-    sm.iterations = 20
+    sm.iterations = 6
     try:
         bpy.ops.object.modifier_apply(modifier="arm_smooth")
     except Exception as e:
@@ -747,8 +742,8 @@ def build_assembly(skip_hair=False, preview=False):
         def pred(pt):
             x, y, z = pt
             # No hair on the inner face of the hub (it sits 0.6 mm off the shoulder cap);
-            # coat the outer face, beam and paw.
-            if abs(x) < 51.5:
+            # coat the upper arm, elbow and the forearm blade across the belly.
+            if abs(x) < 51.5 and ((y - SH[1]) ** 2 + (z - SH[2]) ** 2) ** 0.5 < 16.0:
                 return 0.0
             return 1.0
         return pred
@@ -801,7 +796,7 @@ def build_assembly(skip_hair=False, preview=False):
     return objs, mats
 
 
-def apply_pose(objs, yaw, arm_l=ARM_REST, arm_r=ARM_REST):
+def apply_pose(objs, yaw, arm_l=REST_L, arm_r=REST_R):
     for name, obj in objs.items():
         if name.startswith("_") or not hasattr(obj, "matrix_world"):
             continue
@@ -840,7 +835,7 @@ def stash_rest(objs):
         REST_MW[name] = obj.matrix_world.copy()
 
 
-def apply_pose_v2(objs, yaw, arm_l=ARM_REST, arm_r=ARM_REST):
+def apply_pose_v2(objs, yaw, arm_l=REST_L, arm_r=REST_R):
     for name, obj in objs.items():
         if name.startswith("_") or not hasattr(obj, "matrix_world"):
             continue
@@ -1126,6 +1121,21 @@ def render_shot(path):
     print(f"WROTE {path} exists={Path(path).exists()} size={Path(path).stat().st_size if Path(path).exists() else 0}", flush=True)
 
 
+def make_pen(arm_l, arm_r, d_mm=8.0, len_mm=140.0):
+    """Ø8 × 140 mm pen-sized test cylinder along x between the forearm blades (same placement as sim_v01)."""
+    mean = math.radians((arm_l + arm_r) / 2.0)
+    y = SH[1] - FORE_R * math.cos(mean)
+    z = SH[2] + FORE_R * math.sin(mean)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=48, radius=d_mm / 2000.0, depth=len_mm / 1000.0,
+                                        location=mm(0, y, z), rotation=(0, math.pi / 2, 0))
+    pen = bpy.context.active_object
+    pen.name = "grip_pen"
+    assign(pen, mat_plastic("PenBlue", hex_lin("1F4E9A"), rough=0.25, spec=0.6))
+    for p in pen.data.polygons:
+        p.use_smooth = True
+    return pen
+
+
 def main():
     args = parse_args()
     preview = bool(args.preview) and not bool(args.final)
@@ -1138,7 +1148,7 @@ def main():
     else:
         samples = 24 if preview else 128
 
-    print(f"=== evokin v4 blender  preview={preview} width={width} samples={samples} shot={args.shot}", flush=True)
+    print(f"=== evoKin V.01 blender  preview={preview} width={width} samples={samples} shot={args.shot}", flush=True)
     reset_scene()
     objs, mats = build_assembly(skip_hair=args.skip_hair, preview=preview)
     stash_rest(objs)
@@ -1162,29 +1172,34 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     # save an unposed-ready blend once the studio is up (will re-save after)
     tag = "preview" if preview else "final"
-    shots = ["hero_forward", "hero_head30", "cutaway"] if args.shot == "all" else [args.shot]
+    shots = ["hero_clasp", "clasp_pen", "cutaway"] if args.shot == "all" else [args.shot]
+    pen = make_pen(PEN_L, PEN_R)
 
     for shot in shots:
-        if shot == "hero_forward":
-            apply_pose_v2(objs, yaw=0, arm_l=ARM_REST, arm_r=ARM_REST)
+        pen.hide_render = True
+        if shot == "hero_clasp":
+            # paws overlapped across the middle, clasp closed
+            apply_pose_v2(objs, yaw=0, arm_l=CLASP_L, arm_r=CLASP_R)
             set_cutters(objs, False)
             set_mode_hero(objs)
-            path = OUT / ("01_hero_forward_preview.png" if preview else "01_hero_forward.png")
-        elif shot == "hero_head30":
-            # head panned +30° (toward its own left = toward the camera), left arm up in a wave
-            apply_pose_v2(objs, yaw=30, arm_l=60, arm_r=ARM_REST)
+            path = OUT / ("01_hero_clasp_preview.png" if preview else "01_hero_clasp.png")
+        elif shot == "clasp_pen":
+            # holding a Ø8 × 140 mm pen against the middle, head turned a little toward the camera
+            apply_pose_v2(objs, yaw=15, arm_l=PEN_L, arm_r=PEN_R)
+            pen.hide_render = False
             set_cutters(objs, False)
             set_mode_hero(objs)
-            path = OUT / ("02_hero_head30_wave_preview.png" if preview else "02_hero_head30_wave.png")
+            path = OUT / ("02_clasp_pen_preview.png" if preview else "02_clasp_pen.png")
         else:
-            apply_pose_v2(objs, yaw=0, arm_l=0, arm_r=0)
+            apply_pose_v2(objs, yaw=0, arm_l=CLASP_L, arm_r=CLASP_R)
             set_mode_cutaway(objs, mats)
             set_cutters(objs, True)
             path = OUT / ("03_cutaway_preview.png" if preview else "03_cutaway.png")
         render_shot(path)
 
-    # restore the forward hero pose in the blend
-    apply_pose_v2(objs, yaw=0)
+    # restore the clasped hero pose in the blend
+    pen.hide_render = True
+    apply_pose_v2(objs, yaw=0, arm_l=CLASP_L, arm_r=CLASP_R)
     set_cutters(objs, False)
     set_mode_hero(objs)
     bpy.ops.wm.save_as_mainfile(filepath=str(BLEND))

@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Evokin — an open-source plush robot companion</title>
-  <meta name="description" content="Evokin is a small orange, Mirumi-style plush robot whose head pans and whose arms reach forward and up. Open-source CAD, STLs and a planned ESP32-S3 brain.">
-  <meta property="og:title" content="Evokin">
+  <title>evoKin V.01 — an open-source plush robot companion</title>
+  <meta name="description" content="evoKin V.01 is a small orange, Mirumi-style plush robot whose head pans and whose forward-facing arms clasp around its middle to hold onto things. Open-source CAD, STLs and a planned ESP32-S3 brain.">
+  <meta property="og:title" content="evoKin V.01">
   <meta property="og:description" content="An open-source plush robot companion. Head pans, arms hug and wave.">
   <meta property="og:image" content="media/evokin_poster.jpg">
   <link rel="icon" type="image/jpeg" href="media/evokin_poster.jpg">
@@ -207,11 +207,11 @@
     <section class="hero">
       <div class="wrap">
         <p class="kicker">Open-source plush robot</p>
-        <h1>A small orange bear that turns its head and reaches out to hug or wave.</h1>
-        <p class="lede">Evokin is a Mirumi-style companion: a furry shell around a motorised head-pan joint and two forward-facing arms, three Feetech FS90MG servos, and a planned ESP32-S3 brain with a camera and a voice.</p>
+        <h1>A small orange bear that turns its head and clasps its arms around its middle to hold onto things.</h1>
+        <p class="lede">evoKin V.01 is a Mirumi-style companion: a furry shell around a motorised head-pan joint and two forward-facing arms whose paws overlap across the belly to hold a pen, cable, small pole or strap, three Feetech FS90MG servos, and a planned ESP32-S3 brain with a camera and a voice.</p>
         <div class="flags">
-          <span class="flag">v4 CAD</span>
-          <span class="flag">21 / 21 CAD checks passed</span>
+          <span class="flag">V.01 CAD</span>
+          <span class="flag">23 / 23 CAD checks passed</span>
           <span class="flag alert">Prototype — nothing printed or purchased</span>
           <span class="flag alert">Not child-ready</span>
         </div>
@@ -221,35 +221,39 @@
             Your browser cannot play this video. <a href="media/evokin_demo_ad_v3_real.mp4">Download the MP4</a>.
           </video>
         </div>
-        <p class="caption">A 10-second generated concept advertisement, not footage of a built unit, and it still shows the older v3 design (backward clasping arms). The CAD and the renders below are the design source of truth. Earlier takes live in the repository’s <code>media/</code> folder.</p>
+        <p class="caption">A 10-second generated concept advertisement, not footage of a built unit, and it still shows the older v3 design (arms clasping backward around a strap), not V.01. The CAD and the renders below are the design source of truth. Earlier takes live in the repository’s <code>media/</code> folder.</p>
       </div>
     </section>
 
     <section id="looks">
       <div class="wrap">
         <h2>How it looks</h2>
-        <p class="sub">Blender Cycles renders of the v4 fur model, plus CAD stills of the mechanism. Click for the same frame at this page’s resolution; full-size PNGs are in the repository.</p>
+        <p class="sub">Blender Cycles renders of the V.01 fur model, plus CAD stills of the mechanism. Click for the same frame at this page’s resolution; full-size PNGs are in the repository.</p>
         <div class="gallery">
           <figure>
-            <a href="renders/01_hero_forward.jpg"><img src="renders/01_hero_forward.jpg" width="960" height="720" alt="Evokin, an orange furry bear-like robot, front three-quarter view with both arms reaching forward"></a>
-            <figcaption>Front 3/4, arms forward.</figcaption>
+            <a href="renders/01_hero_clasp.jpg"><img src="renders/01_hero_clasp.jpg" width="960" height="720" alt="evoKin V.01, an orange furry bear-like robot, front three-quarter view with its forearms crossed and overlapped across its belly"></a>
+            <figcaption>Front 3/4, clasp closed: paws overlap across the middle.</figcaption>
           </figure>
           <figure>
-            <a href="renders/02_hero_head30_wave.jpg"><img src="renders/02_hero_head30_wave.jpg" width="960" height="720" alt="Evokin with its head turned 30 degrees and its left arm raised in a wave"></a>
-            <figcaption>Head panned 30°, left arm up in a wave.</figcaption>
+            <a href="renders/02_clasp_pen.jpg"><img src="renders/02_clasp_pen.jpg" width="960" height="720" alt="evoKin V.01 holding a blue pen-sized cylinder against its belly between its two forearms, head turned 15 degrees"></a>
+            <figcaption>Holding a Ø8 × 140 mm pen against its middle.</figcaption>
           </figure>
           <figure>
-            <a href="renders/03_cutaway.jpg"><img src="renders/03_cutaway.jpg" width="960" height="720" alt="Colour-coded cutaway of Evokin showing the head, yaw stack, shoulder servos, speaker and arms"></a>
+            <a href="renders/03_cutaway.jpg"><img src="renders/03_cutaway.jpg" width="960" height="720" alt="Colour-coded cutaway of evoKin V.01 showing the head, yaw stack, shoulder servos, speaker and clasp arms"></a>
             <figcaption>Cutaway of the printed shell, yaw stack, shoulder servos and speaker.</figcaption>
           </figure>
           <figure>
-            <a href="renders/v4_head30_wave.jpg"><img src="renders/v4_head30_wave.jpg" width="960" height="540" alt="CAD view of Evokin v4 with the head panned 30 degrees and the left arm raised"></a>
-            <figcaption>CAD: head pan +30°, left arm +60°.</figcaption>
+            <a href="renders/v01_clasp_open_head30.jpg"><img src="renders/v01_clasp_open_head30.jpg" width="960" height="540" alt="CAD view of evoKin V.01 with the head panned 30 degrees and the clasp open to 25 mm, beside the clasp closed"></a>
+            <figcaption>CAD: head pan +30° with the clasp open to 25 mm; clasp closed.</figcaption>
           </figure>
         </div>
         <figure class="wide">
-          <a href="renders/v4_shoulder_exploded.jpg"><img src="renders/v4_shoulder_exploded.jpg" width="960" height="540" alt="Exploded CAD view of the v4 shoulder: pod, servo, cap, horn and arm hub"></a>
-          <figcaption>Shoulder, exploded: pod in the back shell, FS90MG, cap, horn, arm hub.</figcaption>
+          <a href="renders/v01_clasp_pen.jpg"><img src="renders/v01_clasp_pen.jpg" width="960" height="540" alt="CAD views of the V.01 forearm blades squeezing a pen-sized cylinder"></a>
+          <figcaption>CAD: the two forearm blades squeeze the pen like scissors.</figcaption>
+        </figure>
+        <figure class="wide">
+          <a href="renders/v01_shoulder_exploded.jpg"><img src="renders/v01_shoulder_exploded.jpg" width="960" height="540" alt="Exploded CAD view of the shoulder: pod, servo, cap, horn and arm hub"></a>
+          <figcaption>Shoulder, exploded (unchanged from v4): pod in the back shell, FS90MG, cap, horn, arm hub.</figcaption>
         </figure>
       </div>
     </section>
@@ -265,11 +269,15 @@
           </article>
           <article class="card">
             <h3>Forward-facing arms</h3>
-            <p>One FS90MG per shoulder, direct drive, in a pod moulded into the back shell. 0° is straight forward and + is up: software range −55° to +70°, for a hug or a wave. Paw force at stall is about 3.4&nbsp;N (datasheet, not measured).</p>
+            <p>One FS90MG per shoulder, direct drive, in a pod moulded into the back shell. Both arms turn on the same left–right axis; 0° is straight forward and + is up. Software range −45° to +30°.</p>
+          </article>
+          <article class="card">
+            <h3>Clasp around the middle (new in V.01)</h3>
+            <p>Each forearm turns inward across the belly and runs 18&nbsp;mm past the midline, so the paws overlap by 36&nbsp;mm. Lowering the left arm onto the right closes the blades like scissors: gap about 1&nbsp;mm to 25&nbsp;mm (≈0.85° per mm), squeeze about 3.0&nbsp;N at datasheet stall torque, not measured. No extra servo or part. Firmware keeps the left arm at least 7.5° above the right.</p>
           </article>
           <article class="card">
             <h3>Fail-safe</h3>
-            <p>Direct drive has no mechanical breakaway. The plan is to cut the 5&nbsp;V servo rail when the arms are parked, or when a current sensor sees a stall, so the servos can back-drive and the arms go limp. That trip is not built yet.</p>
+            <p>Direct drive has no mechanical breakaway; the only compliance in the clasp is the fur on the blades. The clasp is a deliberate pinch point (about 3&nbsp;N). The plan is to cap grip current and cut the 5&nbsp;V servo rail when a current sensor sees a stall or a forced arm, so the servos back-drive and the arms go limp. That trip is not built yet.</p>
           </article>
           <article class="card">
             <h3>Shells and fasteners</h3>
@@ -293,8 +301,8 @@
             </thead>
             <tbody>
               <tr><td>Feetech FS90MG (head pan)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
-              <tr><td>Feetech FS90MG (left arm)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
-              <tr><td>Feetech FS90MG (right arm, new in v4)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
+              <tr><td>Feetech FS90MG (left arm + clasp)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
+              <tr><td>Feetech FS90MG (right arm + clasp)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
               <tr><td>Adafruit 3351 mono enclosed speaker, 3&nbsp;W 4&nbsp;Ω</td><td class="num">1</td><td class="num">8.95</td><td class="num">8.95</td><td>Core Electronics / Adafruit</td></tr>
             </tbody>
             <tfoot>
@@ -368,7 +376,7 @@
               <tr><td>Yaw coupler</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/yaw_coupler.stl">yaw_coupler.stl</a></td><td>2.0 mm blade. Needs a longer M2.5 horn screw.</td><td class="num">1</td></tr>
               <tr><td>Thrust washer</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/yaw_thrust_washer.stl">yaw_thrust_washer.stl</a></td><td>0.8 mm. Print flat, no supports.</td><td class="num">1</td></tr>
               <tr><td>Head front / back</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/head_front.stl">head_front.stl</a>, <a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/head_back.stl">head_back.stl</a></td><td>Back prints skirt-down, 30° cone.</td><td class="num">1+1</td></tr>
-              <tr><td>Arms L / R</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/arm_L.stl">arm_L.stl</a>, <a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/arm_R.stl">arm_R.stl</a></td><td>Critter’s own left is +x. Forward-reaching, hub screws to the servo horn. Exported at −20°.</td><td class="num">1+1</td></tr>
+              <tr><td>Arms L / R</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/arm_L.stl">arm_L.stl</a>, <a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/arm_R.stl">arm_R.stl</a></td><td>Critter’s own left is +x. V.01 L-shaped clasp arm: hub screws to the servo horn, forearm blade crosses the belly to 18 mm past the midline. Exported at −15° (L) / −25° (R). Print on the blade’s broad side, PETG preferred.</td><td class="num">1+1</td></tr>
               <tr><td>Shoulder caps</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/shoulder_bracket_L.stl">L</a>, <a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/shoulder_bracket_R.stl">R</a></td><td>4 mm plate; arm servo screws to it, 2 × M2.5 into the pod.</td><td class="num">1+1</td></tr>
               <tr><td>Eye bezel</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/bezel.stl">bezel.stl</a></td><td>Print two (left and right are mirrors).</td><td class="num">2</td></tr>
               <tr><td>Shutter</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/shutter.stl">shutter.stl</a></td><td>Camera shutter.</td><td class="num">1</td></tr>
@@ -382,7 +390,7 @@
     <section id="electronics">
       <div class="wrap">
         <h2>Electronics</h2>
-        <p class="sub">The planned brain is an ESP32-S3, not the Raspberry Pi Zero still drawn as a tray dummy in the CAD. v4 needs three servo PWM channels. Planning notes, GPIO cautions and a bring-up checklist are in <a href="https://github.com/Hewlbern/evoKin-V.01/blob/main/electronics/esp32-board-notes.md">electronics/esp32-board-notes.md</a>.</p>
+        <p class="sub">The planned brain is an ESP32-S3, not the Raspberry Pi Zero still drawn as a tray dummy in the CAD. V.01 needs three servo PWM channels; the clasp uses the two arm channels. Planning notes, GPIO cautions and a bring-up checklist are in <a href="https://github.com/Hewlbern/evoKin-V.01/blob/main/electronics/esp32-board-notes.md">electronics/esp32-board-notes.md</a>.</p>
         <div class="grid-2">
           <article class="card">
             <h3>Prototype paths</h3>
@@ -406,16 +414,19 @@
     <section id="validation">
       <div class="wrap">
         <h2>Validation and status</h2>
-        <p class="sub">The v4 audit is CAD measurements and an imposed-motion collision sweep on the exported STLs. Nothing has been printed or physically tested.</p>
+        <p class="sub">The V.01 audit is CAD measurements and an imposed-motion collision sweep on the exported STLs. Nothing has been printed or physically tested.</p>
         <div class="scroll">
           <table>
             <thead><tr><th>Check</th><th>Result</th></tr></thead>
             <tbody>
-              <tr><td>Fit-audit interfaces</td><td class="ok">21 / 21 pass, 0 marginal, 0 fail</td></tr>
-              <tr><td>Imposed-motion sweep</td><td>1,017 poses, 245,097 pair tests, 22,712 booleans</td></tr>
-              <tr><td>Rigid overlaps in travel</td><td class="ok">0 (arms −55…+70°, head ±42°)</td></tr>
+              <tr><td>Fit-audit interfaces</td><td class="ok">23 / 23 pass, 0 marginal, 0 fail</td></tr>
+              <tr><td>Imposed-motion sweep</td><td>988 poses, 238,108 pair tests, 64,792 booleans</td></tr>
+              <tr><td>Rigid overlaps in travel</td><td class="ok">0 (arms −45…+30° with armL − armR ≥ 7.5°, head ±42°)</td></tr>
+              <tr><td>Clasp closure</td><td class="ok">Blades overlap 36 mm; gap 0.98 mm closed, up to 33 mm open</td></tr>
+              <tr><td>Grip clearance</td><td class="ok">Ø4–25 mm test cylinders all fit in travel, ≥ 0.57 mm off the shell</td></tr>
+              <tr><td>Grip force (datasheet)</td><td>≈ 3.0 N at stall; not measured</td></tr>
               <tr><td>Head pan hard stop</td><td>Collar ↔ head contact at ±47°, beyond the ±42° clamp</td></tr>
-              <tr><td>Arm clearances</td><td>0.6 mm to shell and cap, 10.6 mm to head; paw ≥ 2.1 mm above the desk</td></tr>
+              <tr><td>Arm clearances</td><td>0.6 mm to shell and cap, 17.8 mm to head; forearm ≥ 4.5 mm above the desk</td></tr>
               <tr><td>Printable meshes</td><td class="ok">Watertight</td></tr>
             </tbody>
           </table>
@@ -423,8 +434,9 @@
         <div class="card" style="margin-top:18px">
           <h3>Status</h3>
           <ul>
-            <li>Prototype. v4 CAD is complete and unprinted. Motion, arm force, fail-safe behaviour and wear are untested.</li>
+            <li>Prototype. V.01 CAD is complete and unprinted. Motion, grip force, fail-safe behaviour and wear are untested.</li>
             <li>The concept video still shows the v3 design.</li>
+            <li>The clasp is a ~3 N pinch point with no mechanical breakaway.</li>
             <li>Nothing has been ordered or purchased.</li>
             <li>Power is bench-tethered only. Portable power is unresolved.</li>
             <li>Not production, not child-ready, not waterproof.</li>

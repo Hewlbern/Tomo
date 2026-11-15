@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""v4 fit audit. CAD measurements on exported STLs. Not physically tested."""
+"""evoKin V.01 fit audit. CAD measurements on exported STLs. Not physically tested."""
 import numpy as np, trimesh, json, csv, os, math
 os.chdir(os.path.dirname(os.path.abspath(__file__))+"/..")
 import sys
@@ -103,7 +103,7 @@ FS=dict(body_L=22.5,body_W=12.1,body_H=22.4,tab=32.3,span=27.7,hole=2.2,
 
 # ---------- 1. Servo seats ----------
 s_off=2.55; span=27.7
-# v4 geometry (cad/critter_v4.scad): shoulder axis y=13 z=60, arm-servo case top |x|=42, cap 42..46.
+# shoulder geometry (cad/evokin_v01.scad, unchanged from v4): shoulder axis y=13 z=60, arm-servo case top |x|=42, cap 42..46.
 SH_Y,SH_Z,XC,CAP_T=13.0,60.0,42.0,4.0
 BODY_Z=SH_Z-s_off          # servo long axis runs along world z; body centre 2.55 below the spline
 def ok_pil(h): return h and 1.55<=h["dia"]<=1.90
@@ -148,7 +148,9 @@ add("Yaw servo seat (FS90MG, official 27.7 span, 1.7 pilots)",
 hub={}
 for side,sx in (("L",1),("R",-1)):
     arm=M[f"arm_{side}"]; horn=M[f"dummy_horn_arm_{side}"]; pod=M["torso_back"]; cap=M[f"shoulder_bracket_{side}"]
-    ab=arm.bounds; hb=horn.bounds; cb=cap.bounds
+    # V.01: the forearm crosses the midline, so take the hub face from arm vertices near the shoulder axis only
+    av=arm.vertices; near=np.hypot(av[:,1]-SH_Y,av[:,2]-SH_Z)<=13.5; ab=np.array([av[near].min(0),av[near].max(0)])
+    hb=horn.bounds; cb=cap.bounds
     if sx>0: arm_in=ab[0][0]; horn_in=hb[0][0]; face=max(cb[1][0], XC+CAP_T)
     else:    arm_in=-ab[1][0]; horn_in=-hb[1][0]; face=max(-cb[0][0], XC+CAP_T)
     hub[side]=dict(cap_face=round(face,3),horn_inner=round(horn_in,3),arm_inner=round(arm_in,3),
@@ -402,7 +404,7 @@ add("Head pan joint (motorised yaw, FS90MG in the collar)",
     "yaw_collar, yaw_coupler, head_back, head_front, dummy_servo_yaw, dummy_horn_yaw",
     "Pan servo is the v3 collar FS90MG (unchanged): horn → coupler blade → slot in head_back. Software clamp ±42° "
     "(84° of the 180° servo travel), hard stop ≈ ±47°. "
-    + (f"Sweep: {SW['sweep']['poses']} poses, rigid overlaps in travel = {len(SW['rigid_overlaps_in_travel'])}; first yaw stop contact {SW['stop_engagement'].get('yaw_pos')}." if SW else "Run scripts/sim_v4.py first."),
+    + (f"Sweep: {SW['sweep']['poses']} poses, rigid overlaps in travel = {len(SW['rigid_overlaps_in_travel'])}; first yaw stop contact {SW['stop_engagement'].get('yaw_pos')}." if SW else "Run scripts/sim_v01.py first."),
     "pass" if yaw_ok else "fail",
     "Tilt was not added: a nod yoke plus a 4th FS90MG does not fit cleanly in the 64 mm head beside the camera and FPC loop.")
 add("Neck cable path (pan servo + camera FPC)",
@@ -415,10 +417,34 @@ add("Neck cable path (pan servo + camera FPC)",
 arm_ok=SW is not None and len(SW["rigid_overlaps_in_travel"])==0 and SW.get("arm_min_clearance_mm",{}).get("ok",False)
 add("Arm travel (forward/up swing, direct drive)",
     "arm_L/R, sleeve_proxy_L/R, torso_back, fur_proxy_torso, head_front/back",
-    "Arm angle 0 = straight forward, + = up. Software clamp −55°..+70° (125° of the 180° servo travel; −55° keeps the paw off the desk). "
-    + (f"Sweep min clearances: {SW.get('arm_min_clearance_mm')}." if SW else "Run scripts/sim_v4.py first."),
+    "Arm angle 0 = straight forward, + = up. Software clamp −45°..+30° per arm, plus the clasp interlock armL − armR ≥ 7.5° "
+    "(the left forearm always passes over the right). −45° keeps the forearm ≥2 mm off the desk; +30° keeps it under the eye bezels. "
+    + (f"Sweep min clearances: {SW.get('arm_min_clearance_mm')}. First arm/head contact {SW['stop_engagement'].get('armL_up')}." if SW else "Run scripts/sim_v01.py first."),
     "pass" if arm_ok else "fail",
-    "Direct drive: a child forcing the arm back-drives the FS90MG gear train. There is no breakaway yet.")
+    "Direct drive: a child forcing an arm back-drives the FS90MG gear train. No mechanical breakaway.")
+C=SW.get("clasp") if SW else None
+cl_ok=bool(C and C.get("closure_ok"))
+add("Clasp closure (forearms overlap across the middle)",
+    "arm_L, arm_R",
+    (f"Forearm blades overlap {C['overlap_x_mm']} mm in x across the midline. Rigid blade gap {C['closed_gap_mm']} mm at the interlock "
+     f"(Δ = 7.5°), {C['max_gap_in_travel_mm']} mm at the widest in-travel opening. Gap ≈ (Δ − {C['delta_deg_for_gap']['offset_deg']}°) / "
+     f"{C['delta_deg_for_gap']['slope_deg_per_mm']}°/mm, the same at mean angles −30°, −10° and +10°; 25 mm needs Δ ≈ {C['delta_deg_for_gap']['gap25_delta_deg']}°. "
+     f"Blade contact in the sweep at Δ ≈ 6.5° (outside travel)." if C else "Run scripts/sim_v01.py first."),
+    "pass" if cl_ok else "fail",
+    "Firmware must enforce armL − armR ≥ 7.5° before either servo moves; the blades cannot pass each other.")
+gr_ok=bool(C and C.get("grip_ok"))
+if C:
+    G=[g for g in C["grip_clearance"] if g["in_travel"]]
+    gtxt=(f"Test cylinders Ø4/8/12/20/25 × 140 mm along x, centred between the blades at r = 71 mm, mean angles −30/−10/+10°: "
+          f"{len(G)}/{len(C['grip_clearance'])} reachable inside travel. Opening needed: "
+          + ", ".join(f"Ø{d} → Δ {next(g['delta_deg'] for g in C['grip_clearance'] if g['d_mm']==d)}°" for d in (4,8,12,20,25))
+          + f". Worst clearance to the torso shell {min(g['clear_to_shell_mm'] for g in G)} mm, to the 4 mm torso fur {min(g['clear_to_torso_fur_mm'] for g in G)} mm, "
+          f"to the head {min(g['clear_to_head_mm'] for g in G)} mm.")
+else: gtxt="Run scripts/sim_v01.py first."
+add("Grip clearance (pen / cable / small pole in the clasp)",
+    "arm_L, arm_R, torso_front, torso_back, fur_proxy_torso, head_front/back",
+    gtxt, "pass" if gr_ok else "fail",
+    "Faces are flat and parallel to each blade, so they meet at an angle Δ (≈13° for a pen, ≈28° at 25 mm): large objects are squeezed outward.")
 
 # coupon exists
 add("Test coupon",
@@ -452,7 +478,7 @@ out=dict(assumptions=dict(
     servo_source="Official Feetech FS90MG drawing p.5, edition A/0, 2021-04-30, ±0.1 mm. File copied to datasheets/FS90MG.pdf.",
     horn="ASSUMED typical 2.0 mm disc + 4-arm star, Ø24. Not on the drawing. p.6 says No Accessories.",
     spline_teeth="Drawing and 6-9 say 20T/Ø4.7; product pages say 21T. Measure on arrival.",
-    arm_servos="2× FS90MG, one per arm, spline along x at y=13 z=60, direct drive on the horn (v4).",
+    arm_servos="2× FS90MG, one per arm, spline along x at y=13 z=60, direct drive on the horn. Forearms overlap across the middle and clasp (V.01).",
     speaker="Adafruit 3351 Mono Enclosed 3W 4Ω, 70×30×17, Core A$8.95",
     amp="Adafruit 3006 MAX98357A 19.4×17.8×3.0",
     mic="Adafruit 3421 16.7×12.7×1.8 bottom-ported",

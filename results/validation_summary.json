@@ -1,5 +1,6 @@
 {
- "version": "v4",
+ "version": "V.01",
+ "project": "evoKin V.01",
  "cad_only": true,
  "physically_tested": false,
  "child_ready": false,
@@ -9,23 +10,49 @@
  "servos": {
   "count": 3,
   "head_pan": "FS90MG in yaw_collar, software ±42°, hard stop ±47°",
-  "arm_L": "FS90MG direct drive, software −55…+70°",
-  "arm_R": "FS90MG direct drive, software −55…+70°"
+  "arm_L": "FS90MG direct drive, software −45…+30°, upper clasp blade",
+  "arm_R": "FS90MG direct drive, software −45…+30°, lower clasp blade",
+  "interlock": "armL − armR ≥ 7.5° (firmware)"
  },
  "arm_angle_convention": "0 = arm straight forward (-y), + = up; rotation about the x axis through y=13, z=60",
+ "clasp": {
+  "mechanism": "overlapping scissor-blade forearms on the two shoulder servos; no added parts",
+  "overlap_x_mm": 35.96,
+  "closed_gap_mm": 0.98,
+  "max_gap_in_travel_mm": 33.35,
+  "gap_control": {
+   "slope_deg_per_mm": 0.848,
+   "offset_deg": 6.62,
+   "gap25_delta_deg": 27.8,
+   "gap0_delta_deg": 6.6
+  },
+  "closure_ok": true,
+  "grip_force_at_stall_N": {
+   "at_r66_inner_edge": 3.27,
+   "at_r71_blade_centre": 3.04,
+   "at_r76_outer_edge": 2.84
+  },
+  "grip_force_pen_pose_N": 2.92,
+  "grip_force_basis": "datasheet stall 2.2 kg·cm at 6 V; not measured",
+  "grip_clearance_cases": 15,
+  "grip_clearance_all_in_travel": true,
+  "grip_min_clear_to_shell_mm": 0.57,
+  "grip_min_clear_to_head_mm": 23.33,
+  "compliance": "2 mm fur sleeve over each blade (≈4 mm of compressible pile in the clasp). Squeeze is set by commanding the blades past contact; the servo's position loop then pushes up to stall. No spring or breakaway part."
+ },
  "fit_audit": {
-  "n": 21,
-  "pass_n": 21,
+  "n": 23,
+  "pass_n": 23,
   "marginal_n": 0,
   "fail_n": 0,
   "cad_only": true,
   "physically_tested": false
  },
  "sweep": {
-  "poses": 1017,
-  "pair_tests": 245097,
-  "booleans": 22712,
-  "seconds": 142.8,
+  "poses": 988,
+  "pair_tests": 238108,
+  "booleans": 64792,
+  "seconds": 286.7,
   "rigid_overlaps_in_travel": 0,
   "transform_max_dev_mm": 0.0005,
   "static_ok": true
@@ -37,86 +64,28 @@
  "arm_min_clearance_mm": {
   "arm_to_shell": 0.6,
   "arm_to_cap": 0.6,
-  "arm_to_head": 10.62,
-  "sleeve_to_fur": 0.58,
-  "arm_lowest_z_mm": 2.1,
-  "sleeve_lowest_z_mm": 3.01,
+  "arm_to_head": 17.83,
+  "sleeve_to_fur": -1.21,
+  "arm_lowest_z_mm": 4.49,
+  "sleeve_lowest_z_mm": 1.66,
+  "arm_top_z_under_bezels_mm": 100.53,
   "ok": true
  },
- "arm_hard_stop": "none within −80…+85° — arm limits are software only",
+ "arm_hard_stop": "first head contact at about +42° (outside the +30° clamp); blade-to-blade contact below 7.5° interlock — arm limits are software only",
  "metrics": {
-  "arm_gravity_torque_fraction_of_stall": 0.021,
-  "paw_force_at_stall_N": 3.43,
-  "head_pan_accel_fraction_of_stall": 0.0669,
+  "arm_gravity_torque_fraction_of_stall": 0.042,
   "shoulder_pod_protrusion_past_fur_mm": 9.6,
-  "servo_peak_all_stalled_A": 2.4
+  "head_pan_accel_fraction_of_stall": 0.0669,
+  "servo_peak_all_stalled_A": 2.4,
+  "paw_force_at_stall_N": 3.04
  },
- "parts_changed_vs_v3": [
-  "arm_L",
-  "arm_R",
-  "coupon",
-  "reference/dummies",
-  "reference/fur_proxy_torso",
-  "reference/sleeve_proxy_L",
-  "reference/sleeve_proxy_R",
-  "shoulder_bracket_L",
-  "shoulder_bracket_R",
-  "torso_back",
-  "torso_front",
-  "tray"
- ],
- "parts_unchanged_vs_v3": [
-  "bezel",
-  "head_back",
-  "head_front",
-  "reference/dummy_amp",
-  "reference/dummy_cam",
-  "reference/dummy_horn_yaw",
-  "reference/dummy_mic",
-  "reference/dummy_pi",
-  "reference/dummy_servo_yaw",
-  "reference/dummy_speaker",
-  "shutter",
-  "yaw_collar",
-  "yaw_coupler",
-  "yaw_retainer_A",
-  "yaw_retainer_B",
-  "yaw_thrust_washer"
- ],
- "parts_new": [
-  "reference/dummy_horn_arm_L",
-  "reference/dummy_horn_arm_R",
-  "reference/dummy_servo_arm_L",
-  "reference/dummy_servo_arm_R"
- ],
- "parts_removed": [
-  "clasp_drum",
-  "templates/paw_pad_L",
-  "templates/paw_pad_R",
-  "reference/dummy_servo_clasp",
-  "reference/dummy_horn_clasp",
-  "reference/strap_env"
- ],
- "ears": "none in the model; nothing changed",
- "watertight": {
-  "torso_front": true,
-  "torso_back": true,
-  "tray": true,
-  "yaw_collar": true,
-  "yaw_retainer_A": true,
-  "yaw_retainer_B": true,
-  "yaw_coupler": true,
-  "yaw_thrust_washer": true,
-  "head_back": true,
-  "head_front": true,
-  "arm_L": true,
-  "arm_R": true,
-  "shoulder_bracket_L": true,
-  "shoulder_bracket_R": true,
-  "bezel": true,
-  "shutter": true,
-  "coupon": true
- },
- "priced_mechanical_AUD": 31.15,
- "nothing_purchased": true
+ "parts_changed_vs_v4": [
+  "arm_L.stl",
+  "arm_R.stl",
+  "reference/dummies.stl",
+  "reference/dummy_horn_arm_L.stl",
+  "reference/dummy_horn_arm_R.stl",
+  "reference/sleeve_proxy_L.stl",
+  "reference/sleeve_proxy_R.stl"
+ ]
 }

@@ -1,4 +1,4 @@
-# Evokin electronics — ESP32-S3 notes
+# evoKin V.01 electronics — ESP32-S3 notes
 
 **Nothing on this page has been purchased, fabricated or brought up.** These are
 planning notes for a first prototype and for a later custom board. Prices in
@@ -17,9 +17,9 @@ A condensed source for the custom-board section is a Gemini (Code and analysis
 | Camera | OV2640 or OV3660, on a 24-pin 0.5 mm FPC through the hollow neck journal |
 | Voice in | I2S or PDM MEMS microphone |
 | Voice out | I2S amplifier (MAX98357A) into the Adafruit 3351 3 W 4 Ω enclosed speaker already seated in the torso |
-| Motion | **Three** Feetech FS90MG servos (v4): head pan, left arm, right arm — three PWM channels |
+| Motion | **Three** Feetech FS90MG servos (V.01): head pan, left arm, right arm — three PWM channels. The V.01 clasp uses the two arm servos, so no fourth channel |
 | Power | USB-C in, 1S LiPo, a clean 3.3 V rail that holds up as the pack sags, and a **separate 5 V servo rail** with bulk capacitance |
-| Fail-safe | Sense current on the 5 V rail and cut servo power so the arms go limp if a child forces them. v4 arms are direct drive with **no mechanical breakaway**, so this electronic trip is the only protection planned. |
+| Fail-safe | Sense current on the 5 V rail and cut servo power so the arms go limp if a child forces them. The arms are direct drive with **no mechanical breakaway**, so this electronic trip is the only protection planned. V.01 clasp: both arm servos can sit near stall while gripping (≈0.8 A each at 6 V); cap grip current in firmware and enforce the blade interlock armL − armR ≥ 7.5°. |
 
 Budget about 800 mA stall per FS90MG, conservatively — **2.4 A** if all three
 stall at once — and keep the first bench bring-up on a current-limited supply.
@@ -68,7 +68,7 @@ before ordering.
 
 ## Servo channels — do the boards have spare PWM GPIOs? (checked Nov 2026)
 
-v4 needs three servo PWM outputs plus I2C for the INA219. On the ESP32-S3 any
+V.01 (like v4) needs three servo PWM outputs plus I2C for the INA219. On the ESP32-S3 any
 free GPIO can output servo PWM through the LEDC peripheral, so the question is
 only whether pins are free.
 
@@ -151,7 +151,7 @@ with peripherals unplugged; enumerate native USB (GPIO19/20); confirm
 camera over Wi-Fi while moving the head by hand; then sweep the servos and log
 INA219 current.
 
-## Fit against the v4 CAD
+## Fit against the V.01 CAD (electronics unchanged from v4)
 
 - Speaker pocket and grille: Adafruit 3351 — keep this part.
 - Amp pocket: sized for Adafruit 3006 (19.4 × 17.8 × 3.0 mm + 8 mm headroom).

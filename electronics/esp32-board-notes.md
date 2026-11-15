@@ -17,16 +17,17 @@ A condensed source for the custom-board section is a Gemini (Code and analysis
 | Camera | OV2640 or OV3660, on a 24-pin 0.5 mm FPC through the hollow neck journal |
 | Voice in | I2S or PDM MEMS microphone |
 | Voice out | I2S amplifier (MAX98357A) into the Adafruit 3351 3 W 4 Ω enclosed speaker already seated in the torso |
-| Motion | Two Feetech FS90MG servos: head yaw, and a cord-drum that clasps the arms |
+| Motion | **Three** Feetech FS90MG servos (v4): head pan, left arm, right arm — three PWM channels |
 | Power | USB-C in, 1S LiPo, a clean 3.3 V rail that holds up as the pack sags, and a **separate 5 V servo rail** with bulk capacitance |
-| Fail-open | Sense current on the 5 V rail and cut servo power so the paws go limp if a child pulls the arms apart. A mechanical weak link in the cord is still a requirement only — it has not been designed or rated. |
+| Fail-safe | Sense current on the 5 V rail and cut servo power so the arms go limp if a child forces them. v4 arms are direct drive with **no mechanical breakaway**, so this electronic trip is the only protection planned. |
 
-Budget about 800 mA stall per FS90MG, conservatively, and keep the first bench
-bring-up on a current-limited supply. Portable power is unresolved.
+Budget about 800 mA stall per FS90MG, conservatively — **2.4 A** if all three
+stall at once — and keep the first bench bring-up on a current-limited supply.
+Stagger moves in firmware or size the 5 V rail for the peak. Portable power is unresolved.
 
 ## Two prototype options (planned, not purchased)
 
-### Option A — about A$88–93 electronics, or about A$112–117 with the priced servos and speaker
+### Option A — about A$88–93 electronics, or about A$119.55–124.05 with the three priced servos and speaker
 
 A project buy, not a single-robot kit: one first-article board plus spare
 modules for a later custom PCB.
@@ -52,7 +53,7 @@ protection; put 470–1000 µF on the 5 V servo header, and prefer a protected
 regulator (Pololu S13V20F5, about A$29.55) when you can. Clone INMP441 modules
 are often fake; the Sense already has a mic, so you may not need one yet.
 
-### Option B — about A$51 electronics, or about A$75 with the priced servos and speaker
+### Option B — about A$51 electronics, or about A$82.33 with the three priced servos and speaker, plus a PCA9685 (not yet sourced)
 
 | Item | Qty | AUD | Supplier (Nov 2026) |
 |---|---:|---:|---|
@@ -60,12 +61,40 @@ are often fake; the Sense already has a mic, so you may not need one yet.
 | INA219 breakout (clone) | 1 | 7.00 | AuscomTech |
 | XL6009 boost, set to 5 V | 1 | 6.95 | AuscomTech |
 | **Subtotal** | | **51.18** | |
+| PCA9685 16-ch I2C servo driver (needed for 3 servos) | 1 | not yet sourced | — |
 
-This is the cheaper, quicker first-build path **if** the DFR1154 still has two
-free GPIOs that can drive the two FS90MG servos at the same time as the
-camera, mic and amplifier. Those GPIOs have **not** been verified. Confirm the
-pinout and the board outline against the v3 tray before ordering. There is no
-charger on this board.
+There is no charger on this board. Confirm the board outline against the tray
+before ordering.
+
+## Servo channels — do the boards have spare PWM GPIOs? (checked Nov 2026)
+
+v4 needs three servo PWM outputs plus I2C for the INA219. On the ESP32-S3 any
+free GPIO can output servo PWM through the LEDC peripheral, so the question is
+only whether pins are free.
+
+**DFRobot DFR1154 — not enough for direct drive. Confirmed from the DFRobot
+wiki pin table:** only **GPIO43 and GPIO44** (the Gravity / UART port) are
+free. The rest are used by the OV3660 camera (DVP bus), the PDM mic (GPIO38/39),
+the MAX98357 amp (GPIO45/46/42), the SD slot (GPIO10–13), the IR LED (GPIO47),
+the status LED (GPIO3) and BOOT (GPIO0). So the DFR1154 **cannot drive three
+servos directly**. Plan: run GPIO43/44 as I2C to a **PCA9685** 16-channel servo
+driver (also gives spare channels), shared with the INA219. Losing the UART
+port means logging over native USB. The PCA9685 is not yet sourced or priced.
+
+**Seeed XIAO ESP32S3 Sense — yes, spare pins confirmed** (Seeed wiki): the
+header has 11 GPIOs (D0–D10), all LEDC-PWM capable. The Sense board's camera
+and PDM mic (GPIO41/42) use the B2B connector, not the header; its SD card uses
+D8–D10. A workable map:
+
+| Use | Pins |
+|---|---|
+| Servo PWM: head pan, arm L, arm R | D0, D1, D2 |
+| I2S to MAX98357A (BCLK, LRCLK, DIN) | D3, D6, D7 |
+| I2C to INA219 (SDA, SCL) | D4, D5 |
+| Spare (or SD card) | D8, D9, D10 |
+
+That is 8 of 11 header pins, leaving D8–D10 spare if the SD card is unused.
+Pin choice is a plan, not bring-up tested.
 
 ### Name-brand alternatives (Core Electronics, Nov 2026)
 
@@ -90,7 +119,7 @@ USB-C 5 V ──► BQ24074 power-path & LiPo charger ◄── 1S LiPo (2000–
  3.3 V MCU    5.0 V servo rail + 470–1000 µF   ► Adafruit 3351
  & camera        │
                  ▼
-           INA219 + TPS259241 eFuse  ► 2× FS90MG
+           INA219 + TPS259241 eFuse  ► 3× FS90MG
      ESP32-S3-WROOM-1-N16R8 ── I2S mic (INMP441 / ICS-43434)
                              ── OV2640 / OV3660 on 24-pin FPC
                              ── native USB D+/D− to USB-C
@@ -102,7 +131,7 @@ Notes worth keeping:
   U.FL), not a bare ESP32-S3.
 - On N16R8 modules, **do not use GPIO 33–37** — they are taken by Octal PSRAM.
 - Trip the eFuse when INA219 sees current above a threshold for about 200 ms,
-  and also after a completed clasp. The “about 450 mA” figure in the design
+  and also when the arms are parked. The “about 450 mA” figure in the design
   discussion is a starting guess only: **measure the real FS90MG moving and
   stall current on the bench before you freeze a threshold.**
 - When the 5 V rail is cut, the FS90MG back-drives reasonably easily, which is
@@ -114,7 +143,7 @@ Notes worth keeping:
   the speaker magnet and the battery at least 20 mm away.
 - Rough cost from the design discussion: about A$120 at JLCPCB for five 4-layer
   boards and two assembled, plus about A$60 of local parts (camera, mic,
-  speaker, two FS90MG, 2000 mAh pack) per robot.
+  speaker, FS90MGs, 2000 mAh pack) per robot. v4 adds a third FS90MG (A$7.40).
 
 A first bring-up checklist, before anyone spins a board: smoke-test the rails
 with peripherals unplugged; enumerate native USB (GPIO19/20); confirm
@@ -122,7 +151,7 @@ with peripherals unplugged; enumerate native USB (GPIO19/20); confirm
 camera over Wi-Fi while moving the head by hand; then sweep the servos and log
 INA219 current.
 
-## Fit against the v3 CAD
+## Fit against the v4 CAD
 
 - Speaker pocket and grille: Adafruit 3351 — keep this part.
 - Amp pocket: sized for Adafruit 3006 (19.4 × 17.8 × 3.0 mm + 8 mm headroom).

@@ -7,6 +7,7 @@
   "servo_source": "Official Feetech FS90MG drawing p.5, edition A/0, 2021-04-30, \u00b10.1 mm. File copied to datasheets/FS90MG.pdf.",
   "horn": "ASSUMED typical 2.0 mm disc + 4-arm star, \u00d824. Not on the drawing. p.6 says No Accessories.",
   "spline_teeth": "Drawing and 6-9 say 20T/\u00d84.7; product pages say 21T. Measure on arrival.",
+  "arm_servos": "2\u00d7 FS90MG, one per arm, spline along x at y=13 z=60, direct drive on the horn (v4).",
   "speaker": "Adafruit 3351 Mono Enclosed 3W 4\u03a9, 70\u00d730\u00d717, Core A$8.95",
   "amp": "Adafruit 3006 MAX98357A 19.4\u00d717.8\u00d73.0",
   "mic": "Adafruit 3421 16.7\u00d712.7\u00d71.8 bottom-ported",
@@ -28,11 +29,18 @@
  },
  "rows": [
   {
-   "interface": "Clasp servo seat (FS90MG, official 27.7 span, 1.7 pilots)",
-   "parts": "tray, dummy_servo_clasp, dummy_horn_clasp, clasp_drum",
-   "measured": "Pilots at x=[-16.4, 11.3] y=20: [([-16.4, 20.0, 44.3], {'dia': 1.698, 'n': 355, 'p05': 1.697, 'p95': 1.7}), ([11.3, 20.0, 44.3], {'dia': 1.698, 'n': 355, 'p05': 1.697, 'p95': 1.7})]. Servo body 22.5x12.1x22.4, s_off=2.55, tab=32.3. clasp_top=51, boss top=55.3, horn 55.3-57.3, drum_base=59.3 (4.0 mm above boss = 2.0 horn + 2.0 air). Servo/tray overlap vol=0.0",
+   "interface": "Arm servo seat L (FS90MG in shoulder pod + cap, official 27.7 span)",
+   "parts": "shoulder_bracket_L, torso_back (pod), dummy_servo_arm_L, tray, dummy_pi, dummy_amp, dummy_servo_yaw",
+   "measured": "Tab pilots in the cap (design 1.7): [{'dia': 1.698, 'n': 350, 'p05': 1.697, 'p95': 1.7}, {'dia': 1.698, 'n': 350, 'p05': 1.697, 'p95': 1.7}]. Cap screw clearance (design 2.8): [{'dia': 2.797, 'n': 350, 'p05': 2.796, 'p95': 2.8}, {'dia': 2.797, 'n': 350, 'p05': 2.796, 'p95': 2.8}]. Pod pilots (design 2.1): [{'dia': 2.098, 'n': 350, 'p05': 2.097, 'p95': 2.1}, {'dia': 2.098, 'n': 350, 'p05': 2.097, 'p95': 2.1}]. Boss hole in cap (design 12.8 for the \u00d811.8 boss): {'dia': 12.786, 'n': 355, 'p05': 12.78, 'p95': 12.8}. Overlaps (mm\u00b3, must be ~0): {'servo_cap': 0.0, 'servo_torso_back': 0.0, 'cap_torso_back': 0.0, 'servo_tray': 0.0, 'servo_pi': 0.0, 'servo_amp': 0.0, 'servo_yaw_servo': 0.0, 'servo_yaw_collar': 0.0, 'servo_torso_front': 0.0}. Case top at |x|=42.0, cap 42.0..46.0, boss top 46.3, horn 46.3..48.3. Servo long axis vertical, spline at y=13.0, z=60.0.",
    "verdict": "pass",
-   "fix": "Measure the included self-tappers on arrival; 1.7 mm is the M2 / typical 9g self-tap pilot."
+   "fix": "Bench-assemble servo to cap (self-tappers from the inner side), then drop the pair into the pod from outside and fit 2\u00d7 M2.5 cap screws."
+  },
+  {
+   "interface": "Arm servo seat R (FS90MG in shoulder pod + cap, official 27.7 span)",
+   "parts": "shoulder_bracket_R, torso_back (pod), dummy_servo_arm_R, tray, dummy_pi, dummy_amp, dummy_servo_yaw",
+   "measured": "Tab pilots in the cap (design 1.7): [{'dia': 1.698, 'n': 350, 'p05': 1.697, 'p95': 1.7}, {'dia': 1.698, 'n': 350, 'p05': 1.697, 'p95': 1.7}]. Cap screw clearance (design 2.8): [{'dia': 2.797, 'n': 350, 'p05': 2.796, 'p95': 2.8}, {'dia': 2.797, 'n': 350, 'p05': 2.796, 'p95': 2.8}]. Pod pilots (design 2.1): [{'dia': 2.098, 'n': 350, 'p05': 2.097, 'p95': 2.1}, {'dia': 2.098, 'n': 350, 'p05': 2.097, 'p95': 2.1}]. Boss hole in cap (design 12.8 for the \u00d811.8 boss): {'dia': 12.786, 'n': 355, 'p05': 12.78, 'p95': 12.8}. Overlaps (mm\u00b3, must be ~0): {'servo_cap': 0.0, 'servo_torso_back': 0.0, 'cap_torso_back': 0.0, 'servo_tray': 0.0, 'servo_pi': 0.0, 'servo_amp': 0.0, 'servo_yaw_servo': 0.0, 'servo_yaw_collar': 0.0, 'servo_torso_front': 0.0}. Case top at |x|=42.0, cap 42.0..46.0, boss top 46.3, horn 46.3..48.3. Servo long axis vertical, spline at y=13.0, z=60.0.",
+   "verdict": "pass",
+   "fix": "Bench-assemble servo to cap (self-tappers from the inner side), then drop the pair into the pod from outside and fit 2\u00d7 M2.5 cap screws."
   },
   {
    "interface": "Yaw servo seat (FS90MG, official 27.7 span, 1.7 pilots)",
@@ -42,16 +50,16 @@
    "fix": "Included M2.5x4 horn screw is too short for horn+coupler; use a longer M2.5 and confirm on arrival."
   },
   {
-   "interface": "Clasp horn / drum clearance",
-   "parts": "clasp_drum, dummy_horn_clasp",
-   "measured": "Drum zmin=59.30, horn z 55.30..57.30, boss top=55.3. Drum-to-horn air=2.00 mm (design 2.0). Drum-to-boss=4.00 mm (design 4.0 = horn 2.0 + air 2.0). Horn is an ASSUMED 2.0 mm / \u00d824 envelope; measure the included horn on arrival.",
+   "interface": "Arm hub on horn / cap face clearance",
+   "parts": "arm_L/R, dummy_horn_arm_L/R, shoulder_bracket_L/R",
+   "measured": "{'L': {'cap_face': np.float64(46.0), 'horn_inner': np.float64(46.3), 'arm_inner': np.float64(46.6), 'horn_to_cap': np.float64(0.3), 'hub_to_cap': np.float64(0.6), 'arm_horn_overlap': 0.0, 'arm_servo_overlap': 0.0}, 'R': {'cap_face': np.float64(46.0), 'horn_inner': np.float64(46.3), 'arm_inner': np.float64(46.6), 'horn_to_cap': np.float64(0.3), 'hub_to_cap': np.float64(0.6), 'arm_horn_overlap': -1.2126596023639042e-12, 'arm_servo_overlap': 0.0}}. Design: horn sits on the boss 0.3 mm proud of the cap face; hub face 0.6 mm off the cap; horn pocket \u00d825 to horn top; spline tip pocket \u00d85.5 to x=50.8; axial M2.5\u00d712 horn screw from the paw-side counterbore. Horn is an ASSUMED 2.0 mm / \u00d824 envelope.",
    "verdict": "pass",
-   "fix": ""
+   "fix": "Measure the included horn; if its hub is taller than 2.0 mm, deepen the pocket. Horn-to-hub pilots at r=7 are assumed."
   },
   {
    "interface": "Torso front \u2194 back seam and fasteners",
    "parts": "torso_front, torso_back",
-   "measured": "Boolean overlap 0.0 mm\u00b3. Back ymin=-1.20 (male lip 1.2 mm into the front). Front ymax=0.00. Groove clearance design 0.25 mm. 0.40 mm outer seam chamfer for elephant-foot. Fasteners M2.5: front clearance 2.8, back pilot 2.1. Holes: [{'xz': [-34, 22], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 355, 'p05': 2.097, 'p95': 2.1}}, {'xz': [34, 22], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}, {'xz': [-36, 72], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}, {'xz': [36, 72], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}]",
+   "measured": "Boolean overlap 0.0 mm\u00b3. Back ymin=-1.20 (male lip 1.2 mm into the front). Front ymax=0.00. Groove clearance design 0.25 mm. 0.40 mm outer seam chamfer for elephant-foot. Fasteners M2.5: front clearance 2.8, back pilot 2.1. Holes: [{'xz': [-24, 12], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 355, 'p05': 2.097, 'p95': 2.1}}, {'xz': [24, 12], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 355, 'p05': 2.097, 'p95': 2.1}}, {'xz': [-30, 79], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}, {'xz': [30, 79], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}]",
    "verdict": "pass",
    "fix": "Optional M2.5 heat-set later: bosses are \u00d87."
   },
@@ -93,7 +101,7 @@
   {
    "interface": "Tray tab pockets",
    "parts": "tray, torso_front, torso_back",
-   "measured": "+x tab/pocket {'tab': {'x': np.float64(10.0), 'y': np.float64(3.0), 'z': np.float64(10.0), 'xmin': np.float64(29.0), 'xmax': np.float64(39.0)}, 'pocket': {'x': 78.6, 'y': 3.6, 'z': 10.6}, 'walls': {'front+x': None, 'front-x': None, 'front+y': None, 'front-y': 1.7999990000000001, 'front+z': None, 'front-z': None, 'back+x': 5.299999999999997, 'back-x': 73.3, 'back+y': 1.7999999999999998, 'back-y': None, 'back+z': 5.299999999999997, 'back-z': 5.299999999999997}}. -x tab/pocket {'tab': {'x': np.float64(10.0), 'y': np.float64(3.0), 'z': np.float64(10.0), 'xmin': np.float64(-39.0), 'xmax': np.float64(-29.0)}, 'pocket': {'x': 78.6, 'y': 3.6, 'z': 10.6}, 'walls': {'front+x': None, 'front-x': None, 'front+y': None, 'front-y': 1.7999990000000001, 'front+z': None, 'front-z': None, 'back+x': 73.3, 'back-x': 5.299999999999997, 'back+y': 1.7999999999999998, 'back-y': None, 'back+z': 5.299999999999997, 'back-z': 5.299999999999997}}. Design: 10\u00d73\u00d710 tab in a 10.6\u00d73.6\u00d710.6 pocket, rib 14 mm wide centred on x=\u00b134 (v2 rib was centred at \u00b137 and only held 8.3 mm of the 10 mm tab).",
+   "measured": "+x tab/pocket {'tab': {'x': np.float64(10.0), 'y': np.float64(3.0), 'z': np.float64(10.0), 'xmin': np.float64(24.0), 'xmax': np.float64(34.0)}, 'pocket': {'x': 68.6, 'y': 3.6, 'z': 10.6}, 'walls': {'front+x': None, 'front-x': None, 'front+y': None, 'front-y': 1.7999990000000001, 'front+z': None, 'front-z': None, 'back+x': 2.799999999999997, 'back-x': 65.8, 'back+y': 1.7999999999999998, 'back-y': None, 'back+z': 5.300000000000001, 'back-z': 5.300000000000001}}. -x tab/pocket {'tab': {'x': np.float64(10.0), 'y': np.float64(3.0), 'z': np.float64(10.0), 'xmin': np.float64(-34.0), 'xmax': np.float64(-24.0)}, 'pocket': {'x': 68.6, 'y': 3.6, 'z': 10.6}, 'walls': {'front+x': None, 'front-x': None, 'front+y': None, 'front-y': 1.7999990000000001, 'front+z': None, 'front-z': None, 'back+x': 65.8, 'back-x': 2.799999999999997, 'back+y': 1.7999999999999998, 'back-y': None, 'back+z': 5.300000000000001, 'back-z': 5.300000000000001}}. Design: 10\u00d73\u00d710 tab in a 10.6\u00d73.6\u00d710.6 pocket, rib 14 mm wide centred on the tab. v4: tabs and ribs moved from (x=\u00b134, z=40) to (x=\u00b129, z=23) to clear the shoulder pods and the Pi standoffs.",
    "verdict": "pass",
    "fix": ""
   },
@@ -128,35 +136,49 @@
   {
    "interface": "Pi envelope",
    "parts": "tray, dummy_pi",
-   "measured": "Pi dummy extents [65.0, 8.5, 30.0] (65\u00d78.5\u00d730: 8.5 mm y-envelope allows a header). v2 was 5 mm and tight if a header is used. Camera is the standard 25\u00d724\u00d711.5 Module 3, not the Wide.",
+   "measured": "Pi dummy extents [65.0, 8.5, 30.0] (65\u00d78.5\u00d730: 8.5 mm y-envelope allows a header). Camera is the standard 25\u00d724\u00d711.5 Module 3, not the Wide. Pi\u2194tray 0.0 mm\u00b3, Pi\u2194arm servos 0.0 / 0.0 mm\u00b3.",
    "verdict": "pass",
    "fix": ""
   },
   {
-   "interface": "Cord drum / pulley and servo angle for 45\u00b0 closure",
-   "parts": "clasp_drum, arm pulleys, FS90MG horn",
-   "measured": "r_d=10.25, r_q=8.0, travel 0\u201345\u00b0 = 6.2832 mm = 35.122\u00b0 drum. Drum is 1:1 on the horn, so servo angle = 35.122\u00b0 (well within the 180\u00b0 FS90MG, 500\u20132500 \u03bcs). Stop-to-stop (\u22123..46\u00b0) = 38.2439\u00b0. Drum xy unchanged from v2; clasp_top lowered to 51 so the new 4.0 mm horn gap still puts grooves at 61.7 / 65.3, mid = zq 63.5, fleet \u00b11.8\u00b0. Drum xy unchanged from v2; clasp_top lowered to 51 so grooves still straddle zq=63.5 after the 4.0 mm horn gap. Fleet \u00b11.8 deg.",
+   "interface": "Head pan joint (motorised yaw, FS90MG in the collar)",
+   "parts": "yaw_collar, yaw_coupler, head_back, head_front, dummy_servo_yaw, dummy_horn_yaw",
+   "measured": "Pan servo is the v3 collar FS90MG (unchanged): horn \u2192 coupler blade \u2192 slot in head_back. Software clamp \u00b142\u00b0 (84\u00b0 of the 180\u00b0 servo travel), hard stop \u2248 \u00b147\u00b0. Sweep: 1017 poses, rigid overlaps in travel = 0; first yaw stop contact {'yaw': 47.0, 'armL': -20.0, 'armR': -20.0, 'a': 'yaw_collar', 'b': 'head_back', 'vol_mm3': 0.619, 'compliant': ''}.",
    "verdict": "pass",
-   "fix": ""
+   "fix": "Tilt was not added: a nod yoke plus a 4th FS90MG does not fit cleanly in the 64 mm head beside the camera and FPC loop."
+  },
+  {
+   "interface": "Neck cable path (pan servo + camera FPC)",
+   "parts": "yaw_collar, head_back, torso",
+   "measured": "The pan servo is fixed in the torso-side collar, so its 3-wire lead never crosses the moving joint: it drops straight down beside the servo body into the torso. Only the camera FPC crosses the neck: floor slot (x=14) \u2192 \u00d834 collar bore \u2192 r=14 U-bend loop bay in the head (\u03c0\u00b714 \u2248 44 mm slack for \u00b142\u00b0). Floor slot probe width 30.2 mm (design 2.5). Collar bore \u00d834 stays open above the boss for service.",
+   "verdict": "pass",
+   "fix": "Do not twist the FPC around the yaw axis; let it roll in the U-bend."
+  },
+  {
+   "interface": "Arm travel (forward/up swing, direct drive)",
+   "parts": "arm_L/R, sleeve_proxy_L/R, torso_back, fur_proxy_torso, head_front/back",
+   "measured": "Arm angle 0 = straight forward, + = up. Software clamp \u221255\u00b0..+70\u00b0 (125\u00b0 of the 180\u00b0 servo travel; \u221255\u00b0 keeps the paw off the desk). Sweep min clearances: {'arm_to_shell': 0.6, 'arm_to_cap': 0.6, 'arm_to_head': 10.62, 'sleeve_to_fur': 0.58, 'arm_lowest_z_mm': 2.1, 'sleeve_lowest_z_mm': 3.01, 'ok': True}.",
+   "verdict": "pass",
+   "fix": "Direct drive: a child forcing the arm back-drives the FS90MG gear train. There is no breakaway yet."
   },
   {
    "interface": "Test coupon",
    "parts": "coupon",
-   "measured": "Separate STL stl/coupon.stl (also coupon/coupon.stl): journal ring + skirt (0.35 mm radial) + 0.8 mm washer, 10 mm tab in a 10.6 mm pocket, and an FS90MG shelf with 27.7 mm span / 1.7 mm pilots. Print this first. Volume 29564 mm\u00b3, extents [97.3, 63.9, 15.0].",
+   "measured": "Separate STL stl/coupon.stl (also coupon/coupon.stl): journal ring + skirt (0.35 mm radial) + 0.8 mm washer, 10 mm tab in a 10.6 mm pocket, and an FS90MG shelf with 27.7 mm span / 1.7 mm pilots. Print this first. Volume 29558 mm\u00b3, extents [97.3, 63.8, 15.0].",
    "verdict": "pass",
    "fix": ""
   },
   {
    "interface": "Mesh watertight (printable parts)",
    "parts": "all printable STLs",
-   "measured": "{'torso_front': True, 'torso_back': True, 'tray': True, 'yaw_collar': True, 'yaw_retainer_A': True, 'yaw_retainer_B': True, 'yaw_coupler': True, 'yaw_thrust_washer': True, 'head_back': True, 'head_front': True, 'arm_L': True, 'arm_R': True, 'shoulder_bracket_L': True, 'shoulder_bracket_R': True, 'clasp_drum': True, 'coupon': True, 'bezel': True}",
+   "measured": "{'torso_front': True, 'torso_back': True, 'tray': True, 'yaw_collar': True, 'yaw_retainer_A': True, 'yaw_retainer_B': True, 'yaw_coupler': True, 'yaw_thrust_washer': True, 'head_back': True, 'head_front': True, 'arm_L': True, 'arm_R': True, 'shoulder_bracket_L': True, 'shoulder_bracket_R': True, 'coupon': True, 'bezel': True}",
    "verdict": "pass",
    "fix": ""
   }
  ],
  "summary": {
-  "n": 18,
-  "pass_n": 18,
+  "n": 21,
+  "pass_n": 21,
   "marginal_n": 0,
   "fail_n": 0,
   "cad_only": true,

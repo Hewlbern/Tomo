@@ -1,10 +1,9 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
-# Export v3 parts at yaw=0 clasp=0 (open).
-# Printable STLs go to stl/, foam templates to stl/templates/,
-# fit dummies and fur/sleeve proxies to stl/reference/.
+# Export v4 parts at yaw=0, armL=armR=-20 (forward, slightly down).
+# Printable STLs go to stl/, fit dummies and fur/sleeve proxies to stl/reference/.
 # Set EXPORT_CHECK=1 to also write imposed-pose intermediates to check/
-# (those files are used by scripts/sim_v3.py and are not checked in).
+# (used by scripts/sim_v4.py to validate its transforms; not checked in).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -18,65 +17,37 @@ else
   exit 1
 fi
 
-mkdir -p stl stl/templates stl/reference
-SCAD="cad/critter_v3.scad"
+mkdir -p stl stl/reference
+SCAD="cad/critter_v4.scad"
 
-export_part() {
-  local part="$1" dest="$2"
-  if command -v xvfb-run >/dev/null 2>&1; then
-    xvfb-run -a "$OS" -D "part=\"$part\"" -D yaw=0 -D clasp=0 -o "$dest" "$SCAD" >/dev/null 2>&1
-  else
-    "$OS" -D "part=\"$part\"" -D yaw=0 -D clasp=0 -o "$dest" "$SCAD" >/dev/null 2>&1
-  fi
+run_os() {
+  # STL export does not need a display. Retry once in case a parallel run trips over a temp file.
+  "$OS" "$@" >/dev/null 2>&1 || "$OS" "$@" >/dev/null 2>&1
 }
+export_part() { run_os -D "part=\"$1\"" -D yaw=0 -D armL=-20 -D armR=-20 -o "$2" "$SCAD"; }
 
-PRINT="torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer head_back head_front arm_L arm_R shoulder_bracket_L shoulder_bracket_R clasp_drum bezel shutter coupon"
-TEMPLATES="paw_pad_L paw_pad_R"
-REFERENCE="dummies dummy_servo_yaw dummy_servo_clasp dummy_horn_yaw dummy_horn_clasp dummy_pi dummy_cam dummy_speaker dummy_amp dummy_mic fur_proxy_torso sleeve_proxy_L sleeve_proxy_R strap_env"
+PRINT="torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer head_back head_front arm_L arm_R shoulder_bracket_L shoulder_bracket_R bezel shutter coupon"
+REFERENCE="dummies dummy_servo_yaw dummy_horn_yaw dummy_servo_arm_L dummy_servo_arm_R dummy_horn_arm_L dummy_horn_arm_R dummy_pi dummy_cam dummy_speaker dummy_amp dummy_mic fur_proxy_torso sleeve_proxy_L sleeve_proxy_R"
 
 pids=()
-for p in $PRINT; do
-  export_part "$p" "stl/$p.stl" &
-  pids+=($!)
-done
-for p in $TEMPLATES; do
-  export_part "$p" "stl/templates/$p.stl" &
-  pids+=($!)
-done
-for p in $REFERENCE; do
-  export_part "$p" "stl/reference/$p.stl" &
-  pids+=($!)
-done
+for p in $PRINT; do export_part "$p" "stl/$p.stl" & pids+=($!); done
+for p in $REFERENCE; do export_part "$p" "stl/reference/$p.stl" & pids+=($!); done
 for pid in "${pids[@]}"; do wait "$pid"; done
 
 if [ "${EXPORT_CHECK:-0}" = "1" ]; then
   mkdir -p check
-  run_os() {
-    if command -v xvfb-run >/dev/null 2>&1; then
-      xvfb-run -a "$OS" "$@" >/dev/null 2>&1
-    else
-      "$OS" "$@" >/dev/null 2>&1
-    fi
-  }
+  rm -f check/*.stl
   pids=()
-  for p in arm_L arm_R paw_pad_L paw_pad_R clasp_drum; do
-    for c in 45 46 -3; do
-      dest="check/${p}_c${c}.stl"
-      part_path="stl/$p.stl"
-      [ -f "stl/templates/$p.stl" ] && part_path="stl/templates/$p.stl"
-      run_os -D "part=\"$p\"" -D yaw=0 -D clasp="$c" -o "$dest" "$SCAD" &
-      pids+=($!)
-    done
+  for a in 70 -55 0; do
+    run_os -D 'part="arm_L"' -D yaw=0 -D armL=$a -D armR=-20 -o "check/arm_L_a${a}.stl" "$SCAD" & pids+=($!)
+    run_os -D 'part="arm_R"' -D yaw=0 -D armL=-20 -D armR=$a -o "check/arm_R_a${a}.stl" "$SCAD" & pids+=($!)
   done
-  for pid in "${pids[@]}"; do wait "$pid"; done
-  pids=()
   for p in head_back head_front yaw_coupler; do
-    run_os -D "part=\"$p\"" -D yaw=45 -D clasp=45 -o "check/${p}_y45_c45.stl" "$SCAD" &
-    pids+=($!)
+    run_os -D "part=\"$p\"" -D yaw=30 -D armL=-20 -D armR=-20 -o "check/${p}_y30.stl" "$SCAD" & pids+=($!)
   done
   for pid in "${pids[@]}"; do wait "$pid"; done
   ls -la check
 fi
 
 echo "Exported STLs:"
-ls -la stl stl/templates stl/reference
+ls -la stl stl/reference

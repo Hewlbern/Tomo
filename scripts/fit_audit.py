@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""v3 fit audit. CAD measurements on exported STLs. Not physically tested."""
+"""v4 fit audit. CAD measurements on exported STLs. Not physically tested."""
 import numpy as np, trimesh, json, csv, os, math
 os.chdir(os.path.dirname(os.path.abspath(__file__))+"/..")
 import sys
@@ -8,8 +8,8 @@ from stl_paths import stl_path
 
 def load(n): return trimesh.load(stl_path(n))
 M={n:load(n) for n in
-   "torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer head_back head_front arm_L arm_R shoulder_bracket_L shoulder_bracket_R clasp_drum coupon".split()}
-for n in "dummy_servo_yaw dummy_servo_clasp dummy_horn_yaw dummy_horn_clasp dummy_pi dummy_cam dummy_speaker dummy_amp dummy_mic".split():
+   "torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer head_back head_front arm_L arm_R shoulder_bracket_L shoulder_bracket_R coupon".split()}
+for n in "dummy_servo_yaw dummy_horn_yaw dummy_servo_arm_L dummy_servo_arm_R dummy_horn_arm_L dummy_horn_arm_R dummy_pi dummy_cam dummy_speaker dummy_amp dummy_mic fur_proxy_torso sleeve_proxy_L sleeve_proxy_R".split():
     M[n]=load(n)
 
 def hole_radius(mesh, origin, axis, r_max=6, n_ang=72, n_z=5, z_span=1.0):
@@ -102,31 +102,39 @@ FS=dict(body_L=22.5,body_W=12.1,body_H=22.4,tab=32.3,span=27.7,hole=2.2,
         s_from_end=8.7,s_off=2.55,boss=26.7,overall=30.7,tab_t=4.2)
 
 # ---------- 1. Servo seats ----------
-# clasp shelf pilots at clasp_xy=(0,20), z around 46.8, span 27.7 about x=-2.55
 s_off=2.55; span=27.7
-# tray pilots: origin at each hole, axis +z
-clasp_holes=[]
-for sx in (-1,1):
-    o=np.array([-s_off+sx*(span/2), 20, 44.3])   # mid-shelf (z 41.8-46.8), under the tabs
-    h=hole_radius(M["tray"], o, [0,0,1], r_max=3, z_span=1.5)
-    clasp_holes.append((o.tolist(), h))
+# v4 geometry (cad/critter_v4.scad): shoulder axis y=13 z=60, arm-servo case top |x|=42, cap 42..46.
+SH_Y,SH_Z,XC,CAP_T=13.0,60.0,42.0,4.0
+BODY_Z=SH_Z-s_off          # servo long axis runs along world z; body centre 2.55 below the spline
+def ok_pil(h): return h and 1.55<=h["dia"]<=1.90
+def ok_m25clr(h): return h and 2.6<=h["dia"]<=3.0
+def ok_m25pil(h): return h and 1.95<=h["dia"]<=2.25
+arm_seat={}
+for side,sx in (("L",1),("R",-1)):
+    cap=M[f"shoulder_bracket_{side}"]; sv=M[f"dummy_servo_arm_{side}"]
+    tab_p=[hole_radius(cap,[sx*(XC+1.6),SH_Y,BODY_Z+dz],[1,0,0],r_max=3,z_span=1.5) for dz in (-span/2,span/2)]
+    cap_c=[hole_radius(cap,[sx*(XC+1.2),SH_Y,BODY_Z+dz],[1,0,0],r_max=3,z_span=1.0) for dz in (-19.3,19.3)]
+    pod_p=[hole_radius(M["torso_back"],[sx*(XC-4.5),SH_Y,BODY_Z+dz],[1,0,0],r_max=3,z_span=2.0) for dz in (-19.3,19.3)]
+    boss=hole_radius(cap,[sx*(XC+2),SH_Y,SH_Z],[1,0,0],r_max=8,z_span=2.0)
+    ov=dict(servo_cap=vol_int(sv,cap),servo_torso_back=vol_int(sv,M["torso_back"]),cap_torso_back=vol_int(cap,M["torso_back"]),
+            servo_tray=vol_int(sv,M["tray"]),servo_pi=vol_int(sv,M["dummy_pi"]),servo_amp=vol_int(sv,M["dummy_amp"]),
+            servo_yaw_servo=vol_int(sv,M["dummy_servo_yaw"]),servo_yaw_collar=vol_int(sv,M["yaw_collar"]),
+            servo_torso_front=vol_int(sv,M["torso_front"]))
+    arm_seat[side]=dict(tab_pilots=tab_p,cap_screw_clearance=cap_c,pod_pilots=pod_p,boss_hole=boss,overlaps_mm3=ov)
+    ok=(all(ok_pil(h) for h in tab_p) and all(ok_m25clr(h) for h in cap_c) and all(ok_m25pil(h) for h in pod_p)
+        and boss and 12.4<=boss["dia"]<=13.2 and all(v is not None and v<=0.05 for v in ov.values()))
+    add(f"Arm servo seat {side} (FS90MG in shoulder pod + cap, official 27.7 span)",
+        f"shoulder_bracket_{side}, torso_back (pod), dummy_servo_arm_{side}, tray, dummy_pi, dummy_amp, dummy_servo_yaw",
+        f"Tab pilots in the cap (design 1.7): {tab_p}. Cap screw clearance (design 2.8): {cap_c}. Pod pilots (design 2.1): {pod_p}. "
+        f"Boss hole in cap (design 12.8 for the Ø11.8 boss): {boss}. Overlaps (mm³, must be ~0): {ov}. "
+        f"Case top at |x|={XC}, cap {XC}..{XC+CAP_T}, boss top {XC+4.3}, horn {XC+4.3}..{XC+6.3}. Servo long axis vertical, spline at y={SH_Y}, z={SH_Z}.",
+        "pass" if ok else "fail",
+        "Bench-assemble servo to cap (self-tappers from the inner side), then drop the pair into the pod from outside and fit 2× M2.5 cap screws.")
 yaw_holes=[]
 for sx in (-1,1):
     o=np.array([-s_off+sx*(span/2), 0, 86.0])    # mid pilot boss, above the tab cutout
     h=hole_radius(M["yaw_collar"], o, [0,0,1], r_max=3, z_span=1.5)
     yaw_holes.append((o.tolist(), h))
-# hole span from measured centres: we used theoretical centres; if the hole is there, dia should be ~1.7
-def ok_pil(h): return h and 1.55<=h["dia"]<=1.90
-span_ok=all(h[1] for h in clasp_holes+yaw_holes)
-add("Clasp servo seat (FS90MG, official 27.7 span, 1.7 pilots)",
-    "tray, dummy_servo_clasp, dummy_horn_clasp, clasp_drum",
-    f"Pilots at x={[-s_off-span/2,-s_off+span/2]} y=20: {clasp_holes}. "
-    f"Servo body {FS['body_L']}x{FS['body_W']}x{FS['body_H']}, s_off={s_off}, tab={FS['tab']}. "
-    f"clasp_top=51, boss top=55.3, horn 55.3-57.3, drum_base=59.3 (4.0 mm above boss = 2.0 horn + 2.0 air). "
-    f"Servo/tray overlap vol={vol_int(M['tray'],M['dummy_servo_clasp'])}",
-    "pass" if ok_pil(clasp_holes[0][1]) and ok_pil(clasp_holes[1][1]) else "fail",
-    "Measure the included self-tappers on arrival; 1.7 mm is the M2 / typical 9g self-tap pilot.")
-
 add("Yaw servo seat (FS90MG, official 27.7 span, 1.7 pilots)",
     "yaw_collar, dummy_servo_yaw, dummy_horn_yaw, yaw_coupler",
     f"Pilots at x={[-s_off-span/2,-s_off+span/2]} y=0: {yaw_holes}. "
@@ -136,18 +144,23 @@ add("Yaw servo seat (FS90MG, official 27.7 span, 1.7 pilots)",
     "pass" if ok_pil(yaw_holes[0][1]) and ok_pil(yaw_holes[1][1]) else "fail",
     "Included M2.5x4 horn screw is too short for horn+coupler; use a longer M2.5 and confirm on arrival.")
 
-# horn gap check via z bounds
-drum_z=M["clasp_drum"].bounds
-horn_c=M["dummy_horn_clasp"].bounds
-boss_top=51+4.3
-gap_drum_to_horn=drum_z[0][2]-horn_c[1][2]
-gap_drum_to_boss=drum_z[0][2]-boss_top
-add("Clasp horn / drum clearance",
-    "clasp_drum, dummy_horn_clasp",
-    f"Drum zmin={drum_z[0][2]:.2f}, horn z {horn_c[0][2]:.2f}..{horn_c[1][2]:.2f}, boss top={boss_top:.1f}. "
-    f"Drum-to-horn air={gap_drum_to_horn:.2f} mm (design 2.0). Drum-to-boss={gap_drum_to_boss:.2f} mm (design 4.0 = horn 2.0 + air 2.0). "
-    f"Horn is an ASSUMED 2.0 mm / Ø24 envelope; measure the included horn on arrival.",
-    "pass" if gap_drum_to_horn>=1.9 and gap_drum_to_boss>=3.9 else "fail")
+# arm hub / horn / pod face clearances (axial, along x)
+hub={}
+for side,sx in (("L",1),("R",-1)):
+    arm=M[f"arm_{side}"]; horn=M[f"dummy_horn_arm_{side}"]; pod=M["torso_back"]; cap=M[f"shoulder_bracket_{side}"]
+    ab=arm.bounds; hb=horn.bounds; cb=cap.bounds
+    if sx>0: arm_in=ab[0][0]; horn_in=hb[0][0]; face=max(cb[1][0], XC+CAP_T)
+    else:    arm_in=-ab[1][0]; horn_in=-hb[1][0]; face=max(-cb[0][0], XC+CAP_T)
+    hub[side]=dict(cap_face=round(face,3),horn_inner=round(horn_in,3),arm_inner=round(arm_in,3),
+        horn_to_cap=round(horn_in-face,3),hub_to_cap=round(arm_in-face,3),
+        arm_horn_overlap=vol_int(arm,horn),arm_servo_overlap=vol_int(arm,M[f"dummy_servo_arm_{side}"]))
+ok=all(h["horn_to_cap"]>=0.25 and h["hub_to_cap"]>=0.5 and (h["arm_horn_overlap"] or 0)<=0.05 and (h["arm_servo_overlap"] or 0)<=0.05 for h in hub.values())
+add("Arm hub on horn / cap face clearance",
+    "arm_L/R, dummy_horn_arm_L/R, shoulder_bracket_L/R",
+    f"{hub}. Design: horn sits on the boss 0.3 mm proud of the cap face; hub face 0.6 mm off the cap; horn pocket Ø25 to horn top; "
+    f"spline tip pocket Ø5.5 to x=50.8; axial M2.5×12 horn screw from the paw-side counterbore. Horn is an ASSUMED 2.0 mm / Ø24 envelope.",
+    "pass" if ok else "fail",
+    "Measure the included horn; if its hub is taller than 2.0 mm, deepen the pocket. Horn-to-hub pilots at r=7 are assumed.")
 
 # ---------- 2. Seams ----------
 # lip: back ymin < 0, front groove exists (cut into mid-wall)
@@ -155,10 +168,10 @@ tf,tb=M["torso_front"],M["torso_back"]
 hf,hb=M["head_front"],M["head_back"]
 t_overlap=vol_int(tf,tb); h_overlap=vol_int(hf,hb)
 # fastener holes: torso bosses at tboss
-tboss=[(-46+12,22),(46-12,22),(-46+10,72),(46-10,72)]
+tboss=[(-24,12),(24,12),(-30,79),(30,79)]   # v4 positions
 # TW/2=46, tboss = [[-TW/2+12,22],...] so x=±34 at z=22 and x=±36 at z=72
 torso_holes=[]
-for x,z in [(-34,22),(34,22),(-36,72),(36,72)]:
+for x,z in tboss:
     # holes are along y
     fr=hole_radius(tf, [x, -4, z], [0,1,0], r_max=4, z_span=1.5)
     bk=hole_radius(tb, [x,  4, z], [0,1,0], r_max=4, z_span=1.5)
@@ -276,7 +289,7 @@ add("Coupler blade in head slot",
 def tab_pocket(sign):
     tab=M["tray"].vertices
     # vertices of the 10x3x10 tab ear only (do not include the spine)
-    sel=tab[(np.abs(tab[:,0]-sign*34)<=5.02)&(np.abs(tab[:,1]-1.5)<=1.52)&(np.abs(tab[:,2]-40)<=5.02)]
+    sel=tab[(np.abs(tab[:,0]-sign*29)<=5.02)&(np.abs(tab[:,1]-1.5)<=1.52)&(np.abs(tab[:,2]-23)<=5.02)]
     # pocket in torso (union front+back roughly: use both)
     tv=np.vstack([M["torso_front"].vertices, M["torso_back"].vertices])
     # pocket is a cut; measure free box by rays along x at y=1.5,z=40 from the tab centre
@@ -285,7 +298,7 @@ def tab_pocket(sign):
     tbnd=[sel[:,0].min(),sel[:,0].max(),sel[:,1].min(),sel[:,1].max(),sel[:,2].min(),sel[:,2].max()]
     # pocket walls: ray ±x, ±y, ±z from (sign*34, 1.5, 40) through torso union? The pocket is empty, walls are the rib.
     # Use torso_back (ribs are on y=+1.5, mostly back). Also front.
-    o=np.array([sign*34,1.5,40],float)
+    o=np.array([sign*31.5,1.5,23],float)   # outer half of the tab (inner half sits in the spine relief)
     extents={}
     for name,mesh in ("front",M["torso_front"]),("back",M["torso_back"]):
         for axis,vec in ("x",[1,0,0]),("y",[0,1,0]),("z",[0,0,1]):
@@ -322,7 +335,7 @@ def pocket_ok(tp):
     return 9.9<=tab["x"]<=10.1 and 2.9<=tab["y"]<=3.1 and 9.9<=tab["z"]<=10.1
 add("Tray tab pockets",
     "tray, torso_front, torso_back",
-    f"+x tab/pocket {tpL}. -x tab/pocket {tpR}. Design: 10×3×10 tab in a 10.6×3.6×10.6 pocket, rib 14 mm wide centred on x=±34 (v2 rib was centred at ±37 and only held 8.3 mm of the 10 mm tab).",
+    f"+x tab/pocket {tpL}. -x tab/pocket {tpR}. Design: 10×3×10 tab in a 10.6×3.6×10.6 pocket, rib 14 mm wide centred on the tab. v4: tabs and ribs moved from (x=±34, z=40) to (x=±29, z=23) to clear the shoulder pods and the Pi standoffs.",
     "pass" if pocket_ok(tpL) and pocket_ok(tpR) else "fail")
 
 # ---------- 5. Electronics seats ----------
@@ -333,21 +346,21 @@ add("Speaker seat (Adafruit 3351, 3 W 4 Ω)",
     f"Dummy extents {np.round(spk.extents,3).tolist()}, centroid {np.round(spk.centroid,2).tolist()}. "
     f"Matches MAX98357A (3.2 W into 4 Ω at 5 V). The v2 Ø28 placeholder and any 0.5 W 8 Ω mini are retired. "
     f"Speaker↔shell overlap {vol_int(M['torso_front'],spk)} mm³ (pocket has 0.3 mm per-side clearance; grille is a 66×26 window).",
-    "pass")
+    "pass" if (vol_int(M['torso_front'],spk) or 0)<=0.05 else "fail")
 
 add("Amp pocket (Adafruit 3006 MAX98357A 19.4×17.8×3.0)",
     "tray, dummy_amp",
     f"Dummy extents {np.round(amp.extents,3).tolist()}, centroid {np.round(amp.centroid,2).tolist()}. "
     f"Pocket is 0.3 mm per side plus 8 mm headroom for the post-2024 terminal block. "
     f"Amp↔tray overlap {vol_int(M['tray'],amp)} mm³. Two M2 pilots at an assumed 15×13 span — MEASURE the board on arrival.",
-    "pass")
+    "pass" if (vol_int(M['tray'],amp) or 0)<=0.05 else "fail")
 
 add("Mic pocket (Adafruit 3421, 16.7×12.7×1.8, bottom-ported)",
     "torso_front, dummy_mic",
     f"Dummy extents {np.round(mic.extents,3).tolist()}, centroid {np.round(mic.centroid,2).tolist()}. "
     f"Port hole is Ø2.4 at (18, front, 80), aligned with the breakout. Pocket 0.3 mm per side. "
     f"Mic↔shell overlap {vol_int(M['torso_front'],mic)} mm³.",
-    "pass")
+    "pass" if (vol_int(M['torso_front'],mic) or 0)<=0.05 else "fail")
 
 # ribbon loop: the bay is a cut, hard to measure radius directly. Probe a 14 mm radius torus region in the head.
 # Check that a 17×2.5 slot exists at the floor (14, 0, hcut+2)
@@ -378,20 +391,34 @@ add("Camera ribbon path",
 add("Pi envelope",
     "tray, dummy_pi",
     f"Pi dummy extents {np.round(pi.extents,3).tolist()} (65×8.5×30: 8.5 mm y-envelope allows a header). "
-    f"v2 was 5 mm and tight if a header is used. Camera is the standard 25×24×11.5 Module 3, not the Wide.",
-    "pass")
+    f"Camera is the standard 25×24×11.5 Module 3, not the Wide. Pi↔tray {vol_int(M['tray'],pi)} mm³, Pi↔arm servos "
+    f"{vol_int(M['dummy_servo_arm_L'],pi)} / {vol_int(M['dummy_servo_arm_R'],pi)} mm³.",
+    "pass" if all((v or 0)<=0.05 for v in (vol_int(M['tray'],pi),vol_int(M['dummy_servo_arm_L'],pi),vol_int(M['dummy_servo_arm_R'],pi))) else "fail")
 
-# ---------- 6. Drum / servo angle (from design_params) ----------
-P=json.load(open("results/design_params.json"))
-cd=P["clasp_to_drum"]
-add("Cord drum / pulley and servo angle for 45° closure",
-    "clasp_drum, arm pulleys, FS90MG horn",
-    f"r_d={cd['r_d']}, r_q={cd['r_q']}, travel 0–45° = {cd['travel_0_to_45_mm']} mm = {cd['drum_deg_0_to_45']}° drum. "
-    f"Drum is 1:1 on the horn, so servo angle = {cd['servo_deg_0_to_45']}° (well within the 180° FS90MG, 500–2500 μs). "
-    f"Stop-to-stop (−3..46°) = {cd['drum_deg_stop_to_stop']}°. "
-    f"Drum xy unchanged from v2; clasp_top lowered to 51 so the new 4.0 mm horn gap still puts grooves at 61.7 / 65.3, mid = zq 63.5, fleet ±1.8°. "
-    f"{cd.get('note','')}",
-    "pass")
+# ---------- 6. Joints: head pan, neck cabling, arm travel ----------
+SW=json.load(open("results/summary_sweep.json")) if os.path.exists("results/summary_sweep.json") else None
+yaw_ok=SW is not None and len(SW["rigid_overlaps_in_travel"])==0
+add("Head pan joint (motorised yaw, FS90MG in the collar)",
+    "yaw_collar, yaw_coupler, head_back, head_front, dummy_servo_yaw, dummy_horn_yaw",
+    "Pan servo is the v3 collar FS90MG (unchanged): horn → coupler blade → slot in head_back. Software clamp ±42° "
+    "(84° of the 180° servo travel), hard stop ≈ ±47°. "
+    + (f"Sweep: {SW['sweep']['poses']} poses, rigid overlaps in travel = {len(SW['rigid_overlaps_in_travel'])}; first yaw stop contact {SW['stop_engagement'].get('yaw_pos')}." if SW else "Run scripts/sim_v4.py first."),
+    "pass" if yaw_ok else "fail",
+    "Tilt was not added: a nod yoke plus a 4th FS90MG does not fit cleanly in the 64 mm head beside the camera and FPC loop.")
+add("Neck cable path (pan servo + camera FPC)",
+    "yaw_collar, head_back, torso",
+    "The pan servo is fixed in the torso-side collar, so its 3-wire lead never crosses the moving joint: it drops straight down beside the "
+    "servo body into the torso. Only the camera FPC crosses the neck: floor slot (x=14) → Ø34 collar bore → r=14 U-bend loop bay in the head "
+    f"(π·14 ≈ 44 mm slack for ±42°). Floor slot probe width {ribbon_slot} mm (design 2.5). Collar bore Ø34 stays open above the boss for service.",
+    "pass" if (ribbon_slot is None or ribbon_slot>=2.2) else "fail",
+    "Do not twist the FPC around the yaw axis; let it roll in the U-bend.")
+arm_ok=SW is not None and len(SW["rigid_overlaps_in_travel"])==0 and SW.get("arm_min_clearance_mm",{}).get("ok",False)
+add("Arm travel (forward/up swing, direct drive)",
+    "arm_L/R, sleeve_proxy_L/R, torso_back, fur_proxy_torso, head_front/back",
+    "Arm angle 0 = straight forward, + = up. Software clamp −55°..+70° (125° of the 180° servo travel; −55° keeps the paw off the desk). "
+    + (f"Sweep min clearances: {SW.get('arm_min_clearance_mm')}." if SW else "Run scripts/sim_v4.py first."),
+    "pass" if arm_ok else "fail",
+    "Direct drive: a child forcing the arm back-drives the FS90MG gear train. There is no breakaway yet.")
 
 # coupon exists
 add("Test coupon",
@@ -406,7 +433,7 @@ if "bezel" not in M and os.path.exists("stl/bezel.stl"):
     M["bezel"]=load("bezel")
 wt_names=["torso_front","torso_back","tray","yaw_collar","yaw_retainer_A","yaw_retainer_B",
     "yaw_coupler","yaw_thrust_washer","head_back","head_front","arm_L","arm_R","shoulder_bracket_L","shoulder_bracket_R",
-    "clasp_drum","coupon"]
+    "coupon"]
 if "bezel" in M: wt_names.append("bezel")
 wt={n:bool(M[n].is_watertight) for n in wt_names}
 add("Mesh watertight (printable parts)",
@@ -425,6 +452,7 @@ out=dict(assumptions=dict(
     servo_source="Official Feetech FS90MG drawing p.5, edition A/0, 2021-04-30, ±0.1 mm. File copied to datasheets/FS90MG.pdf.",
     horn="ASSUMED typical 2.0 mm disc + 4-arm star, Ø24. Not on the drawing. p.6 says No Accessories.",
     spline_teeth="Drawing and 6-9 say 20T/Ø4.7; product pages say 21T. Measure on arrival.",
+    arm_servos="2× FS90MG, one per arm, spline along x at y=13 z=60, direct drive on the horn (v4).",
     speaker="Adafruit 3351 Mono Enclosed 3W 4Ω, 70×30×17, Core A$8.95",
     amp="Adafruit 3006 MAX98357A 19.4×17.8×3.0",
     mic="Adafruit 3421 16.7×12.7×1.8 bottom-ported",

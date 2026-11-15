@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Evokin — an open-source plush robot companion</title>
-  <meta name="description" content="Evokin is a small orange, Mirumi-style plush robot whose head turns and whose paws clasp in the middle. Open-source CAD, STLs and a planned ESP32-S3 brain.">
+  <meta name="description" content="Evokin is a small orange, Mirumi-style plush robot whose head pans and whose arms reach forward and up. Open-source CAD, STLs and a planned ESP32-S3 brain.">
   <meta property="og:title" content="Evokin">
-  <meta property="og:description" content="An open-source plush robot companion. Head turns, paws clasp.">
+  <meta property="og:description" content="An open-source plush robot companion. Head pans, arms hug and wave.">
   <meta property="og:image" content="media/evokin_poster.jpg">
   <link rel="icon" type="image/jpeg" href="media/evokin_poster.jpg">
   <style>
@@ -207,11 +207,11 @@
     <section class="hero">
       <div class="wrap">
         <p class="kicker">Open-source plush robot</p>
-        <h1>A small orange bear that turns its head and clasps its paws.</h1>
-        <p class="lede">Evokin is a Mirumi-style companion: a furry shell around a printed yaw joint, a cord-drum arm drive, two Feetech FS90MG servos, and a planned ESP32-S3 brain with a camera and a voice.</p>
+        <h1>A small orange bear that turns its head and reaches out to hug or wave.</h1>
+        <p class="lede">Evokin is a Mirumi-style companion: a furry shell around a motorised head-pan joint and two forward-facing arms, three Feetech FS90MG servos, and a planned ESP32-S3 brain with a camera and a voice.</p>
         <div class="flags">
-          <span class="flag">v3 CAD</span>
-          <span class="flag">18 / 18 CAD checks passed</span>
+          <span class="flag">v4 CAD</span>
+          <span class="flag">21 / 21 CAD checks passed</span>
           <span class="flag alert">Prototype — nothing printed or purchased</span>
           <span class="flag alert">Not child-ready</span>
         </div>
@@ -221,35 +221,35 @@
             Your browser cannot play this video. <a href="media/evokin_demo_ad_v3_real.mp4">Download the MP4</a>.
           </video>
         </div>
-        <p class="caption">A 10-second generated concept advertisement, not footage of a built unit. The CAD and the renders below are the design source of truth. Earlier takes live in the repository’s <code>media/</code> folder.</p>
+        <p class="caption">A 10-second generated concept advertisement, not footage of a built unit, and it still shows the older v3 design (backward clasping arms). The CAD and the renders below are the design source of truth. Earlier takes live in the repository’s <code>media/</code> folder.</p>
       </div>
     </section>
 
     <section id="looks">
       <div class="wrap">
         <h2>How it looks</h2>
-        <p class="sub">Blender Cycles renders of the v3 fur model, plus CAD stills of the mechanism. Click for the same frame at this page’s resolution; full-size PNGs are in the repository.</p>
+        <p class="sub">Blender Cycles renders of the v4 fur model, plus CAD stills of the mechanism. Click for the same frame at this page’s resolution; full-size PNGs are in the repository.</p>
         <div class="gallery">
           <figure>
-            <a href="renders/01_hero_open.jpg"><img src="renders/01_hero_open.jpg" width="960" height="720" alt="Evokin, an orange furry bear-like robot, with its arms open"></a>
-            <figcaption>Arms open.</figcaption>
+            <a href="renders/01_hero_forward.jpg"><img src="renders/01_hero_forward.jpg" width="960" height="720" alt="Evokin, an orange furry bear-like robot, front three-quarter view with both arms reaching forward"></a>
+            <figcaption>Front 3/4, arms forward.</figcaption>
           </figure>
           <figure>
-            <a href="renders/02_hero_clasp.jpg"><img src="renders/02_hero_clasp.jpg" width="960" height="720" alt="Evokin with its paws clasped together in the middle"></a>
-            <figcaption>Paws clasped.</figcaption>
+            <a href="renders/02_hero_head30_wave.jpg"><img src="renders/02_hero_head30_wave.jpg" width="960" height="720" alt="Evokin with its head turned 30 degrees and its left arm raised in a wave"></a>
+            <figcaption>Head panned 30°, left arm up in a wave.</figcaption>
           </figure>
           <figure>
-            <a href="renders/03_cutaway.jpg"><img src="renders/03_cutaway.jpg" width="960" height="720" alt="Colour-coded cutaway of Evokin showing the head, yaw stack, servos, speaker and arms"></a>
-            <figcaption>Cutaway of the printed shell, yaw stack, servos, speaker and arm drive.</figcaption>
+            <a href="renders/03_cutaway.jpg"><img src="renders/03_cutaway.jpg" width="960" height="720" alt="Colour-coded cutaway of Evokin showing the head, yaw stack, shoulder servos, speaker and arms"></a>
+            <figcaption>Cutaway of the printed shell, yaw stack, shoulder servos and speaker.</figcaption>
           </figure>
           <figure>
-            <a href="renders/v3_exploded_fixes.jpg"><img src="renders/v3_exploded_fixes.jpg" width="960" height="552" alt="Exploded CAD view of Evokin v3"></a>
-            <figcaption>Exploded CAD. Red is the new thrust washer; yellow is the assumed horn envelope; teal is the speaker, amp and mic.</figcaption>
+            <a href="renders/v4_head30_wave.jpg"><img src="renders/v4_head30_wave.jpg" width="960" height="540" alt="CAD view of Evokin v4 with the head panned 30 degrees and the left arm raised"></a>
+            <figcaption>CAD: head pan +30°, left arm +60°.</figcaption>
           </figure>
         </div>
         <figure class="wide">
-          <a href="renders/v3_yaw_and_servo_section.jpg"><img src="renders/v3_yaw_and_servo_section.jpg" width="960" height="504" alt="Section through the yaw joint and servo seats"></a>
-          <figcaption>Section through the yaw joint and the two FS90MG seats.</figcaption>
+          <a href="renders/v4_shoulder_exploded.jpg"><img src="renders/v4_shoulder_exploded.jpg" width="960" height="540" alt="Exploded CAD view of the v4 shoulder: pod, servo, cap, horn and arm hub"></a>
+          <figcaption>Shoulder, exploded: pod in the back shell, FS90MG, cap, horn, arm hub.</figcaption>
         </figure>
       </div>
     </section>
@@ -257,19 +257,19 @@
     <section id="works">
       <div class="wrap">
         <h2>How it works</h2>
-        <p class="sub">Two metal-gear micro servos do all of the motion. The shells are FDM-printed and closed on a registration lip. Fail-open is a requirement, not a finished feature.</p>
+        <p class="sub">Three metal-gear micro servos do all of the motion. The shells are FDM-printed and closed on a registration lip. Fail-safe is a requirement, not a finished feature.</p>
         <div class="grid-2">
           <article class="card">
-            <h3>Head yaw</h3>
-            <p>An FS90MG in the yaw collar turns a coupler blade in a slot in the head. A printed 0.8&nbsp;mm thrust washer takes the axial load. Software should clamp yaw to about ±42° so the hard stop is not a running face.</p>
+            <h3>Head pan</h3>
+            <p>An FS90MG in the yaw collar turns a coupler blade in a slot in the head. A printed 0.8&nbsp;mm thrust washer takes the axial load. Software clamps pan to ±42°; the printed hard stop is at about ±47°. No tilt axis — it does not fit cleanly beside the camera.</p>
           </article>
           <article class="card">
-            <h3>Arm clasp</h3>
-            <p>A second FS90MG turns a cord drum 1:1 with the horn. 0–45° of arm close is 6.28&nbsp;mm of cord, which is 35.12° of servo travel. Soft foam pads are meant to meet in the middle; pad stiffness, and therefore grip force, is unknown.</p>
+            <h3>Forward-facing arms</h3>
+            <p>One FS90MG per shoulder, direct drive, in a pod moulded into the back shell. 0° is straight forward and + is up: software range −55° to +70°, for a hug or a wave. Paw force at stall is about 3.4&nbsp;N (datasheet, not measured).</p>
           </article>
           <article class="card">
-            <h3>Fail-open</h3>
-            <p>The plan is to cut the 5&nbsp;V servo rail when the paws are parked, or when a current sensor sees a child pulling the arms apart, so the servos can back-drive and the paws go limp. A mechanical weak link in the cord has not been designed or rated.</p>
+            <h3>Fail-safe</h3>
+            <p>Direct drive has no mechanical breakaway. The plan is to cut the 5&nbsp;V servo rail when the arms are parked, or when a current sensor sees a stall, so the servos can back-drive and the arms go limp. That trip is not built yet.</p>
           </article>
           <article class="card">
             <h3>Shells and fasteners</h3>
@@ -283,7 +283,7 @@
       <div class="wrap">
         <h2>Bill of materials</h2>
         <p class="sub">Prices are in Australian dollars, from November 2026 supplier quotes, and may have changed. The complete table, including unsourced fasteners, fur and the custom-board target, is in the repository as <a href="https://github.com/Hewlbern/evokin/blob/main/BOM.csv">BOM.csv</a>.</p>
-        <p class="note">Nothing has been purchased. Every line below is planned or suggested only. Fasteners, fur, foam, cord, a battery and filament are still unsourced.</p>
+        <p class="note">Nothing has been purchased. Every line below is planned or suggested only. Fasteners, fur, a battery and filament are still unsourced.</p>
 
         <h3 style="margin-top:0">Priced mechanical</h3>
         <div class="scroll">
@@ -292,18 +292,19 @@
               <tr><th>Item</th><th class="num">Qty</th><th class="num">Unit</th><th class="num">Line</th><th>Supplier</th></tr>
             </thead>
             <tbody>
-              <tr><td>Feetech FS90MG (head yaw)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
-              <tr><td>Feetech FS90MG (arm clasp)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
+              <tr><td>Feetech FS90MG (head pan)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
+              <tr><td>Feetech FS90MG (left arm)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
+              <tr><td>Feetech FS90MG (right arm, new in v4)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
               <tr><td>Adafruit 3351 mono enclosed speaker, 3&nbsp;W 4&nbsp;Ω</td><td class="num">1</td><td class="num">8.95</td><td class="num">8.95</td><td>Core Electronics / Adafruit</td></tr>
             </tbody>
             <tfoot>
-              <tr><td>Subtotal</td><td></td><td></td><td class="num">23.75</td><td></td></tr>
+              <tr><td>Subtotal</td><td></td><td></td><td class="num">31.15</td><td></td></tr>
             </tfoot>
           </table>
         </div>
 
         <h3>Option A — project buy</h3>
-        <p class="sub">One first-article brain plus spare modules for a later custom board. About A$88.40 electronics, or A$92.90 with the optional TP4056, or about A$112–117 with the priced servos and speaker.</p>
+        <p class="sub">One first-article brain plus spare modules for a later custom board. About A$88.40 electronics, or A$92.90 with the optional TP4056, or about A$119.55 with the three priced servos and speaker.</p>
         <div class="scroll">
           <table>
             <thead>
@@ -323,8 +324,8 @@
           </table>
         </div>
 
-        <h3>Option B — cheaper first build, if the pinout checks out</h3>
-        <p class="sub">About A$51.18 electronics, or about A$75 with the priced servos and speaker (A$75–85 with postage). The DFR1154’s two spare servo GPIOs are still unverified, and the board has no charger.</p>
+        <h3>Option B — cheaper electronics, needs a servo driver</h3>
+        <p class="sub">About A$51.18 electronics, or about A$82.33 with the three priced servos and speaker, plus a PCA9685 servo driver (not yet sourced) and postage. The DFR1154 has only GPIO43/44 free, so it cannot drive three servos directly. It has no charger.</p>
         <div class="scroll">
           <table>
             <thead>
@@ -334,9 +335,10 @@
               <tr><td>DFRobot ESP32-S3 AI Camera DFR1154 (OV3660, PDM mic, MAX98357, no charger)</td><td class="num">1</td><td class="num">37.23</td><td>Core Electronics</td></tr>
               <tr><td>INA219 breakout (clone)</td><td class="num">1</td><td class="num">7.00</td><td>AuscomTech</td></tr>
               <tr><td>XL6009 boost, set to 5&nbsp;V</td><td class="num">1</td><td class="num">6.95</td><td>AuscomTech</td></tr>
+              <tr><td>PCA9685 16-channel I2C servo driver</td><td class="num">1</td><td class="num">not yet sourced</td><td>—</td></tr>
             </tbody>
             <tfoot>
-              <tr><td>Electronics subtotal</td><td></td><td class="num">51.18</td><td></td></tr>
+              <tr><td>Electronics subtotal (priced lines)</td><td></td><td class="num">51.18</td><td></td></tr>
             </tfoot>
           </table>
         </div>
@@ -349,7 +351,7 @@
         <h2>Printable STLs</h2>
         <p class="sub">FDM in PLA or PETG is the intended process. No layer height or infill has been validated. Print the coupon first. A passing coupon is not a full fit-check.</p>
         <div class="btnrow">
-          <a class="btn" href="downloads/evokin-stls.zip">Download all STLs (zip, 1.5 MB)</a>
+          <a class="btn" href="downloads/evokin-stls.zip">Download all STLs (zip, 1.1 MB)</a>
           <a class="btn ghost" href="https://github.com/Hewlbern/evokin/tree/main/stl">Browse on GitHub</a>
         </div>
         <div class="scroll">
@@ -359,20 +361,18 @@
             </thead>
             <tbody>
               <tr><td>Torso front</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/torso_front.stl">torso_front.stl</a></td><td>Seam-down. 0.40 mm chamfer. M2.5 clearance 2.8 mm. Female groove.</td><td class="num">1</td></tr>
-              <tr><td>Torso back</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/torso_back.stl">torso_back.stl</a></td><td>Male lip, 1.2 mm. M2.5 pilots 2.1 mm.</td><td class="num">1</td></tr>
-              <tr><td>Tray</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/tray.stl">tray.stl</a></td><td>Clasp-servo shelf, 1.7 mm pilots, 10 mm tabs.</td><td class="num">1</td></tr>
+              <tr><td>Torso back</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/torso_back.stl">torso_back.stl</a></td><td>Male lip, 1.2 mm. M2.5 pilots 2.1 mm. Shoulder servo pods moulded in.</td><td class="num">1</td></tr>
+              <tr><td>Tray</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/tray.stl">tray.stl</a></td><td>Spine with amp pocket; 10 mm tabs at x = ±29.</td><td class="num">1</td></tr>
               <tr><td>Yaw collar</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/yaw_collar.stl">yaw_collar.stl</a></td><td>Servo hangers, stepped Ø34 bore.</td><td class="num">1</td></tr>
               <tr><td>Yaw retainers</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/yaw_retainer_A.stl">yaw_retainer_A.stl</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/yaw_retainer_B.stl">B</a></td><td>M2 clearance 2.3 mm.</td><td class="num">1+1</td></tr>
               <tr><td>Yaw coupler</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/yaw_coupler.stl">yaw_coupler.stl</a></td><td>2.0 mm blade. Needs a longer M2.5 horn screw.</td><td class="num">1</td></tr>
               <tr><td>Thrust washer</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/yaw_thrust_washer.stl">yaw_thrust_washer.stl</a></td><td>0.8 mm. Print flat, no supports.</td><td class="num">1</td></tr>
               <tr><td>Head front / back</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/head_front.stl">head_front.stl</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/head_back.stl">head_back.stl</a></td><td>Back prints skirt-down, 30° cone.</td><td class="num">1+1</td></tr>
-              <tr><td>Arms L / R</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/arm_L.stl">arm_L.stl</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/arm_R.stl">arm_R.stl</a></td><td>Critter’s own left is +x. Unchanged from v2.</td><td class="num">1+1</td></tr>
-              <tr><td>Shoulder brackets</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/shoulder_bracket_L.stl">L</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/shoulder_bracket_R.stl">R</a></td><td>2.8 mm screw holes.</td><td class="num">1+1</td></tr>
-              <tr><td>Clasp drum</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/clasp_drum.stl">clasp_drum.stl</a></td><td>1:1 on the FS90MG horn. Ø3.2 screw access.</td><td class="num">1</td></tr>
+              <tr><td>Arms L / R</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/arm_L.stl">arm_L.stl</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/arm_R.stl">arm_R.stl</a></td><td>Critter’s own left is +x. Forward-reaching, hub screws to the servo horn. Exported at −20°.</td><td class="num">1+1</td></tr>
+              <tr><td>Shoulder caps</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/shoulder_bracket_L.stl">L</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/shoulder_bracket_R.stl">R</a></td><td>4 mm plate; arm servo screws to it, 2 × M2.5 into the pod.</td><td class="num">1+1</td></tr>
               <tr><td>Eye bezel</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/bezel.stl">bezel.stl</a></td><td>Print two (left and right are mirrors).</td><td class="num">2</td></tr>
               <tr><td>Shutter</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/shutter.stl">shutter.stl</a></td><td>Camera shutter.</td><td class="num">1</td></tr>
               <tr><td>Test coupon</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/coupon.stl">coupon.stl</a></td><td>Print first. Journal, washer, tab, servo seat.</td><td class="num">1</td></tr>
-              <tr><td>Paw pad templates</td><td><a href="https://github.com/Hewlbern/evokin/raw/main/stl/templates/paw_pad_L.stl">paw_pad_L.stl</a>, <a href="https://github.com/Hewlbern/evokin/raw/main/stl/templates/paw_pad_R.stl">R</a></td><td>Not printed — cut foam from these.</td><td class="num">2</td></tr>
             </tbody>
           </table>
         </div>
@@ -382,13 +382,13 @@
     <section id="electronics">
       <div class="wrap">
         <h2>Electronics</h2>
-        <p class="sub">The planned brain is an ESP32-S3, not the Raspberry Pi Zero still drawn as a tray dummy in the v3 CAD. Planning notes, GPIO cautions and a bring-up checklist are in <a href="https://github.com/Hewlbern/evokin/blob/main/electronics/esp32-board-notes.md">electronics/esp32-board-notes.md</a>.</p>
+        <p class="sub">The planned brain is an ESP32-S3, not the Raspberry Pi Zero still drawn as a tray dummy in the CAD. v4 needs three servo PWM channels. Planning notes, GPIO cautions and a bring-up checklist are in <a href="https://github.com/Hewlbern/evokin/blob/main/electronics/esp32-board-notes.md">electronics/esp32-board-notes.md</a>.</p>
         <div class="grid-2">
           <article class="card">
             <h3>Prototype paths</h3>
             <ul>
-              <li>Option A: Seeed XIAO ESP32S3 Sense, plus spare WROOM-1U-N16R8 modules.</li>
-              <li>Option B: DFRobot DFR1154, if two servo GPIOs are free — still unverified.</li>
+              <li>Option A: Seeed XIAO ESP32S3 Sense, plus spare WROOM-1U-N16R8 modules. Three spare PWM pins confirmed (e.g. D0–D2).</li>
+              <li>Option B: DFRobot DFR1154. Only GPIO43/44 free, so add a PCA9685 servo driver over I2C.</li>
             </ul>
           </article>
           <article class="card">
@@ -406,24 +406,25 @@
     <section id="validation">
       <div class="wrap">
         <h2>Validation and status</h2>
-        <p class="sub">The v3 audit is CAD measurements and an imposed-motion collision sweep on the exported STLs. Nothing has been printed or physically tested.</p>
+        <p class="sub">The v4 audit is CAD measurements and an imposed-motion collision sweep on the exported STLs. Nothing has been printed or physically tested.</p>
         <div class="scroll">
           <table>
             <thead><tr><th>Check</th><th>Result</th></tr></thead>
             <tbody>
-              <tr><td>Fit-audit interfaces</td><td class="ok">18 / 18 pass, 0 marginal, 0 fail</td></tr>
-              <tr><td>Imposed-motion sweep</td><td>529 poses, 149,178 pair tests, 13,721 booleans</td></tr>
-              <tr><td>Rigid overlaps in travel</td><td class="ok">0</td></tr>
-              <tr><td>Contact at 45° clasp</td><td>0.30 mm pad overlap, 6.5 mm core gap, 0.20 mm pad-into-strap (foam stiffness unknown; no force claimed)</td></tr>
+              <tr><td>Fit-audit interfaces</td><td class="ok">21 / 21 pass, 0 marginal, 0 fail</td></tr>
+              <tr><td>Imposed-motion sweep</td><td>1,017 poses, 245,097 pair tests, 22,712 booleans</td></tr>
+              <tr><td>Rigid overlaps in travel</td><td class="ok">0 (arms −55…+70°, head ±42°)</td></tr>
+              <tr><td>Head pan hard stop</td><td>Collar ↔ head contact at ±47°, beyond the ±42° clamp</td></tr>
+              <tr><td>Arm clearances</td><td>0.6 mm to shell and cap, 10.6 mm to head; paw ≥ 2.1 mm above the desk</td></tr>
               <tr><td>Printable meshes</td><td class="ok">Watertight</td></tr>
-              <tr><td>Drive</td><td>6.2832 mm of cord = 35.122° of servo for 0–45° of arm close</td></tr>
             </tbody>
           </table>
         </div>
         <div class="card" style="margin-top:18px">
           <h3>Status</h3>
           <ul>
-            <li>Prototype. v3 CAD is complete and unprinted. Motion, grip force, fail-open and wear are untested.</li>
+            <li>Prototype. v4 CAD is complete and unprinted. Motion, arm force, fail-safe behaviour and wear are untested.</li>
+            <li>The concept video still shows the v3 design.</li>
             <li>Nothing has been ordered or purchased.</li>
             <li>Power is bench-tethered only. Portable power is unresolved.</li>
             <li>Not production, not child-ready, not waterproof.</li>

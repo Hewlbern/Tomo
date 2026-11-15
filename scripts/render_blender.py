@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: MIT
 #!/usr/bin/env python3
-"""Photoreal Cycles renders of critter v3 (orange furry teddy).
+"""Photoreal Cycles renders of Evokin v4 (orange furry teddy, forward-facing arms, head pan).
 
-STLs are in millimetres, Z-up, -Y face, +Y strap, exported at yaw=0, clasp=0.
+STLs are in millimetres, Z-up, -Y face, exported at yaw=0, both arms at -20° (0 = forward, + = up).
 This script scales them 0.001 (Blender metres) and poses moving parts with the
-same imposed kinematics as scripts/sim_v3.py.
+same imposed kinematics as scripts/sim_v4.py.
 
 Usage (from any cwd):
   blender -b -P render_blender.py -- --preview
   blender -b -P render_blender.py -- --final
-  blender -b -P render_blender.py -- --shot hero_open --final
+  blender -b -P render_blender.py -- --shot hero_forward --final
 """
 from __future__ import annotations
 
@@ -35,21 +35,15 @@ def resolve_stl(filename):
         if candidate.is_file():
             return candidate
     raise FileNotFoundError(f"{name} not found under {STL}")
-BLEND = OUT / "critter_v3_fur.blend"
+BLEND = OUT / "evokin_v4_fur.blend"
 S = 0.001  # mm -> m
 
 # Official / CAD numbers (mm)
 EYE_X, EYE_Z, HD = 13.0, 120.0, 74.0
 # Flange just proud of the head surface (~y=-35.1 at the eye)
 BEZEL_Y = -36.2
-PIV_L = (58.0, 10.0, 0.0)
-PIV_R = (-58.0, 10.0, 0.0)
-DRUM_PIV = (0.0, 20.0, 0.0)
-RATIO = 8.0 / 10.25  # r_q / r_d
-
-# Slightly-open hero pose: a visible gap, still a reach-to-hug.
-CLASP_OPEN = 32.0
-CLASP_CLOSED = 45.0
+SH = (0.0, 13.0, 60.0)      # v4 shoulder axis (x direction) through y=13, z=60
+ARM_REST = -20.0            # STL export pose (deg); 0 = forward, + = up
 
 HEAD_PARTS = {
     "head_back", "head_front", "yaw_coupler", "yaw_retainer_A", "yaw_retainer_B",
@@ -57,8 +51,8 @@ HEAD_PARTS = {
     "bezel_L", "bezel_R", "eye_L", "eye_R", "eye_rim_L", "eye_rim_R", "fur_head",
 }
 
-ARM_L_PARTS = {"arm_L", "paw_pad_L", "sleeve_proxy_L", "fur_arm_L"}
-ARM_R_PARTS = {"arm_R", "paw_pad_R", "sleeve_proxy_R", "fur_arm_R"}
+ARM_L_PARTS = {"arm_L", "sleeve_proxy_L", "fur_arm_L", "dummy_horn_arm_L"}
+ARM_R_PARTS = {"arm_R", "sleeve_proxy_R", "fur_arm_R", "dummy_horn_arm_R"}
 
 # Deep saturated marmalade. AgX + studio lights wash mid oranges to peach,
 # so the albedo is deliberately darker and redder than the target grade.
@@ -79,7 +73,7 @@ def parse_args():
     p.add_argument("--preview", action="store_true")
     p.add_argument("--final", action="store_true")
     p.add_argument("--shot", default="all",
-                   choices=["all", "hero_open", "hero_clasp", "cutaway"])
+                   choices=["all", "hero_forward", "hero_head30", "cutaway"])
     p.add_argument("--samples", type=int, default=0)
     p.add_argument("--width", type=int, default=0)
     p.add_argument("--skip-hair", action="store_true")
@@ -111,15 +105,19 @@ def rot_z_about(angle_deg, pivot_mm):
     return T @ R @ T.inverted()
 
 
-def pose_matrix(name, yaw, clasp):
+def rot_x_about(angle_deg, pivot_mm):
+    T = Matrix.Translation(mm(*pivot_mm))
+    R = Matrix.Rotation(math.radians(angle_deg), 4, "X")
+    return T @ R @ T.inverted()
+
+
+def pose_matrix(name, yaw, arm_l, arm_r):
     if name in HEAD_PARTS:
         return rot_z_about(yaw, (0, 0, 0))
     if name in ARM_L_PARTS:
-        return rot_z_about(clasp, PIV_L)
+        return rot_x_about(-(arm_l - ARM_REST), SH)
     if name in ARM_R_PARTS:
-        return rot_z_about(-clasp, PIV_R)
-    if name == "clasp_drum" or name == "dummy_horn_clasp":
-        return rot_z_about(-RATIO * clasp, DRUM_PIV)
+        return rot_x_about(-(arm_r - ARM_REST), SH)
     return Matrix.Identity(4)
 
 
@@ -367,10 +365,9 @@ def torso_fur_ok(pt):
     x, y, z = pt
     if z > 85.5 or z < -2:
         return False
-    # designed shoulder cutouts: cubes at (±57, 10, 62), 30×34×26
-    for sx in (1, -1):
-        if abs(x - sx * 57) < 15 and abs(y - 10) < 17 and abs(z - 62) < 13:
-            return False
+    # v4 shoulder openings: no hair where the arm hub sits on the cap (r < 14 mm round the axis)
+    if abs(x) > 38 and ((y - SH[1]) ** 2 + (z - SH[2]) ** 2) ** 0.5 < 14.0:
+        return False
     return True
 
 
@@ -497,16 +494,15 @@ PART_FILES = {
     "arm_R": "arm_R.stl",
     "shoulder_bracket_L": "shoulder_bracket_L.stl",
     "shoulder_bracket_R": "shoulder_bracket_R.stl",
-    "clasp_drum": "clasp_drum.stl",
-    "paw_pad_L": "paw_pad_L.stl",
-    "paw_pad_R": "paw_pad_R.stl",
     "sleeve_proxy_L": "sleeve_proxy_L.stl",
     "sleeve_proxy_R": "sleeve_proxy_R.stl",
     "fur_proxy_torso": "fur_proxy_torso.stl",
     "dummy_servo_yaw": "dummy_servo_yaw.stl",
-    "dummy_servo_clasp": "dummy_servo_clasp.stl",
+    "dummy_servo_arm_L": "dummy_servo_arm_L.stl",
+    "dummy_servo_arm_R": "dummy_servo_arm_R.stl",
     "dummy_horn_yaw": "dummy_horn_yaw.stl",
-    "dummy_horn_clasp": "dummy_horn_clasp.stl",
+    "dummy_horn_arm_L": "dummy_horn_arm_L.stl",
+    "dummy_horn_arm_R": "dummy_horn_arm_R.stl",
     "dummy_pi": "dummy_pi.stl",
     "dummy_cam": "dummy_cam.stl",
     "dummy_speaker": "dummy_speaker.stl",
@@ -531,11 +527,12 @@ CUT_COLORS = {
     "arm_R": hex_lin("6AA84F"),
     "shoulder_bracket_L": hex_lin("2F5F8F"),
     "shoulder_bracket_R": hex_lin("4F7A3A"),
-    "clasp_drum": hex_lin("5B3D1F"),
     "dummy_servo_yaw": hex_lin("2C3E50"),
-    "dummy_servo_clasp": hex_lin("2C3E50"),
+    "dummy_servo_arm_L": hex_lin("2C3E50"),
+    "dummy_servo_arm_R": hex_lin("2C3E50"),
     "dummy_horn_yaw": hex_lin("F1C40F"),
-    "dummy_horn_clasp": hex_lin("F1C40F"),
+    "dummy_horn_arm_L": hex_lin("F1C40F"),
+    "dummy_horn_arm_R": hex_lin("F1C40F"),
     "dummy_pi": hex_lin("8E44AD"),
     "dummy_cam": hex_lin("9B59B6"),
     "dummy_speaker": hex_lin("1ABC9C"),
@@ -700,8 +697,6 @@ def build_assembly(skip_hair=False, preview=False):
     assign(objs["sleeve_proxy_R"], mats["print_dark"])
     assign(objs["shoulder_bracket_L"], mats["print_bracket"])
     assign(objs["shoulder_bracket_R"], mats["print_bracket"])
-    assign(objs["paw_pad_L"], mats["pad"])
-    assign(objs["paw_pad_R"], mats["pad"])
     assign(objs["bezel_L"], mats["bezel"])
     assign(objs["bezel_R"], mats["bezel"])
     assign(objs["eye_rim_L"], mats["bezel"])
@@ -709,7 +704,7 @@ def build_assembly(skip_hair=False, preview=False):
     assign(objs["eye_L"], mats["eye"])
     assign(objs["eye_R"], mats["eye"])
     for k in ("tray", "yaw_collar", "yaw_coupler", "yaw_retainer_A", "yaw_retainer_B",
-              "yaw_thrust_washer", "clasp_drum"):
+              "yaw_thrust_washer"):
         assign(objs[k], mats["print_dark"])
     for k in list(CUT_COLORS):
         if k in objs:
@@ -749,16 +744,11 @@ def build_assembly(skip_hair=False, preview=False):
     # by emitting from the sleeve proxies and the arm solids with a density
     # group that kills the pulley hub (near the pivot).
     def arm_fur_ok_side(side):
-        piv = PIV_L if side == "L" else PIV_R
-
         def pred(pt):
             x, y, z = pt
-            # Keep a small bare bore at the pulley so hair does not explode
-            # out of the shoulder joint, but coat the rest of the arm.
-            dx, dy = x - piv[0], y - piv[1]
-            if (dx * dx + dy * dy) ** 0.5 < 8.0 and abs(z - 62.0) < 12:
-                return 0.0
-            if not (48 < z < 80):
+            # No hair on the inner face of the hub (it sits 0.6 mm off the shoulder cap);
+            # coat the outer face, beam and paw.
+            if abs(x) < 51.5:
                 return 0.0
             return 1.0
         return pred
@@ -811,11 +801,11 @@ def build_assembly(skip_hair=False, preview=False):
     return objs, mats
 
 
-def apply_pose(objs, yaw, clasp):
+def apply_pose(objs, yaw, arm_l=ARM_REST, arm_r=ARM_REST):
     for name, obj in objs.items():
         if name.startswith("_") or not hasattr(obj, "matrix_world"):
             continue
-        obj.matrix_world = pose_matrix(name, yaw, clasp) @ Matrix.Identity(4)
+        obj.matrix_world = pose_matrix(name, yaw, arm_l, arm_r) @ Matrix.Identity(4)
         # bezels and eyes already have a local transform (location/rotation).
         # pose_matrix for head parts is a yaw about Z at the origin, which must
         # be PRE-multiplied around their existing local matrix.
@@ -831,12 +821,12 @@ def apply_pose(objs, yaw, clasp):
         if "rest_mw" not in obj:
             obj["rest_mw"] = [list(row) for row in obj.matrix_world]
         rest = Matrix([obj["rest_mw"][0], obj["rest_mw"][1], obj["rest_mw"][2], obj["rest_mw"][3]])
-        obj.matrix_world = pose_matrix(name, yaw, clasp) @ rest
+        obj.matrix_world = pose_matrix(name, yaw, arm_l, arm_r) @ rest
     bpy.context.view_layer.update()
 
 
 # The first call of apply_pose as written would stash already-posed matrices if
-# we pose before stashing. We'll stash immediately after assembly at clasp=0.
+# we pose before stashing. We'll stash immediately after assembly at the export pose.
 
 
 REST_MW = {}
@@ -850,14 +840,14 @@ def stash_rest(objs):
         REST_MW[name] = obj.matrix_world.copy()
 
 
-def apply_pose_v2(objs, yaw, clasp):
+def apply_pose_v2(objs, yaw, arm_l=ARM_REST, arm_r=ARM_REST):
     for name, obj in objs.items():
         if name.startswith("_") or not hasattr(obj, "matrix_world"):
             continue
         rest = REST_MW.get(name)
         if rest is None:
             continue
-        obj.matrix_world = pose_matrix(name, yaw, clasp) @ rest
+        obj.matrix_world = pose_matrix(name, yaw, arm_l, arm_r) @ rest
     bpy.context.view_layer.update()
 
 
@@ -953,17 +943,10 @@ def build_studio():
 
 
 def build_camera():
-    # Elevated 3/4 from the front-right: face is readable, clasped paws
-    # (which meet on the +Y strap side) stay in frame.
-    # 85 mm from ~0.85 m: the 150 mm critter sits comfortably in frame
-    # without the macro-shallow DOF we got at 0.37 m.
-    # Front 3/4, slightly elevated: ~22° off the face axis, ~30° up.
-    # Both eyes stay readable, both arms stay in frame, and looking down
-    # lets the clasp (paws meet on the +Y strap side) show behind the body.
-    # ~18° off the face axis, ~36° elevation, so both eyes stay in view
-    # and we can look over the belly to the +Y clasp.
-    target = mm(0, 18, 70)
-    loc = mm(155, -430, 405)
+    # v4: front 3/4 from the critter's left-front, a little above eye height, so
+    # the forward-reaching paws and the face both read. 80 mm lens at ~0.55 m.
+    target = mm(0, -10, 72)
+    loc = mm(240, -470, 230)
     bpy.ops.object.camera_add(location=loc)
     cam = bpy.context.active_object
     cam.name = "hero_cam"
@@ -983,7 +966,6 @@ def build_camera():
 # -----------------------------------------------------------------------------
 HERO_SHOW = {
     "fur_torso", "fur_head", "fur_arm_L", "fur_arm_R",
-    "paw_pad_L", "paw_pad_R",
     "eye_rim_L", "eye_rim_R", "eye_L", "eye_R",
     "studio_ground", "studio_back",
 }
@@ -991,11 +973,11 @@ HERO_SHOW = {
 HERO_HIDE = {
     "torso_front", "torso_back", "head_front", "head_back",
     "tray", "yaw_collar", "yaw_coupler", "yaw_retainer_A", "yaw_retainer_B",
-    "yaw_thrust_washer", "clasp_drum",
+    "yaw_thrust_washer",
     "arm_L", "arm_R", "sleeve_proxy_L", "sleeve_proxy_R",
     "fur_proxy_torso", "bezel_L", "bezel_R",
     "shoulder_bracket_L", "shoulder_bracket_R",
-    "dummy_servo_yaw", "dummy_servo_clasp", "dummy_horn_yaw", "dummy_horn_clasp",
+    "dummy_servo_yaw", "dummy_servo_arm_L", "dummy_servo_arm_R", "dummy_horn_yaw", "dummy_horn_arm_L", "dummy_horn_arm_R",
     "dummy_pi", "dummy_cam", "dummy_speaker", "dummy_amp", "dummy_mic",
 }
 
@@ -1036,7 +1018,7 @@ def set_mode_hero(objs, show_emitters=False):
                 obj.hide_render = False
             else:
                 set_emitter_visible(obj, True)
-    for n in ("paw_pad_L", "paw_pad_R", "eye_L", "eye_R", "eye_rim_L", "eye_rim_R"):
+    for n in ("eye_L", "eye_R", "eye_rim_L", "eye_rim_R"):
         if n in objs:
             set_hide(objs[n], False)
             set_emitter_visible(objs[n], True)
@@ -1081,7 +1063,7 @@ def set_mode_cutaway(objs, mats):
             assign(objs[k], mat)
             set_hide(objs[k], False)
     # keep eyes/bezels/pads readable
-    for n in ("bezel_L", "bezel_R", "eye_L", "eye_R", "paw_pad_L", "paw_pad_R"):
+    for n in ("bezel_L", "bezel_R", "eye_L", "eye_R"):
         set_hide(objs[n], False)
     for n in ("eye_rim_L", "eye_rim_R"):
         if n in objs:
@@ -1156,12 +1138,12 @@ def main():
     else:
         samples = 24 if preview else 128
 
-    print(f"=== critter v3 blender  preview={preview} width={width} samples={samples} shot={args.shot}", flush=True)
+    print(f"=== evokin v4 blender  preview={preview} width={width} samples={samples} shot={args.shot}", flush=True)
     reset_scene()
     objs, mats = build_assembly(skip_hair=args.skip_hair, preview=preview)
     stash_rest(objs)
     print("=== rest bounds (m) ===", flush=True)
-    for name in ("torso_front", "head_front", "arm_L", "paw_pad_L", "fur_torso", "fur_head", "bezel_L", "eye_L"):
+    for name in ("torso_front", "head_front", "arm_L", "fur_torso", "fur_head", "bezel_L", "eye_L"):
         o = objs.get(name)
         if not o:
             print(" missing", name); continue
@@ -1180,28 +1162,29 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     # save an unposed-ready blend once the studio is up (will re-save after)
     tag = "preview" if preview else "final"
-    shots = ["hero_open", "hero_clasp", "cutaway"] if args.shot == "all" else [args.shot]
+    shots = ["hero_forward", "hero_head30", "cutaway"] if args.shot == "all" else [args.shot]
 
     for shot in shots:
-        if shot == "hero_open":
-            apply_pose_v2(objs, yaw=0, clasp=CLASP_OPEN)
+        if shot == "hero_forward":
+            apply_pose_v2(objs, yaw=0, arm_l=ARM_REST, arm_r=ARM_REST)
             set_cutters(objs, False)
             set_mode_hero(objs)
-            path = OUT / ("01_hero_open_preview.png" if preview else "01_hero_open.png")
-        elif shot == "hero_clasp":
-            apply_pose_v2(objs, yaw=0, clasp=CLASP_CLOSED)
+            path = OUT / ("01_hero_forward_preview.png" if preview else "01_hero_forward.png")
+        elif shot == "hero_head30":
+            # head panned +30° (toward its own left = toward the camera), left arm up in a wave
+            apply_pose_v2(objs, yaw=30, arm_l=60, arm_r=ARM_REST)
             set_cutters(objs, False)
             set_mode_hero(objs)
-            path = OUT / ("02_hero_clasp_preview.png" if preview else "02_hero_clasp.png")
+            path = OUT / ("02_hero_head30_wave_preview.png" if preview else "02_hero_head30_wave.png")
         else:
-            apply_pose_v2(objs, yaw=0, clasp=CLASP_OPEN)
+            apply_pose_v2(objs, yaw=0, arm_l=0, arm_r=0)
             set_mode_cutaway(objs, mats)
             set_cutters(objs, True)
             path = OUT / ("03_cutaway_preview.png" if preview else "03_cutaway.png")
         render_shot(path)
 
-    # restore a nice default pose in the blend (clasped hero)
-    apply_pose_v2(objs, yaw=0, clasp=CLASP_CLOSED)
+    # restore the forward hero pose in the blend
+    apply_pose_v2(objs, yaw=0)
     set_cutters(objs, False)
     set_mode_hero(objs)
     bpy.ops.wm.save_as_mainfile(filepath=str(BLEND))

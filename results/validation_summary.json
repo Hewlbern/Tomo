@@ -1,77 +1,103 @@
 {
- "version": "v3",
+ "version": "v4",
  "cad_only": true,
  "physically_tested": false,
  "child_ready": false,
  "power": "bench rail only",
- "date_local_australia_sydney": "2026-11-11",
- "official_FS90MG": "datasheets/FS90MG.pdf p.5, edition A/0, 2021-04-30, all \u00b10.1 mm",
- "s_off_mm": 2.55,
- "servo_deg_0_to_45": 35.122,
- "drum_travel_mm": 6.2832,
+ "date_local_australia_sydney": "2026-11-16",
+ "official_FS90MG": "datasheets/FS90MG.pdf p.5, edition A/0, 2021-04-30, all ±0.1 mm",
+ "servos": {
+  "count": 3,
+  "head_pan": "FS90MG in yaw_collar, software ±42°, hard stop ±47°",
+  "arm_L": "FS90MG direct drive, software −55…+70°",
+  "arm_R": "FS90MG direct drive, software −55…+70°"
+ },
+ "arm_angle_convention": "0 = arm straight forward (-y), + = up; rotation about the x axis through y=13, z=60",
  "fit_audit": {
-  "n": 18,
-  "pass_n": 18,
+  "n": 21,
+  "pass_n": 21,
   "marginal_n": 0,
   "fail_n": 0,
   "cad_only": true,
   "physically_tested": false
  },
  "sweep": {
-  "poses": 529,
-  "pair_tests": 149178,
-  "booleans": 13721,
-  "seconds": 250.2,
+  "poses": 1017,
+  "pair_tests": 245097,
+  "booleans": 22712,
+  "seconds": 142.8,
   "rigid_overlaps_in_travel": 0,
-  "transform_max_dev_mm": 0.001,
+  "transform_max_dev_mm": 0.0005,
   "static_ok": true
  },
- "contact_at_45": {
-  "pad_overlap_mm": 0.3,
-  "core_gap_mm": 6.5,
-  "pad_into_strap_mm": 0.2,
-  "note": "same as v2; foam stiffness unknown, no force claimed"
+ "head_pan_stop": {
+  "contact_deg": 47.0,
+  "software_clamp_deg": 42
  },
- "parts_changed_vs_v2": [
-  "clasp_drum",
-  "dummies",
-  "head_back",
-  "head_front",
+ "arm_min_clearance_mm": {
+  "arm_to_shell": 0.6,
+  "arm_to_cap": 0.6,
+  "arm_to_head": 10.62,
+  "sleeve_to_fur": 0.58,
+  "arm_lowest_z_mm": 2.1,
+  "sleeve_lowest_z_mm": 3.01,
+  "ok": true
+ },
+ "arm_hard_stop": "none within −80…+85° — arm limits are software only",
+ "metrics": {
+  "arm_gravity_torque_fraction_of_stall": 0.021,
+  "paw_force_at_stall_N": 3.43,
+  "head_pan_accel_fraction_of_stall": 0.0669,
+  "shoulder_pod_protrusion_past_fur_mm": 9.6,
+  "servo_peak_all_stalled_A": 2.4
+ },
+ "parts_changed_vs_v3": [
+  "arm_L",
+  "arm_R",
+  "coupon",
+  "reference/dummies",
+  "reference/fur_proxy_torso",
+  "reference/sleeve_proxy_L",
+  "reference/sleeve_proxy_R",
   "shoulder_bracket_L",
   "shoulder_bracket_R",
   "torso_back",
   "torso_front",
-  "tray",
+  "tray"
+ ],
+ "parts_unchanged_vs_v3": [
+  "bezel",
+  "head_back",
+  "head_front",
+  "reference/dummy_amp",
+  "reference/dummy_cam",
+  "reference/dummy_horn_yaw",
+  "reference/dummy_mic",
+  "reference/dummy_pi",
+  "reference/dummy_servo_yaw",
+  "reference/dummy_speaker",
+  "shutter",
   "yaw_collar",
   "yaw_coupler",
   "yaw_retainer_A",
-  "yaw_retainer_B"
- ],
- "parts_unchanged_vs_v2": [
-  "arm_L",
-  "arm_R",
-  "bezel",
-  "fur_proxy_torso",
-  "paw_pad_L",
-  "paw_pad_R",
-  "shutter",
-  "sleeve_proxy_L",
-  "sleeve_proxy_R",
-  "strap_env"
- ],
- "parts_new": [
-  "coupon",
-  "dummy_amp",
-  "dummy_cam",
-  "dummy_horn_clasp",
-  "dummy_horn_yaw",
-  "dummy_mic",
-  "dummy_pi",
-  "dummy_servo_clasp",
-  "dummy_servo_yaw",
-  "dummy_speaker",
+  "yaw_retainer_B",
   "yaw_thrust_washer"
  ],
+ "parts_new": [
+  "reference/dummy_horn_arm_L",
+  "reference/dummy_horn_arm_R",
+  "reference/dummy_servo_arm_L",
+  "reference/dummy_servo_arm_R"
+ ],
+ "parts_removed": [
+  "clasp_drum",
+  "templates/paw_pad_L",
+  "templates/paw_pad_R",
+  "reference/dummy_servo_clasp",
+  "reference/dummy_horn_clasp",
+  "reference/strap_env"
+ ],
+ "ears": "none in the model; nothing changed",
  "watertight": {
   "torso_front": true,
   "torso_back": true,
@@ -87,10 +113,10 @@
   "arm_R": true,
   "shoulder_bracket_L": true,
   "shoulder_bracket_R": true,
-  "clasp_drum": true,
   "bezel": true,
   "shutter": true,
   "coupon": true
  },
- "priced_BOM_AUD": 158.6
+ "priced_mechanical_AUD": 31.15,
+ "nothing_purchased": true
 }

@@ -1,6 +1,7 @@
 {
- "version": "V.01",
- "project": "evoKin V.01",
+ "version": "V.01 passive spring hug",
+ "project": "Tomo by DreamMachina (formerly evoKin V.01)",
+ "repository": "https://github.com/Hewlbern/Tomo",
  "cad_only": true,
  "physically_tested": false,
  "child_ready": false,
@@ -8,84 +9,191 @@
  "date_local_australia_sydney": "2026-11-16",
  "official_FS90MG": "datasheets/FS90MG.pdf p.5, edition A/0, 2021-04-30, all ±0.1 mm",
  "servos": {
-  "count": 3,
+  "count": 2,
   "head_pan": "FS90MG in yaw_collar, software ±42°, hard stop ±47°",
-  "arm_L": "FS90MG direct drive, software −45…+30°, upper clasp blade",
-  "arm_R": "FS90MG direct drive, software −45…+30°, lower clasp blade",
-  "interlock": "armL − armR ≥ 7.5° (firmware)"
+  "head_tilt": "FS90MG on neck_turret, axis along x through y=6, z=119; software ±10°, first contact +12.0° (nod down) / -15.5° (look up)",
+  "arms": "none — passive"
  },
- "arm_angle_convention": "0 = arm straight forward (-y), + = up; rotation about the x axis through y=13, z=60",
- "clasp": {
-  "mechanism": "overlapping scissor-blade forearms on the two shoulder servos; no added parts",
-  "overlap_x_mm": 35.96,
-  "closed_gap_mm": 0.98,
-  "max_gap_in_travel_mm": 33.35,
-  "gap_control": {
-   "slope_deg_per_mm": 0.848,
-   "offset_deg": 6.62,
-   "gap25_delta_deg": 27.8,
-   "gap0_delta_deg": 6.6
+ "hug": {
+  "mechanism": "Mirumi-style passive hug: each arm turns on a vertical M3 hip pin; a music-wire torsion spring in the knuckle closes it onto a printed rest stop; opened by hand to a 40° printed stop; zero power to hold",
+  "spring": {
+   "part": "music-wire torsion spring, 0.048 in (1.22 mm) wire, 3/8 in (9.5 mm) OD, 90° legs (trim to ~6 mm); catalogue 3HPG6 (LH) / 3HPD1 (RH)",
+   "rate_Nmm_per_deg": 3.363,
+   "rated_torque_Nmm_at_90deg": 302.7,
+   "preload_deg": 35.0,
+   "max_windup_deg": 75.0,
+   "torque_at_rest_Nmm": 117.7,
+   "torque_at_open_stop_Nmm": 252.3
   },
-  "closure_ok": true,
-  "grip_force_at_stall_N": {
-   "at_r66_inner_edge": 3.27,
-   "at_r71_blade_centre": 3.04,
-   "at_r76_outer_edge": 2.84
+  "arm_angle_convention": "0 = closed on the rest stop, + = open; rotation about z through each hip (x=±49.95, y=−16.19)",
+  "groove": "R8 channel down the belly, floor y = −30 − 0.25(z − 30) (leans 14°), z 12–62, 2.4 mm liner",
+  "grip": [
+   {
+    "object": "round Ø10.0 lying in the groove (leans 14°)",
+    "d_mm": 10.0,
+    "open_deg": 1.9,
+    "rigid_arm_only_open_deg": 0.2,
+    "rigid_arm_clear_of_object_mm": 1.48,
+    "spring_torque_Nmm": 124.1,
+    "contact_point": [
+     3.2,
+     -40.5,
+     35.7
+    ],
+    "lever_mm": 51.3,
+    "paw_force_N": 2.42,
+    "push_into_groove_N": 3.66,
+    "object_vs_torso_front_mm3": 0.052
+   },
+   {
+    "object": "round Ø12.5 lying in the groove (leans 14°)",
+    "d_mm": 12.5,
+    "open_deg": 4.39,
+    "rigid_arm_only_open_deg": 2.69,
+    "rigid_arm_clear_of_object_mm": 1.46,
+    "spring_torque_Nmm": 132.5,
+    "contact_point": [
+     4.3,
+     -42.5,
+     35.7
+    ],
+    "lever_mm": 51.0,
+    "paw_force_N": 2.6,
+    "push_into_groove_N": 3.7,
+    "object_vs_torso_front_mm3": 0.062
+   },
+   {
+    "object": "round Ø15.0 lying in the groove (leans 14°)",
+    "d_mm": 15.0,
+    "open_deg": 6.83,
+    "rigid_arm_only_open_deg": 5.13,
+    "rigid_arm_clear_of_object_mm": 1.48,
+    "spring_torque_Nmm": 140.7,
+    "contact_point": [
+     5.4,
+     -44.4,
+     35.7
+    ],
+    "lever_mm": 50.8,
+    "paw_force_N": 2.77,
+    "push_into_groove_N": 3.73,
+    "object_vs_torso_front_mm3": 0.074
+   },
+   {
+    "object": "flat strap 25 x 2.5 resting on the belly across the groove",
+    "d_mm": 25,
+    "strap_back_face_y": -36.19,
+    "open_deg": 2.62,
+    "rigid_arm_clear_of_object_mm": 1.48,
+    "spring_torque_Nmm": 126.5,
+    "contact_point": [
+     6.0,
+     -40.1,
+     35.7
+    ],
+    "lever_mm": 43.9,
+    "paw_force_N": 2.88,
+    "push_into_groove_N": 5.76
+   }
+  ],
+  "open": {
+   "open_stop_deg": 40,
+   "pad_to_belly_mm": 28.28,
+   "pad_tip_to_tip_mm": 53.97,
+   "pad_to_belly_at_closed_mm": 1.04,
+   "rod15_insertion_path_clear": true,
+   "note": "Ø15 rod slid in along the groove normal from 60 mm out to the groove floor with both arms on the open stop; the last 3 steps are the clamp zone."
   },
-  "grip_force_pen_pose_N": 2.92,
-  "grip_force_basis": "datasheet stall 2.2 kg·cm at 6 V; not measured",
-  "grip_clearance_cases": 15,
-  "grip_clearance_all_in_travel": true,
-  "grip_min_clear_to_shell_mm": 0.57,
-  "grip_min_clear_to_head_mm": 23.33,
-  "compliance": "2 mm fur sleeve over each blade (≈4 mm of compressible pile in the clasp). Squeeze is set by commanding the blades past contact; the servo's position loop then pushes up to stall. No spring or breakaway part."
+  "assumption": "Spring rate from the catalogue (2.679 lbf·in at 90°), linear; no friction in the hinge; force = torque / perpendicular lever from the hinge axis to the pad contact line. TPU pads assumed rigid for the angle (real pads add ~1 mm of squash). Not measured.",
+  "stops": {
+   "closed": -0.5,
+   "open": 40.5
+  }
+ },
+ "sweep": {
+  "poses": 457,
+  "pair_tests": 147154,
+  "booleans": 15815,
+  "rigid_overlaps_in_travel": 0,
+  "head_tilt_clearance_mm": {
+   "t-12": {
+    "head_to_turret": 0.6,
+    "head_to_collar": 2.02,
+    "camera_to_tilt_servo": 4.94,
+    "head_to_tilt_servo": 2.5
+   },
+   "t-6": {
+    "head_to_turret": 0.6,
+    "head_to_collar": 4.28,
+    "camera_to_tilt_servo": 6.51,
+    "head_to_tilt_servo": 2.5
+   },
+   "t0": {
+    "head_to_turret": 0.6,
+    "head_to_collar": 7.0,
+    "camera_to_tilt_servo": 7.95,
+    "head_to_tilt_servo": 2.11
+   },
+   "t6": {
+    "head_to_turret": 0.6,
+    "head_to_collar": 3.03,
+    "camera_to_tilt_servo": 6.73,
+    "head_to_tilt_servo": 2.06
+   },
+   "t12": {
+    "head_to_turret": 0.6,
+    "head_to_collar": -0.17,
+    "camera_to_tilt_servo": 5.36,
+    "head_to_tilt_servo": 2.12
+   }
+  },
+  "arm_min_clearance_mm": {
+   "arm_to_shell": -0.0,
+   "pad_to_shell": 1.04,
+   "arm_to_hip_cap": 0.4,
+   "arm_lowest_z_mm": 22.0,
+   "ok": true
+  }
  },
  "fit_audit": {
-  "n": 23,
-  "pass_n": 23,
+  "n": 25,
+  "pass_n": 25,
   "marginal_n": 0,
   "fail_n": 0,
   "cad_only": true,
   "physically_tested": false
  },
- "sweep": {
-  "poses": 988,
-  "pair_tests": 238108,
-  "booleans": 64792,
-  "seconds": 286.7,
-  "rigid_overlaps_in_travel": 0,
-  "transform_max_dev_mm": 0.0005,
-  "static_ok": true
+ "mass": {
+  "estimate_g": 263.0,
+  "solid_upper_bound_g": 310.0,
+  "with_2000mAh_battery_g": 301.0,
+  "centre_of_mass_mm": [
+   -1.0,
+   -4.6,
+   70.2
+  ]
  },
- "head_pan_stop": {
-  "contact_deg": 47.0,
-  "software_clamp_deg": 42
+ "hanging": {
+  "weight_N": 2.58,
+  "com_offset_from_strap_axis_mm": 40.6,
+  "body_leans_back_deg": 14.0,
+  "pitch_moment_Nmm": 105.0,
+  "couple_length_mm": 27.1,
+  "reaction_needed_at_paws_N": 3.86,
+  "spring_paw_force_total_N": 5.2,
+  "friction_capacity_N_mu0p5": 9.06,
+  "slip_safety_factor": 3.52,
+  "com_x_mm": -1.0
  },
- "arm_min_clearance_mm": {
-  "arm_to_shell": 0.6,
-  "arm_to_cap": 0.6,
-  "arm_to_head": 17.83,
-  "sleeve_to_fur": -1.21,
-  "arm_lowest_z_mm": 4.49,
-  "sleeve_lowest_z_mm": 1.66,
-  "arm_top_z_under_bezels_mm": 100.53,
-  "ok": true
- },
- "arm_hard_stop": "first head contact at about +42° (outside the +30° clamp); blade-to-blade contact below 7.5° interlock — arm limits are software only",
- "metrics": {
-  "arm_gravity_torque_fraction_of_stall": 0.042,
-  "shoulder_pod_protrusion_past_fur_mm": 9.6,
-  "head_pan_accel_fraction_of_stall": 0.0669,
-  "servo_peak_all_stalled_A": 2.4,
-  "paw_force_at_stall_N": 3.04
- },
- "parts_changed_vs_v4": [
-  "arm_L.stl",
-  "arm_R.stl",
-  "reference/dummies.stl",
-  "reference/dummy_horn_arm_L.stl",
-  "reference/dummy_horn_arm_R.stl",
-  "reference/sleeve_proxy_L.stl",
-  "reference/sleeve_proxy_R.stl"
- ]
+ "hanging_verdict": "On paper it holds: the springs give 5.2 N total at the paws, more than the 3.9 N (4.5 N with a battery) needed to carry the pitch moment, and the friction safety factor is about 3.5 (3.3 with a battery). The body hangs leaning back 14° along the groove; com_x ≈ 0, so it does not roll sideways. Untested; real strap friction and fur squash will decide it.",
+ "servo_power": {
+  "servos": 2,
+  "channels": [
+   "head pan",
+   "head tilt"
+  ],
+  "stall_each_A_6V": 0.8,
+  "worst_case_all_stalled_A": 1.6,
+  "note": "Arms are passive and draw nothing; hugging costs no power. Budget the 5 V servo rail for ≥1.6 A peak."
+ }
 }

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""evoKin V.01 fit audit. CAD measurements on exported STLs. Not physically tested."""
+"""Tomo (formerly evoKin V.01) fit audit: passive spring hug + pan/tilt head. CAD measurements on exported STLs. Not physically tested."""
 import numpy as np, trimesh, json, csv, os, math
 os.chdir(os.path.dirname(os.path.abspath(__file__))+"/..")
 import sys
@@ -8,8 +8,8 @@ from stl_paths import stl_path
 
 def load(n): return trimesh.load(stl_path(n))
 M={n:load(n) for n in
-   "torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer head_back head_front arm_L arm_R shoulder_bracket_L shoulder_bracket_R coupon".split()}
-for n in "dummy_servo_yaw dummy_horn_yaw dummy_servo_arm_L dummy_servo_arm_R dummy_horn_arm_L dummy_horn_arm_R dummy_pi dummy_cam dummy_speaker dummy_amp dummy_mic fur_proxy_torso sleeve_proxy_L sleeve_proxy_R".split():
+   "torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer neck_turret tilt_hub head_back head_front arm_L arm_R hip_cap_L hip_cap_R paw_pad_L paw_pad_R coupon".split()}
+for n in "dummy_servo_yaw dummy_horn_yaw dummy_servo_tilt dummy_horn_tilt dummy_pi dummy_cam dummy_speaker dummy_amp dummy_mic fur_proxy_torso sleeve_proxy_L sleeve_proxy_R grip_rod".split():
     M[n]=load(n)
 
 def hole_radius(mesh, origin, axis, r_max=6, n_ang=72, n_z=5, z_span=1.0):
@@ -103,33 +103,50 @@ FS=dict(body_L=22.5,body_W=12.1,body_H=22.4,tab=32.3,span=27.7,hole=2.2,
 
 # ---------- 1. Servo seats ----------
 s_off=2.55; span=27.7
-# shoulder geometry (cad/evokin_v01.scad, unchanged from v4): shoulder axis y=13 z=60, arm-servo case top |x|=42, cap 42..46.
-SH_Y,SH_Z,XC,CAP_T=13.0,60.0,42.0,4.0
-BODY_Z=SH_Z-s_off          # servo long axis runs along world z; body centre 2.55 below the spline
 def ok_pil(h): return h and 1.55<=h["dia"]<=1.90
 def ok_m25clr(h): return h and 2.6<=h["dia"]<=3.0
 def ok_m25pil(h): return h and 1.95<=h["dia"]<=2.25
-arm_seat={}
+# tilt servo (neck_turret cradle): spline along -x at y=6, z=119, case top x=-22, tabs x -22..-17.8, holes z = 119+2.55 ∓ 13.85
+TY,TZ=6.0,119.0
+tilt_p=[hole_radius(M["neck_turret"],[-16.3,TY,z],[1,0,0],r_max=3,z_span=1.5) for z in (TZ+s_off-span/2,TZ+s_off+span/2)]
+tov=dict(servo_turret=vol_int(M["dummy_servo_tilt"],M["neck_turret"]),servo_head_back=vol_int(M["dummy_servo_tilt"],M["head_back"]),
+         servo_head_front=vol_int(M["dummy_servo_tilt"],M["head_front"]),servo_cam=vol_int(M["dummy_servo_tilt"],M["dummy_cam"]))
+add("Tilt servo seat (FS90MG in the neck_turret cradle, official 27.7 span)",
+    "neck_turret, dummy_servo_tilt, head_back, head_front, dummy_cam",
+    f"Tab pilots in the cradle plate (design 1.7): {tilt_p}. Overlaps (mm³, must be ~0): {tov}. Spline on the tilt axis (x direction) at y={TY}, z={TZ}; "
+    f"case top x=-22, horn x -26.3..-28.3, tilt_hub keyed into head_back. Body window 0.3 mm per side through the cradle.",
+    "pass" if all(ok_pil(h) for h in tilt_p) and all((v or 0)<=0.05 for v in tov.values()) else "fail",
+    "Install servo from the +x side through the cradle window, tabs on the -x face, 2 self-tappers. Turret deck is notched for the lower tab.")
+# hip hinge (left; right is the mirror)
+def ea(z): return 46*math.sqrt(1-((z-50)/50)**2)
+def eb(z): return 40*math.sqrt(1-((z-50)/50)**2)
+HX=(ea(38)+8.5)*math.cos(math.radians(-20)); HY=(eb(38)+8.5)*math.sin(math.radians(-20))
+hinge={}
 for side,sx in (("L",1),("R",-1)):
-    cap=M[f"shoulder_bracket_{side}"]; sv=M[f"dummy_servo_arm_{side}"]
-    tab_p=[hole_radius(cap,[sx*(XC+1.6),SH_Y,BODY_Z+dz],[1,0,0],r_max=3,z_span=1.5) for dz in (-span/2,span/2)]
-    cap_c=[hole_radius(cap,[sx*(XC+1.2),SH_Y,BODY_Z+dz],[1,0,0],r_max=3,z_span=1.0) for dz in (-19.3,19.3)]
-    pod_p=[hole_radius(M["torso_back"],[sx*(XC-4.5),SH_Y,BODY_Z+dz],[1,0,0],r_max=3,z_span=2.0) for dz in (-19.3,19.3)]
-    boss=hole_radius(cap,[sx*(XC+2),SH_Y,SH_Z],[1,0,0],r_max=8,z_span=2.0)
-    ov=dict(servo_cap=vol_int(sv,cap),servo_torso_back=vol_int(sv,M["torso_back"]),cap_torso_back=vol_int(cap,M["torso_back"]),
-            servo_tray=vol_int(sv,M["tray"]),servo_pi=vol_int(sv,M["dummy_pi"]),servo_amp=vol_int(sv,M["dummy_amp"]),
-            servo_yaw_servo=vol_int(sv,M["dummy_servo_yaw"]),servo_yaw_collar=vol_int(sv,M["yaw_collar"]),
-            servo_torso_front=vol_int(sv,M["torso_front"]))
-    arm_seat[side]=dict(tab_pilots=tab_p,cap_screw_clearance=cap_c,pod_pilots=pod_p,boss_hole=boss,overlaps_mm3=ov)
-    ok=(all(ok_pil(h) for h in tab_p) and all(ok_m25clr(h) for h in cap_c) and all(ok_m25pil(h) for h in pod_p)
-        and boss and 12.4<=boss["dia"]<=13.2 and all(v is not None and v<=0.05 for v in ov.values()))
-    add(f"Arm servo seat {side} (FS90MG in shoulder pod + cap, official 27.7 span)",
-        f"shoulder_bracket_{side}, torso_back (pod), dummy_servo_arm_{side}, tray, dummy_pi, dummy_amp, dummy_servo_yaw",
-        f"Tab pilots in the cap (design 1.7): {tab_p}. Cap screw clearance (design 2.8): {cap_c}. Pod pilots (design 2.1): {pod_p}. "
-        f"Boss hole in cap (design 12.8 for the Ø11.8 boss): {boss}. Overlaps (mm³, must be ~0): {ov}. "
-        f"Case top at |x|={XC}, cap {XC}..{XC+CAP_T}, boss top {XC+4.3}, horn {XC+4.3}..{XC+6.3}. Servo long axis vertical, spline at y={SH_Y}, z={SH_Z}.",
-        "pass" if ok else "fail",
-        "Bench-assemble servo to cap (self-tappers from the inner side), then drop the pair into the pod from outside and fit 2× M2.5 cap screws.")
+    x=sx*HX
+    up=hole_radius(M["torso_front"],[x,HY,40.0],[0,0,1],r_max=2.5,z_span=1.5)
+    sp=hole_radius(M["torso_front"],[x,HY,33.0],[0,0,1],r_max=2.5,z_span=2.0)
+    kn=hole_radius(M[f"arm_{side}"],[x,HY,26.0],[0,0,1],r_max=2.5,z_span=2.0)
+    cp=hole_radius(M[f"hip_cap_{side}"],[x,HY,20.0],[0,0,1],r_max=2.5,z_span=1.0)
+    rec=hole_radius(M[f"arm_{side}"],[x,HY,32.5],[0,0,1],r_max=7,z_span=2.0)
+    av=M[f"arm_{side}"].bounds; cb=M[f"hip_cap_{side}"].bounds
+    web=[hole_radius(M["torso_front"],[sx*px,py,24.0],[0,0,1],r_max=2.5,z_span=1.5) for px,py in ((38.5,-10),(42.2,-10))]
+    capc=[hole_radius(M[f"hip_cap_{side}"],[sx*px,py,19.0],[0,0,1],r_max=2.5,z_span=1.0) for px,py in ((38.5,-10),(42.2,-10))]
+    hinge[side]=dict(upper_ear_pin=up,spigot_bore=sp,knuckle_bore=kn,hip_cap_pin=cp,spring_recess=rec,
+                     knuckle_to_cap_axial=round(av[0][2]-cb[1][2],3),web_pilots=web,cap_clearance=capc,
+                     arm_cap_overlap=vol_int(M[f"arm_{side}"],M[f"hip_cap_{side}"]),arm_torso_overlap=vol_int(M[f"arm_{side}"],M["torso_front"]))
+def okd(h,lo,hi): return h and lo<=h["dia"]<=hi
+ok=all(okd(h["upper_ear_pin"],3.0,3.4) and okd(h["knuckle_bore"],3.25,3.6) and okd(h["hip_cap_pin"],3.0,3.4) and okd(h["spring_recess"],10.6,11.4)
+       and 0.3<=h["knuckle_to_cap_axial"]<=0.6 and all(ok_m25pil(w) for w in h["web_pilots"]) and all(ok_m25clr(c) for c in h["cap_clearance"])
+       and (h["arm_cap_overlap"] or 0)<=0.05 and (h["arm_torso_overlap"] or 0)<=0.05 for h in hinge.values())
+add("Hip hinge (vertical M3 pin, knuckle between the torso ear and hip_cap)",
+    "torso_front (upper ear, spigot, stop lug, web), arm_L/R (knuckle), hip_cap_L/R",
+    f"Axis at x=±{HX:.2f}, y={HY:.2f}. {hinge}. Design: M3 pin screw Ø3.2 in the ears and spigot, Ø3.4 running bore in the knuckle, "
+    f"0.4 mm axial gap each end, Ø11 spring recess around a Ø5.9 spigot (spring ID 7.09 free, ≈6.8 at 75° wind-up), M3 nyloc in the cap's hex trap, "
+    f"hip_cap held by 2 × M2.5 (2.8 clearance / 2.1 pilots in the web).",
+    "pass" if ok else "fail",
+    "Assembly: spring on the spigot, torso leg in the lug slot; knuckle up from below with the arm leg in its slot; wind the arm 35° open so the lug enters the relief; fit hip_cap and the pin.")
+
 yaw_holes=[]
 for sx in (-1,1):
     o=np.array([-s_off+sx*(span/2), 0, 86.0])    # mid pilot boss, above the tab cutout
@@ -144,25 +161,15 @@ add("Yaw servo seat (FS90MG, official 27.7 span, 1.7 pilots)",
     "pass" if ok_pil(yaw_holes[0][1]) and ok_pil(yaw_holes[1][1]) else "fail",
     "Included M2.5x4 horn screw is too short for horn+coupler; use a longer M2.5 and confirm on arrival.")
 
-# arm hub / horn / pod face clearances (axial, along x)
-hub={}
-for side,sx in (("L",1),("R",-1)):
-    arm=M[f"arm_{side}"]; horn=M[f"dummy_horn_arm_{side}"]; pod=M["torso_back"]; cap=M[f"shoulder_bracket_{side}"]
-    # V.01: the forearm crosses the midline, so take the hub face from arm vertices near the shoulder axis only
-    av=arm.vertices; near=np.hypot(av[:,1]-SH_Y,av[:,2]-SH_Z)<=13.5; ab=np.array([av[near].min(0),av[near].max(0)])
-    hb=horn.bounds; cb=cap.bounds
-    if sx>0: arm_in=ab[0][0]; horn_in=hb[0][0]; face=max(cb[1][0], XC+CAP_T)
-    else:    arm_in=-ab[1][0]; horn_in=-hb[1][0]; face=max(-cb[0][0], XC+CAP_T)
-    hub[side]=dict(cap_face=round(face,3),horn_inner=round(horn_in,3),arm_inner=round(arm_in,3),
-        horn_to_cap=round(horn_in-face,3),hub_to_cap=round(arm_in-face,3),
-        arm_horn_overlap=vol_int(arm,horn),arm_servo_overlap=vol_int(arm,M[f"dummy_servo_arm_{side}"]))
-ok=all(h["horn_to_cap"]>=0.25 and h["hub_to_cap"]>=0.5 and (h["arm_horn_overlap"] or 0)<=0.05 and (h["arm_servo_overlap"] or 0)<=0.05 for h in hub.values())
-add("Arm hub on horn / cap face clearance",
-    "arm_L/R, dummy_horn_arm_L/R, shoulder_bracket_L/R",
-    f"{hub}. Design: horn sits on the boss 0.3 mm proud of the cap face; hub face 0.6 mm off the cap; horn pocket Ø25 to horn top; "
-    f"spline tip pocket Ø5.5 to x=50.8; axial M2.5×12 horn screw from the paw-side counterbore. Horn is an ASSUMED 2.0 mm / Ø24 envelope.",
-    "pass" if ok else "fail",
-    "Measure the included horn; if its hub is taller than 2.0 mm, deepen the pocket. Horn-to-hub pilots at r=7 are assumed.")
+sw_=json.load(open("results/summary_sweep.json")) if os.path.exists("results/summary_sweep.json") else None
+st=sw_["stop_engagement"] if sw_ else {}
+add("Arm hard stops (printed lug in the knuckle relief)",
+    "torso_front (stop lug), arm_L/R (relief sector)",
+    (f"First rigid contact closing past rest: L {st.get('armL_closed_stop',{}).get('armL')}°, R {st.get('armR_closed_stop',{}).get('armR')}°; opening: "
+     f"L {st.get('armL_open_stop',{}).get('armL')}°, R {st.get('armR_open_stop',{}).get('armR')}° (design 0° and 40°, sweep step 0.5°). "
+     "Lug 24° wide, r 5.7–7.7, 2.6 mm deep; spring torque on the open stop 252 N·mm ≈ 38 N on the lug face.") if sw_ else "Run scripts/sim_v01.py first.",
+    "pass" if sw_ and st.get("armL_closed_stop",{}).get("armL",-9)>=-1 and 40<=st.get("armL_open_stop",{}).get("armL",0)<=41 else "fail",
+    "Print torso_front so the lug is loaded across layers, not in peel. The spring cannot over-rotate past 75° total wind-up (rated 90°).")
 
 # ---------- 2. Seams ----------
 # lip: back ymin < 0, front groove exists (cut into mid-wall)
@@ -178,10 +185,10 @@ for x,z in tboss:
     fr=hole_radius(tf, [x, -4, z], [0,1,0], r_max=4, z_span=1.5)
     bk=hole_radius(tb, [x,  4, z], [0,1,0], r_max=4, z_span=1.5)
     torso_holes.append(dict(xz=[x,z], front=fr, back=bk))
-hboss=[(-42+12,110),(42-12,110),(-42+16,138),(42-16,138)]
+hboss=[(-32,106),(32,106),(-28,138),(28,138)]   # V.01 hug: lower bosses moved for the tilt hub
 # HW/2=42, hboss = [[-HW/2+12,hcut+12=110], [-HW/2+16, HC+20=138]]
 head_holes=[]
-for x,z in [(-30,110),(30,110),(-26,138),(26,138)]:
+for x,z in hboss:
     fr=hole_radius(hf, [x, -4, z], [0,1,0], r_max=4, z_span=1.5)
     bk=hole_radius(hb, [x,  4, z], [0,1,0], r_max=4, z_span=1.5)
     head_holes.append(dict(xz=[x,z], front=fr, back=bk))
@@ -208,32 +215,32 @@ add("Head front ↔ back seam and fasteners",
 jrn=_cyl_clean(M["yaw_collar"], np.array([0,0,94.7]), np.array([0,0,1]),
                np.array([1,0,0]), np.array([0,1,0]), 21.0, 23.0, 120, 5, 2.0, True)
 # journal OD: ray outward from r=21
-skirt=_cyl_clean(M["head_back"], np.array([0,0,94]), np.array([0,0,1]),
+skirt=_cyl_clean(M["neck_turret"], np.array([0,0,94]), np.array([0,0,1]),
                  np.array([1,0,0]), np.array([0,1,0]), 23.0, 21.0, 120, 5, 2.0, True)
 # skirt ID: start at r=23 (inside the 22.35 ID? 44.7/2=22.35). Start at r=20 going out to 23.
-skirt=_cyl_clean(M["head_back"], np.array([0,0,94]), np.array([0,0,1]),
+skirt=_cyl_clean(M["neck_turret"], np.array([0,0,94]), np.array([0,0,1]),
                  np.array([1,0,0]), np.array([0,1,0]), 20.0, 24.0, 120, 5, 2.0, True)
 j_top=z_of_face(M["yaw_collar"], 10, 23, 96.5, 98.5, "max")
 w_z=z_of_face(M["yaw_thrust_washer"], 17, 22, 96, 99)
 # head cone / floor near r=21 at z~98.5
-h_floor=z_of_face(M["head_back"], 17, 22, 97.5, 106)
+h_floor=z_of_face(M["neck_turret"], 17, 22, 97.5, 106)
 j_od=jrn["dia"] if jrn else None
 s_id=skirt["dia"] if skirt else None
 rad_clr=(s_id-j_od)/2 if (j_od and s_id) else None
 wash_top=w_z["zmax"] if w_z else None
 # designed floor at 98.5; cone may have a range
 add("Yaw journal radial (skirt on journal)",
-    "head_back, yaw_collar",
+    "neck_turret, yaw_collar",
     f"Journal {jrn}, skirt ID {skirt}, radial clearance {None if rad_clr is None else round(rad_clr,3)} mm (design 0.35). "
     f"Justified: tight end of the requested 0.35–0.4 mm FDM running-fit band; 0.30 (v2) is too tight after typical hole shrinkage. "
-    f"Head↔collar overlap {vol_int(M['head_back'],M['yaw_collar'])} mm³.",
+    f"Head↔collar overlap {vol_int(M['neck_turret'],M['yaw_collar'])} mm³.",
     "pass" if rad_clr and 0.30<=rad_clr<=0.45 else "marginal")
 
 add("Yaw thrust (printed washer + 0.30 mm axial gap + 30° cone)",
-    "yaw_thrust_washer, yaw_collar, head_back",
+    "yaw_thrust_washer, yaw_collar, neck_turret",
     f"Journal top {j_top}. Washer {w_z} (design 97.4–98.2, 0.8 mm, printed flat, no supports). "
     f"Head floor/cone in r=17–22, z=97.5–106: {h_floor}. Design: washer top 98.2, head at 98.5, gap 0.30 mm. "
-    f"Washer↔head overlap {vol_int(M['yaw_thrust_washer'],M['head_back'])} mm³. "
+    f"Washer↔head overlap {vol_int(M['yaw_thrust_washer'],M['neck_turret'])} mm³. "
     f"Skirt-down print: vertical skirt then a 30°-from-vertical cone so a 35° support threshold does not land supports on a flat thrust face. The flat thrust is the washer.",
     "pass" if (wash_top and abs(wash_top-98.2)<0.15 and (h_floor and h_floor["zmin"]>=98.35)) else "fail")
 
@@ -247,11 +254,11 @@ play=None
 if ret_top and j_lip:
     play=round(j_lip["zmin"]-ret_top["zmax"],3)
 ret_h=hole_radius(retA, [23.8,0,90.125], [1,0,0], r_max=3, z_span=1.2)
-hd_h=hole_radius(M["head_back"], [23.8,0,90.125], [1,0,0], r_max=3, z_span=1.2)
+hd_h=hole_radius(M["neck_turret"], [23.8,0,90.125], [1,0,0], r_max=3, z_span=1.2)
 ret_ok=ret_h and 2.15<=ret_h["dia"]<=2.45
 hd_ok=hd_h and 1.55<=hd_h["dia"]<=1.90
 add("Yaw retainers (under journal lip)",
-    "yaw_retainer_A/B, yaw_collar, head_back",
+    "yaw_retainer_A/B, yaw_collar, neck_turret",
     f"Retainer top {ret_top}, journal lip {j_lip}, axial play {play} mm (design 0.35). "
     f"Retainer hole (clearance, design 2.3) {ret_h}. Head skirt pilot (design 1.7) {hd_h}.",
     "pass" if ret_ok and hd_ok and play is not None and 0.25<=play<=0.50 else "fail")
@@ -262,8 +269,8 @@ add("Yaw retainers (under journal lip)",
 # I'll do it carefully below
 ws=[]
 for x in np.linspace(-6,6,9):
-    yp=M["head_back"].ray.intersects_location([[x,0.0,96.0]],[[0.0,1.0,0.0]])[0]
-    yn=M["head_back"].ray.intersects_location([[x,0.0,96.0]],[[0.0,-1.0,0.0]])[0]
+    yp=M["neck_turret"].ray.intersects_location([[x,0.0,96.0]],[[0.0,1.0,0.0]])[0]
+    yn=M["neck_turret"].ray.intersects_location([[x,0.0,96.0]],[[0.0,-1.0,0.0]])[0]
     if len(yp)==0 or len(yn)==0: continue
     yplus=yp[yp[:,1]>0][:,1]; yminus=yn[yn[:,1]<0][:,1]
     if len(yplus) and len(yminus):
@@ -277,8 +284,8 @@ if len(sel):
 slot=round(float(np.median(ws)),3) if ws else None
 side_clr=(slot-blade)/2 if (slot and blade) else None
 backlash=round(2*math.degrees(math.atan(side_clr/8.0)),2) if side_clr else None
-add("Coupler blade in head slot",
-    "yaw_coupler, head_back",
+add("Coupler blade in turret slot",
+    "yaw_coupler, neck_turret",
     f"Blade thickness {blade} mm (design 2.00). Slot width {slot} mm (design 2.70). "
     f"Side clearance {None if side_clr is None else round(side_clr,3)} mm (design 0.35). "
     f"Backlash at r=8 mm ≈ {backlash}° total. Software yaw clamp ±42° so the ~47° hard stop is not a running face. "
@@ -368,8 +375,8 @@ add("Mic pocket (Adafruit 3421, 16.7×12.7×1.8, bottom-ported)",
 # Check that a 17×2.5 slot exists at the floor (14, 0, hcut+2)
 slot_ok=False
 # ray a 17 mm box: from (14,0,100) along y the slot should be open ~2.5 mm
-yp=M["head_back"].ray.intersects_location([[14,0,100]],[[0,1,0]])[0]
-yn=M["head_back"].ray.intersects_location([[14,0,100]],[[0,-1,0]])[0]
+yp=M["neck_turret"].ray.intersects_location([[20,0,105]],[[0,1,0]])[0]
+yn=M["neck_turret"].ray.intersects_location([[20,0,105]],[[0,-1,0]])[0]
 ribbon_slot=None
 if len(yp) and len(yn):
     yplus=yp[yp[:,1]>0][:,1]; yminus=yn[yn[:,1]<0][:,1]
@@ -384,67 +391,77 @@ for a in np.linspace(0,np.pi,12):
     # this is messy; report design value and whether the head volume is cut (overlap of a r=14 tube).
     pass
 add("Camera ribbon path",
-    "head_front, head_back, yaw_collar, dummy_cam",
+    "head_front, head_back, neck_turret, yaw_collar, dummy_cam",
     f"Design: loop bay r=14 mm (π·14 ≈ 44 mm extra vs the ≥9.4 mm requirement), slot 17×2.5 mm for a 15×1 mm FPC, "
     f"path camera → loop → floor slot at x=14 → +x side of the Ø34 yaw bore (beside coupler and servo) → torso duct → Pi CSI. "
-    f"Floor slot probe at (14,0,100) width={ribbon_slot} mm.",
+    f"Turret deck slot probe at (20,0,105) width={ribbon_slot} mm.",
     "pass" if ribbon_slot is None or ribbon_slot>=2.2 else "marginal")
 
 add("Pi envelope",
     "tray, dummy_pi",
     f"Pi dummy extents {np.round(pi.extents,3).tolist()} (65×8.5×30: 8.5 mm y-envelope allows a header). "
-    f"Camera is the standard 25×24×11.5 Module 3, not the Wide. Pi↔tray {vol_int(M['tray'],pi)} mm³, Pi↔arm servos "
-    f"{vol_int(M['dummy_servo_arm_L'],pi)} / {vol_int(M['dummy_servo_arm_R'],pi)} mm³.",
-    "pass" if all((v or 0)<=0.05 for v in (vol_int(M['tray'],pi),vol_int(M['dummy_servo_arm_L'],pi),vol_int(M['dummy_servo_arm_R'],pi))) else "fail")
+    f"Camera is the standard 25×24×11.5 Module 3, not the Wide. Pi↔tray {vol_int(M['tray'],pi)} mm³, Pi↔torso_front (groove liner) {vol_int(M['torso_front'],pi)} mm³ (arm servos removed in the hug redesign).",
+    "pass" if all((v or 0)<=0.05 for v in (vol_int(M['tray'],pi),vol_int(M['torso_front'],pi))) else "fail")
 
-# ---------- 6. Joints: head pan, neck cabling, arm travel ----------
+# ---------- 6. Joints: head pan + tilt, neck cabling, passive hug ----------
 SW=json.load(open("results/summary_sweep.json")) if os.path.exists("results/summary_sweep.json") else None
-yaw_ok=SW is not None and len(SW["rigid_overlaps_in_travel"])==0
+nov=SW is not None and len(SW["rigid_overlaps_in_travel"])==0
+st=SW["stop_engagement"] if SW else {}
 add("Head pan joint (motorised yaw, FS90MG in the collar)",
-    "yaw_collar, yaw_coupler, head_back, head_front, dummy_servo_yaw, dummy_horn_yaw",
-    "Pan servo is the v3 collar FS90MG (unchanged): horn → coupler blade → slot in head_back. Software clamp ±42° "
-    "(84° of the 180° servo travel), hard stop ≈ ±47°. "
-    + (f"Sweep: {SW['sweep']['poses']} poses, rigid overlaps in travel = {len(SW['rigid_overlaps_in_travel'])}; first yaw stop contact {SW['stop_engagement'].get('yaw_pos')}." if SW else "Run scripts/sim_v01.py first."),
-    "pass" if yaw_ok else "fail",
-    "Tilt was not added: a nod yoke plus a 4th FS90MG does not fit cleanly in the 64 mm head beside the camera and FPC loop.")
-add("Neck cable path (pan servo + camera FPC)",
-    "yaw_collar, head_back, torso",
-    "The pan servo is fixed in the torso-side collar, so its 3-wire lead never crosses the moving joint: it drops straight down beside the "
-    "servo body into the torso. Only the camera FPC crosses the neck: floor slot (x=14) → Ø34 collar bore → r=14 U-bend loop bay in the head "
-    f"(π·14 ≈ 44 mm slack for ±42°). Floor slot probe width {ribbon_slot} mm (design 2.5). Collar bore Ø34 stays open above the boss for service.",
+    "yaw_collar, yaw_coupler, neck_turret, head_back, head_front, dummy_servo_yaw, dummy_horn_yaw",
+    "Pan servo is the v3 collar FS90MG (unchanged): horn → coupler blade → slot in neck_turret (the slot, skirt, cone and retainers moved "
+    "from head_back to the turret). Software clamp ±42°. "
+    + (f"Sweep: {SW['sweep']['poses']} poses, rigid overlaps in travel = {len(SW['rigid_overlaps_in_travel'])}; first yaw stop contact at "
+       f"{st['yaw_pos']['yaw']}° / {st['yaw_neg']['yaw']}° (collar lug ↔ turret lug)." if SW else "Run scripts/sim_v01.py first."),
+    "pass" if nov else "fail")
+hc=SW.get("head_tilt_clearance_mm") if SW else None
+tilt_ok=bool(SW and nov and st.get("tilt_down") and st["tilt_down"]["tilt"]>=11.5 and st.get("tilt_up") and st["tilt_up"]["tilt"]<=-11.5)
+add("Head tilt / nod joint (FS90MG on the neck turret, NEW)",
+    "neck_turret, tilt_hub, head_back, head_front, dummy_servo_tilt, dummy_horn_tilt, dummy_cam, yaw_collar",
+    ("Tilt axis along x through y=6, z=119 (near the head centre, so the shell barely moves). Firmware clamp ±10° (+ = nod down). "
+     f"First rigid contact: nod down {st['tilt_down']['tilt']}° ({st['tilt_down']['a']} ↔ {st['tilt_down']['b']}), look up {st['tilt_up']['tilt']}° "
+     f"({st['tilt_up']['a']} ↔ {st['tilt_up']['b']}). Clearances by tilt: {hc}. Head shell now starts at z=103.5 (was 101) and the front of the turret deck "
+     "is cut away so the chin and camera clear when nodding. Lower seam bosses moved to x ±32, z 106; upper to x ±28." if SW else "Run scripts/sim_v01.py first."),
+    "pass" if tilt_ok else "fail",
+    "Margin to the first contact is only 2° nodding down (head rim on the collar ring at +12°). Keep the firmware clamp; fur in the neck gap is compliant.")
+add("Neck cable path (pan + tilt servo leads, camera FPC)",
+    "yaw_collar, neck_turret, head_back, torso",
+    "Pan servo lead: fixed in the collar, never crosses a moving joint. Tilt servo lead: rides on the turret, so it crosses the PAN joint only; route it "
+    "down the Ø34 collar bore beside the FPC with a loose service loop (≥40 mm) for ±42°. Camera FPC crosses pan and tilt: turret deck slot (x 5.5–22.5) → "
+    f"r=14 U-bend loop bay in the head, which sits close to the tilt axis (±10° ≈ ±3 mm of FPC travel). Turret deck slot probe width {ribbon_slot} mm (design 2.5).",
     "pass" if (ribbon_slot is None or ribbon_slot>=2.2) else "fail",
-    "Do not twist the FPC around the yaw axis; let it roll in the U-bend.")
-arm_ok=SW is not None and len(SW["rigid_overlaps_in_travel"])==0 and SW.get("arm_min_clearance_mm",{}).get("ok",False)
-add("Arm travel (forward/up swing, direct drive)",
-    "arm_L/R, sleeve_proxy_L/R, torso_back, fur_proxy_torso, head_front/back",
-    "Arm angle 0 = straight forward, + = up. Software clamp −45°..+30° per arm, plus the clasp interlock armL − armR ≥ 7.5° "
-    "(the left forearm always passes over the right). −45° keeps the forearm ≥2 mm off the desk; +30° keeps it under the eye bezels. "
-    + (f"Sweep min clearances: {SW.get('arm_min_clearance_mm')}. First arm/head contact {SW['stop_engagement'].get('armL_up')}." if SW else "Run scripts/sim_v01.py first."),
+    "Do not twist the FPC around the yaw axis; let it roll in the U-bend. Tie the tilt lead to the FPC so they move together.")
+H=SW.get("hug") if SW else None
+arm_ok=bool(SW and nov and SW.get("arm_min_clearance_mm",{}).get("ok"))
+add("Arm swing (passive, vertical hip hinge, 0–40°)",
+    "arm_L/R, paw_pad_L/R, sleeve_proxy_L/R, torso_front, hip_cap_L/R, fur_proxy_torso",
+    ("Arms turn about vertical hip pins; 0° = hugging on the rest stop, 40° = open stop. "
+     f"Min clearances by angle {SW.get('arm_min_clearance_by_angle_mm')}; worst {SW.get('arm_min_clearance_mm')} (arm_to_shell 0 = the lug resting on its stop face). "
+     "Rotation about z keeps the band at z 22–38, well clear of the desk and the head.") if SW else "Run scripts/sim_v01.py first.",
     "pass" if arm_ok else "fail",
-    "Direct drive: a child forcing an arm back-drives the FS90MG gear train. No mechanical breakaway.")
-C=SW.get("clasp") if SW else None
-cl_ok=bool(C and C.get("closure_ok"))
-add("Clasp closure (forearms overlap across the middle)",
-    "arm_L, arm_R",
-    (f"Forearm blades overlap {C['overlap_x_mm']} mm in x across the midline. Rigid blade gap {C['closed_gap_mm']} mm at the interlock "
-     f"(Δ = 7.5°), {C['max_gap_in_travel_mm']} mm at the widest in-travel opening. Gap ≈ (Δ − {C['delta_deg_for_gap']['offset_deg']}°) / "
-     f"{C['delta_deg_for_gap']['slope_deg_per_mm']}°/mm, the same at mean angles −30°, −10° and +10°; 25 mm needs Δ ≈ {C['delta_deg_for_gap']['gap25_delta_deg']}°. "
-     f"Blade contact in the sweep at Δ ≈ 6.5° (outside travel)." if C else "Run scripts/sim_v01.py first."),
-    "pass" if cl_ok else "fail",
-    "Firmware must enforce armL − armR ≥ 7.5° before either servo moves; the blades cannot pass each other.")
-gr_ok=bool(C and C.get("grip_ok"))
-if C:
-    G=[g for g in C["grip_clearance"] if g["in_travel"]]
-    gtxt=(f"Test cylinders Ø4/8/12/20/25 × 140 mm along x, centred between the blades at r = 71 mm, mean angles −30/−10/+10°: "
-          f"{len(G)}/{len(C['grip_clearance'])} reachable inside travel. Opening needed: "
-          + ", ".join(f"Ø{d} → Δ {next(g['delta_deg'] for g in C['grip_clearance'] if g['d_mm']==d)}°" for d in (4,8,12,20,25))
-          + f". Worst clearance to the torso shell {min(g['clear_to_shell_mm'] for g in G)} mm, to the 4 mm torso fur {min(g['clear_to_torso_fur_mm'] for g in G)} mm, "
-          f"to the head {min(g['clear_to_head_mm'] for g in G)} mm.")
+    "Passive: a child can push the arms open against ≈5 N at the paw; nothing is driven, so there is no gear train to strip. The paws are a deliberate (soft) pinch point at ≈2.5 N.")
+if H:
+    gtxt="; ".join(f"{g['object']}: opens {g['open_deg']}°, paw force {g['paw_force_N']} N each (lever {g['lever_mm']} mm, spring {g['spring_torque_Nmm']} N·mm), rigid arm {g['rigid_arm_clear_of_object_mm']} mm clear" for g in H["grip"])
+    gtxt+=f". Spring: {H['spring']['part']}, {H['spring']['rate_Nmm_per_deg']} N·mm/°, preload {H['spring']['preload_deg']}°. Assumption: {H['assumption']}"
 else: gtxt="Run scripts/sim_v01.py first."
-add("Grip clearance (pen / cable / small pole in the clasp)",
-    "arm_L, arm_R, torso_front, torso_back, fur_proxy_torso, head_front/back",
-    gtxt, "pass" if gr_ok else "fail",
-    "Faces are flat and parallel to each blade, so they meet at an angle Δ (≈13° for a pen, ≈28° at 25 mm): large objects are squeezed outward.")
+g_ok=bool(H and all(g["open_deg"]<=40 and g["paw_force_N"]>=2.0 for g in H["grip"]))
+add("Passive hug grip (round Ø10 / 12.5 / 15 in the groove, flat 25 mm strap)",
+    "arm_L/R, paw_pad_L/R, torso_front (groove), grip test objects",
+    gtxt, "pass" if g_ok else "fail",
+    "Forces are from the catalogue spring rate, not measured. Contact sits low on the pad (z≈36); the TPU pads take the squash.")
+add("Hand opening (paws on the open stop)",
+    "arm_L/R, paw_pad_L/R, torso_front",
+    (f"At 40°: pad ↔ belly {H['open']['pad_to_belly_mm']} mm (spec ≥20), pad tip ↔ tip {H['open']['pad_tip_to_tip_mm']} mm; "
+     f"a Ø15 rod slides into the groove without touching the arms: {H['open']['rod15_insertion_path_clear']}. Closed: pad ↔ shell {H['open']['pad_to_belly_at_closed_mm']} mm.") if H else "Run scripts/sim_v01.py first.",
+    "pass" if H and H["open"]["pad_to_belly_mm"]>=20 and H["open"]["rod15_insertion_path_clear"] else "fail")
+gv=hole_radius  # noqa
+rod=M["grip_rod"]; rv=vol_int(rod,M["torso_front"]); rs=vol_int(rod,M["dummy_speaker"])
+add("Belly groove (R8 channel, floor leans 14°)",
+    "torso_front, dummy_speaker, dummy_pi, grip_rod (Ø12.5 reference)",
+    f"Floor line y = −30 − 0.25·(z − 30), capsule z 4…70, 2.4 mm liner. Ø12.5 reference rod lying on the floor ↔ torso_front {rv} mm³ (touching), ↔ speaker {rs} mm³. "
+    "The lean lets a straight strap clear the upper-belly bulge and the speaker grille; the liner leaves ≈0.9 mm to the speaker pocket at z≈53.",
+    "pass" if (rv or 0)<=0.1 and (rs or 0)<=0.05 else "fail",
+    "The fur skin needs a matching channel (or a slit) down the belly.")
 
 # coupon exists
 add("Test coupon",
@@ -458,8 +475,8 @@ add("Test coupon",
 if "bezel" not in M and os.path.exists("stl/bezel.stl"):
     M["bezel"]=load("bezel")
 wt_names=["torso_front","torso_back","tray","yaw_collar","yaw_retainer_A","yaw_retainer_B",
-    "yaw_coupler","yaw_thrust_washer","head_back","head_front","arm_L","arm_R","shoulder_bracket_L","shoulder_bracket_R",
-    "coupon"]
+    "yaw_coupler","yaw_thrust_washer","neck_turret","tilt_hub","head_back","head_front","arm_L","arm_R","hip_cap_L","hip_cap_R",
+    "paw_pad_L","paw_pad_R","coupon"]
 if "bezel" in M: wt_names.append("bezel")
 wt={n:bool(M[n].is_watertight) for n in wt_names}
 add("Mesh watertight (printable parts)",
@@ -478,7 +495,8 @@ out=dict(assumptions=dict(
     servo_source="Official Feetech FS90MG drawing p.5, edition A/0, 2021-04-30, ±0.1 mm. File copied to datasheets/FS90MG.pdf.",
     horn="ASSUMED typical 2.0 mm disc + 4-arm star, Ø24. Not on the drawing. p.6 says No Accessories.",
     spline_teeth="Drawing and 6-9 say 20T/Ø4.7; product pages say 21T. Measure on arrival.",
-    arm_servos="2× FS90MG, one per arm, spline along x at y=13 z=60, direct drive on the horn. Forearms overlap across the middle and clasp (V.01).",
+    arm_servos="None. Arms are passive: vertical hip hinge + torsion spring (3HPG6 LH / 3HPD1 RH, 3.36 N·mm/°, 35° preload), printed stops at 0° and 40°.",
+    head_servos="2× FS90MG: pan in the yaw collar, tilt on the neck turret (spline on the tilt axis).",
     speaker="Adafruit 3351 Mono Enclosed 3W 4Ω, 70×30×17, Core A$8.95",
     amp="Adafruit 3006 MAX98357A 19.4×17.8×3.0",
     mic="Adafruit 3421 16.7×12.7×1.8 bottom-ported",

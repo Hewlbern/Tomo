@@ -1,15 +1,16 @@
 # SPDX-License-Identifier: MIT
 #!/usr/bin/env python3
-"""Photoreal Cycles renders of evoKin V.01 (orange furry teddy, clasp around the middle, head pan).
+"""Photoreal Cycles renders of Tomo by DreamMachina (formerly evoKin V.01): orange furry teddy,
+Mirumi-style passive spring hug arms, head pan + tilt.
 
-STLs are in millimetres, Z-up, -Y face, exported at yaw=0, arm L -15°, arm R -25° (0 = forward, + = up).
+STLs are in millimetres, Z-up, -Y face, exported at yaw=0, tilt=0, arms closed (0 = hugging, + = open).
 This script scales them 0.001 (Blender metres) and poses moving parts with the
 same imposed kinematics as scripts/sim_v01.py.
 
 Usage (from any cwd):
   blender -b -P render_blender.py -- --preview
   blender -b -P render_blender.py -- --final
-  blender -b -P render_blender.py -- --shot clasp_pen --final
+  blender -b -P render_blender.py -- --shot hero_hug --final
 """
 from __future__ import annotations
 
@@ -42,21 +43,31 @@ S = 0.001  # mm -> m
 EYE_X, EYE_Z, HD = 13.0, 120.0, 74.0
 # Flange just proud of the head surface (~y=-35.1 at the eye)
 BEZEL_Y = -36.2
-SH = (0.0, 13.0, 60.0)      # shoulder axis (x direction) through y=13, z=60
-REST_L, REST_R = -15.0, -25.0   # STL export pose (deg); 0 = forward, + = up
-ARM_REST = REST_L
-FORE_R = 71.0               # forearm blade centre radius from the shoulder axis
-CLASP_L, CLASP_R = -6.25, -13.75    # closed clasp: interlock delta 7.5° at mean -10° (≈1 mm blade gap)
-PEN_L, PEN_R = -3.55, -16.45        # Ø8 pen between the blades at mean -10° (from results/summary_sweep.json)
+HL = (49.95, -16.19, 0.0)   # left hip hinge (vertical, z axis); right is mirrored in x
+HR = (-49.95, -16.19, 0.0)
+TILT_AX = (0.0, 6.0, 119.0) # head tilt axis along x through y=6, z=119 (+ = nose down)
+REST_L, REST_R = 0.0, 0.0   # STL export pose: arms closed on their rest stops
+ARM_OPEN = 40.0             # open stop
+GF, G_SLOPE = -30.0, 0.25   # groove floor y = GF - G_SLOPE*(z-30) (leans 14°)
+GZ0, GZ1, GR = 12.0, 62.0, 8.0
+HANDLE_D = 12.5             # round bag handle
+try:
+    import json as _json
+    _G = _json.load(open(ROOT / "results" / "summary_sweep.json"))["hug"]["grip"]
+    HUG_OPEN = next(g["open_deg"] for g in _G if g.get("d_mm") == HANDLE_D)
+except Exception:
+    HUG_OPEN = 4.39         # arm opening on a Ø12.5 handle (sim_v01.py)
 
 HEAD_PARTS = {
-    "head_back", "head_front", "yaw_coupler", "yaw_retainer_A", "yaw_retainer_B",
-    "dummy_cam", "dummy_horn_yaw",
+    "head_back", "head_front", "tilt_hub", "dummy_cam", "dummy_horn_tilt",
     "bezel_L", "bezel_R", "eye_L", "eye_R", "eye_rim_L", "eye_rim_R", "fur_head",
 }
+TURRET_PARTS = {"neck_turret", "yaw_coupler", "yaw_retainer_A", "yaw_retainer_B",
+                "dummy_servo_tilt", "dummy_horn_yaw"}
 
-ARM_L_PARTS = {"arm_L", "sleeve_proxy_L", "fur_arm_L", "dummy_horn_arm_L"}
-ARM_R_PARTS = {"arm_R", "sleeve_proxy_R", "fur_arm_R", "dummy_horn_arm_R"}
+ARM_L_PARTS = {"arm_L", "paw_pad_L", "sleeve_proxy_L", "fur_arm_L"}
+ARM_R_PARTS = {"arm_R", "paw_pad_R", "sleeve_proxy_R", "fur_arm_R"}
+GLOBAL = [None]             # optional whole-robot matrix (hanging pose)
 
 # Deep saturated marmalade. AgX + studio lights wash mid oranges to peach,
 # so the albedo is deliberately darker and redder than the target grade.
@@ -77,7 +88,7 @@ def parse_args():
     p.add_argument("--preview", action="store_true")
     p.add_argument("--final", action="store_true")
     p.add_argument("--shot", default="all",
-                   choices=["all", "hero_clasp", "clasp_pen", "cutaway"])
+                   choices=["all", "hero_hug", "arms_open", "cutaway"])
     p.add_argument("--samples", type=int, default=0)
     p.add_argument("--width", type=int, default=0)
     p.add_argument("--skip-hair", action="store_true")
@@ -115,14 +126,21 @@ def rot_x_about(angle_deg, pivot_mm):
     return T @ R @ T.inverted()
 
 
-def pose_matrix(name, yaw, arm_l, arm_r):
+def _pose_local(name, yaw, arm_l, arm_r, tilt):
     if name in HEAD_PARTS:
+        return rot_z_about(yaw, (0, 0, 0)) @ rot_x_about(tilt, TILT_AX)
+    if name in TURRET_PARTS:
         return rot_z_about(yaw, (0, 0, 0))
     if name in ARM_L_PARTS:
-        return rot_x_about(-(arm_l - REST_L), SH)
+        return rot_z_about(arm_l, HL)
     if name in ARM_R_PARTS:
-        return rot_x_about(-(arm_r - REST_R), SH)
+        return rot_z_about(-arm_r, HR)
     return Matrix.Identity(4)
+
+
+def pose_matrix(name, yaw, arm_l, arm_r, tilt=0.0):
+    m = _pose_local(name, yaw, arm_l, arm_r, tilt)
+    return (GLOBAL[0] @ m) if GLOBAL[0] is not None else m
 
 
 # -----------------------------------------------------------------------------
@@ -369,10 +387,42 @@ def torso_fur_ok(pt):
     x, y, z = pt
     if z > 85.5 or z < -2:
         return False
-    # v4 shoulder openings: no hair where the arm hub sits on the cap (r < 14 mm round the axis)
-    if abs(x) > 38 and ((y - SH[1]) ** 2 + (z - SH[2]) ** 2) ** 0.5 < 14.0:
+    # belly groove: keep the channel bare so a strap / handle sits in it
+    if abs(x) < GR + 2.0 and GZ0 - 6 < z < GZ1 + 6 and y < -15:
         return False
+    # hip hinges: no hair on the knuckles
+    for hx in (HL[0], HR[0]):
+        if ((x - hx) ** 2 + (y - HL[1]) ** 2) ** 0.5 < 11.0 and 14 < z < 46:
+            return False
     return True
+
+
+def groove_fur_emitter(obj):
+    """Press a channel into the torso fur ellipsoid along the leaning belly groove."""
+    import bmesh
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    mw = obj.matrix_world
+    inv = mw.inverted()
+    for v in bm.verts:
+        w = mw @ v.co
+        x, y, z = w.x / S, w.y / S, w.z / S
+        if y > -10 or abs(x) > GR + 3:
+            continue
+        zc = min(max(z, GZ0), GZ1)
+        c = GF - G_SLOPE * (zc - 30.0) - GR          # capsule centre line (y)
+        dz = z - zc
+        rr = GR + 1.0                                 # 1 mm of pile on the liner
+        q = rr * rr - x * x - dz * dz
+        if q <= 0:
+            continue
+        yb = c + math.sqrt(q)                         # back wall of the channel
+        if y < yb:
+            nw = inv @ Vector((x * S, yb * S, z * S))
+            v.co = nw
+    bm.to_mesh(obj.data)
+    obj.data.update()
+    bm.free()
 
 
 def head_fur_ok(pt):
@@ -494,19 +544,21 @@ PART_FILES = {
     "yaw_retainer_A": "yaw_retainer_A.stl",
     "yaw_retainer_B": "yaw_retainer_B.stl",
     "yaw_thrust_washer": "yaw_thrust_washer.stl",
+    "neck_turret": "neck_turret.stl",
+    "tilt_hub": "tilt_hub.stl",
     "arm_L": "arm_L.stl",
     "arm_R": "arm_R.stl",
-    "shoulder_bracket_L": "shoulder_bracket_L.stl",
-    "shoulder_bracket_R": "shoulder_bracket_R.stl",
+    "hip_cap_L": "hip_cap_L.stl",
+    "hip_cap_R": "hip_cap_R.stl",
+    "paw_pad_L": "paw_pad_L.stl",
+    "paw_pad_R": "paw_pad_R.stl",
     "sleeve_proxy_L": "sleeve_proxy_L.stl",
     "sleeve_proxy_R": "sleeve_proxy_R.stl",
     "fur_proxy_torso": "fur_proxy_torso.stl",
     "dummy_servo_yaw": "dummy_servo_yaw.stl",
-    "dummy_servo_arm_L": "dummy_servo_arm_L.stl",
-    "dummy_servo_arm_R": "dummy_servo_arm_R.stl",
+    "dummy_servo_tilt": "dummy_servo_tilt.stl",
     "dummy_horn_yaw": "dummy_horn_yaw.stl",
-    "dummy_horn_arm_L": "dummy_horn_arm_L.stl",
-    "dummy_horn_arm_R": "dummy_horn_arm_R.stl",
+    "dummy_horn_tilt": "dummy_horn_tilt.stl",
     "dummy_pi": "dummy_pi.stl",
     "dummy_cam": "dummy_cam.stl",
     "dummy_speaker": "dummy_speaker.stl",
@@ -527,16 +579,18 @@ CUT_COLORS = {
     "yaw_retainer_A": hex_lin("9AA0A6"),
     "yaw_retainer_B": hex_lin("9AA0A6"),
     "yaw_thrust_washer": hex_lin("C0392B"),
+    "neck_turret": hex_lin("5D6D7E"),
+    "tilt_hub": hex_lin("E74C3C"),
     "arm_L": hex_lin("3D85C6"),
     "arm_R": hex_lin("6AA84F"),
-    "shoulder_bracket_L": hex_lin("2F5F8F"),
-    "shoulder_bracket_R": hex_lin("4F7A3A"),
+    "hip_cap_L": hex_lin("2F5F8F"),
+    "hip_cap_R": hex_lin("4F7A3A"),
+    "paw_pad_L": hex_lin("3A2A22"),
+    "paw_pad_R": hex_lin("3A2A22"),
     "dummy_servo_yaw": hex_lin("2C3E50"),
-    "dummy_servo_arm_L": hex_lin("2C3E50"),
-    "dummy_servo_arm_R": hex_lin("2C3E50"),
+    "dummy_servo_tilt": hex_lin("2C3E50"),
     "dummy_horn_yaw": hex_lin("F1C40F"),
-    "dummy_horn_arm_L": hex_lin("F1C40F"),
-    "dummy_horn_arm_R": hex_lin("F1C40F"),
+    "dummy_horn_tilt": hex_lin("F1C40F"),
     "dummy_pi": hex_lin("8E44AD"),
     "dummy_cam": hex_lin("9B59B6"),
     "dummy_speaker": hex_lin("1ABC9C"),
@@ -690,8 +744,10 @@ def build_assembly(skip_hair=False, preview=False):
     assign(objs["arm_R"], mats["print_dark"])
     assign(objs["sleeve_proxy_L"], mats["print_dark"])
     assign(objs["sleeve_proxy_R"], mats["print_dark"])
-    assign(objs["shoulder_bracket_L"], mats["print_bracket"])
-    assign(objs["shoulder_bracket_R"], mats["print_bracket"])
+    assign(objs["hip_cap_L"], mats["print_bracket"])
+    assign(objs["hip_cap_R"], mats["print_bracket"])
+    assign(objs["paw_pad_L"], mats["pad"])
+    assign(objs["paw_pad_R"], mats["pad"])
     assign(objs["bezel_L"], mats["bezel"])
     assign(objs["bezel_R"], mats["bezel"])
     assign(objs["eye_rim_L"], mats["bezel"])
@@ -699,7 +755,7 @@ def build_assembly(skip_hair=False, preview=False):
     assign(objs["eye_L"], mats["eye"])
     assign(objs["eye_R"], mats["eye"])
     for k in ("tray", "yaw_collar", "yaw_coupler", "yaw_retainer_A", "yaw_retainer_B",
-              "yaw_thrust_washer"):
+              "yaw_thrust_washer", "neck_turret", "tilt_hub"):
         assign(objs[k], mats["print_dark"])
     for k in list(CUT_COLORS):
         if k in objs:
@@ -712,9 +768,10 @@ def build_assembly(skip_hair=False, preview=False):
         "fur_torso",
         location=mm(0, 0, 50),
         scale_m=(0.050, 0.044, 0.054),
-        segments=56 if not preview else 40,
-        rings=32 if not preview else 24,
+        segments=128 if not preview else 96,
+        rings=64 if not preview else 48,
     )
+    groove_fur_emitter(fur_t)
     assign(fur_t, mats["fur_clay"])
     vg_t = density_group(fur_t, "fur_density", torso_fur_ok)
     objs["fur_torso"] = fur_t
@@ -741,9 +798,11 @@ def build_assembly(skip_hair=False, preview=False):
     def arm_fur_ok_side(side):
         def pred(pt):
             x, y, z = pt
-            # No hair on the inner face of the hub (it sits 0.6 mm off the shoulder cap);
-            # coat the upper arm, elbow and the forearm blade across the belly.
-            if abs(x) < 51.5 and ((y - SH[1]) ** 2 + (z - SH[2]) ** 2) ** 0.5 < 16.0:
+            # No hair on the hip knuckle; keep the inner paw bare so the TPU pad shows.
+            hx = HL[0] if side == "L" else HR[0]
+            if ((x - hx) ** 2 + (y - HL[1]) ** 2) ** 0.5 < 11.0:
+                return 0.0
+            if abs(x) < 13.0 and y > -48.0:
                 return 0.0
             return 1.0
         return pred
@@ -796,11 +855,11 @@ def build_assembly(skip_hair=False, preview=False):
     return objs, mats
 
 
-def apply_pose(objs, yaw, arm_l=REST_L, arm_r=REST_R):
+def apply_pose(objs, yaw, arm_l=REST_L, arm_r=REST_R, tilt=0.0):
     for name, obj in objs.items():
         if name.startswith("_") or not hasattr(obj, "matrix_world"):
             continue
-        obj.matrix_world = pose_matrix(name, yaw, arm_l, arm_r) @ Matrix.Identity(4)
+        obj.matrix_world = pose_matrix(name, yaw, arm_l, arm_r, tilt) @ Matrix.Identity(4)
         # bezels and eyes already have a local transform (location/rotation).
         # pose_matrix for head parts is a yaw about Z at the origin, which must
         # be PRE-multiplied around their existing local matrix.
@@ -816,7 +875,7 @@ def apply_pose(objs, yaw, arm_l=REST_L, arm_r=REST_R):
         if "rest_mw" not in obj:
             obj["rest_mw"] = [list(row) for row in obj.matrix_world]
         rest = Matrix([obj["rest_mw"][0], obj["rest_mw"][1], obj["rest_mw"][2], obj["rest_mw"][3]])
-        obj.matrix_world = pose_matrix(name, yaw, arm_l, arm_r) @ rest
+        obj.matrix_world = pose_matrix(name, yaw, arm_l, arm_r, tilt) @ rest
     bpy.context.view_layer.update()
 
 
@@ -835,14 +894,14 @@ def stash_rest(objs):
         REST_MW[name] = obj.matrix_world.copy()
 
 
-def apply_pose_v2(objs, yaw, arm_l=REST_L, arm_r=REST_R):
+def apply_pose_v2(objs, yaw, arm_l=REST_L, arm_r=REST_R, tilt=0.0):
     for name, obj in objs.items():
         if name.startswith("_") or not hasattr(obj, "matrix_world"):
             continue
         rest = REST_MW.get(name)
         if rest is None:
             continue
-        obj.matrix_world = pose_matrix(name, yaw, arm_l, arm_r) @ rest
+        obj.matrix_world = pose_matrix(name, yaw, arm_l, arm_r, tilt) @ rest
     bpy.context.view_layer.update()
 
 
@@ -911,13 +970,13 @@ def set_cutters(objs, on):
 
 def build_studio():
     # Seamless cove: large ground + back wall, slightly curved via a bent plane
-    bpy.ops.mesh.primitive_plane_add(size=2.4, location=(0, 0.05, 0))
+    bpy.ops.mesh.primitive_plane_add(size=6.0, location=(0, 0.05, 0))
     ground = bpy.context.active_object
     ground.name = "studio_ground"
     mat = mat_plastic("StudioFloor", srgb_lin((226, 222, 216)), rough=0.55, spec=0.2)
     assign(ground, mat)
 
-    bpy.ops.mesh.primitive_plane_add(size=2.4, location=(0, 1.05, 0.9))
+    bpy.ops.mesh.primitive_plane_add(size=6.0, location=(0, 1.05, 2.0))
     wall = bpy.context.active_object
     wall.name = "studio_back"
     wall.rotation_euler = (math.radians(90), 0, 0)
@@ -969,10 +1028,11 @@ HERO_HIDE = {
     "torso_front", "torso_back", "head_front", "head_back",
     "tray", "yaw_collar", "yaw_coupler", "yaw_retainer_A", "yaw_retainer_B",
     "yaw_thrust_washer",
+    "neck_turret", "tilt_hub",
     "arm_L", "arm_R", "sleeve_proxy_L", "sleeve_proxy_R",
     "fur_proxy_torso", "bezel_L", "bezel_R",
-    "shoulder_bracket_L", "shoulder_bracket_R",
-    "dummy_servo_yaw", "dummy_servo_arm_L", "dummy_servo_arm_R", "dummy_horn_yaw", "dummy_horn_arm_L", "dummy_horn_arm_R",
+    "hip_cap_L", "hip_cap_R",
+    "dummy_servo_yaw", "dummy_servo_tilt", "dummy_horn_yaw", "dummy_horn_tilt",
     "dummy_pi", "dummy_cam", "dummy_speaker", "dummy_amp", "dummy_mic",
 }
 
@@ -1017,7 +1077,7 @@ def set_mode_hero(objs, show_emitters=False):
         if n in objs:
             set_hide(objs[n], False)
             set_emitter_visible(objs[n], True)
-    for n in ("bezel_L", "bezel_R", "shoulder_bracket_L", "shoulder_bracket_R"):
+    for n in ("bezel_L", "bezel_R", "hip_cap_L", "hip_cap_R"):
         if n in objs:
             set_hide(objs[n], True)
 
@@ -1121,19 +1181,88 @@ def render_shot(path):
     print(f"WROTE {path} exists={Path(path).exists()} size={Path(path).stat().st_size if Path(path).exists() else 0}", flush=True)
 
 
-def make_pen(arm_l, arm_r, d_mm=8.0, len_mm=140.0):
-    """Ø8 × 140 mm pen-sized test cylinder along x between the forearm blades (same placement as sim_v01)."""
-    mean = math.radians((arm_l + arm_r) / 2.0)
-    y = SH[1] - FORE_R * math.cos(mean)
-    z = SH[2] + FORE_R * math.sin(mean)
-    bpy.ops.mesh.primitive_cylinder_add(vertices=48, radius=d_mm / 2000.0, depth=len_mm / 1000.0,
-                                        location=mm(0, y, z), rotation=(0, math.pi / 2, 0))
-    pen = bpy.context.active_object
-    pen.name = "grip_pen"
-    assign(pen, mat_plastic("PenBlue", hex_lin("1F4E9A"), rough=0.25, spec=0.6))
-    for p in pen.data.polygons:
-        p.use_smooth = True
-    return pen
+HANG_Z = 132.0     # mm: lift of the robot hip origin in the hanging hero shot
+BAG_TOP = 104.0    # mm: top edge of the tote bag under the hanging robot
+ARC_R = 40.0       # mm: radius of the handle arch
+
+
+def hang_matrix():
+    """Whole-robot pose for hanging on a strap: lean back 14° so the groove line is vertical, then lift."""
+    return Matrix.Translation(mm(0, 0, HANG_Z)) @ Matrix.Rotation(-math.atan(G_SLOPE), 4, "X")
+
+
+def handle_axis_world():
+    """Point on the Ø12.5 handle centre line (world, mm) and its x, after hang_matrix()."""
+    ga = math.atan(G_SLOPE)
+    r = HANDLE_D / 2.0
+    c = Vector((0.0, GF - r * math.cos(ga), 30.0 - r * math.sin(ga)))
+    w = hang_matrix() @ (c * S)
+    top = hang_matrix() @ (Vector((0.0, GF - G_SLOPE * (GZ1 - 30.0) - r * math.cos(ga), GZ1 - r * math.sin(ga))) * S)
+    return w / S, top / S
+
+
+def make_handle_and_bag():
+    """A curved round bag handle (Ø12.5) running through the belly groove, arching over to the
+    robot's right, both legs stitched into the top of a leather tote under the robot."""
+    p, top = handle_axis_world()
+    y = p.y
+    za = top.z + 4.0                      # arch starts just above the groove
+    pts = [(0.0, BAG_TOP - 6.0), (0.0, za)]
+    for i in range(1, 24):
+        t = math.pi * i / 24.0
+        pts.append((-ARC_R + ARC_R * math.cos(t), za + ARC_R * math.sin(t)))
+    pts += [(-2 * ARC_R, za), (-2 * ARC_R, BAG_TOP - 6.0)]
+    cd = bpy.data.curves.new("bag_handle_curve", "CURVE")
+    cd.dimensions = "3D"
+    sp = cd.splines.new("POLY")
+    sp.points.add(len(pts) - 1)
+    for i, (x, z) in enumerate(pts):
+        sp.points[i].co = (x * S, y * S, z * S, 1.0)
+    cd.bevel_depth = HANDLE_D / 2.0 * S
+    cd.bevel_resolution = 6
+    cd.use_fill_caps = True
+    handle = bpy.data.objects.new("bag_handle", cd)
+    bpy.context.scene.collection.objects.link(handle)
+    # smooth the polyline corners a little
+    sm = handle.modifiers.new("handle_subsurf", "SUBSURF")
+    sm.levels = 1
+    sm.render_levels = 2
+    leather = mat_plastic("HandleLeather", srgb_lin((112, 62, 30)), rough=0.48, spec=0.35)
+    handle.data.materials.append(leather)
+    # tote body
+    x0, x1 = -2 * ARC_R - 34.0, 34.0
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=mm((x0 + x1) / 2, y + 4.0, BAG_TOP / 2))
+    bag = bpy.context.active_object
+    bag.name = "tote_bag"
+    bag.scale = mm(x1 - x0, 58.0, BAG_TOP)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    bv = bag.modifiers.new("bag_bevel", "BEVEL")
+    bv.width = 0.006
+    bv.segments = 6
+    for poly in bag.data.polygons:
+        poly.use_smooth = True
+    assign(bag, mat_plastic("ToteCanvas", srgb_lin((58, 70, 82)), rough=0.8, spec=0.15))
+    return [handle, bag]
+
+
+def set_camera(target_mm, offset_mm, lens):
+    cam = bpy.context.scene.camera
+    target = mm(*target_mm)
+    loc = target + mm(*offset_mm)
+    cam.location = loc
+    cam.rotation_euler = (target - loc).to_track_quat("-Z", "Y").to_euler()
+    cam.data.lens = lens
+    bpy.context.view_layer.update()
+
+
+LIGHTS = ("key", "fill", "rim", "top")
+
+
+def shift_lights(dz_mm):
+    for n in LIGHTS:
+        o = bpy.data.objects.get(n)
+        if o:
+            o.location.z += dz_mm * S
 
 
 def main():
@@ -1148,7 +1277,7 @@ def main():
     else:
         samples = 24 if preview else 128
 
-    print(f"=== evoKin V.01 blender  preview={preview} width={width} samples={samples} shot={args.shot}", flush=True)
+    print(f"=== Tomo (evoKin V.01) blender  preview={preview} width={width} samples={samples} shot={args.shot}", flush=True)
     reset_scene()
     objs, mats = build_assembly(skip_hair=args.skip_hair, preview=preview)
     stash_rest(objs)
@@ -1172,36 +1301,54 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     # save an unposed-ready blend once the studio is up (will re-save after)
     tag = "preview" if preview else "final"
-    shots = ["hero_clasp", "clasp_pen", "cutaway"] if args.shot == "all" else [args.shot]
-    pen = make_pen(PEN_L, PEN_R)
+    shots = ["hero_hug", "arms_open", "cutaway"] if args.shot == "all" else [args.shot]
+    props = make_handle_and_bag()
+    CAM0 = ((0, -10, 72), (240, -460, 158), 80)
+
+    def show_props(on):
+        for o in props:
+            o.hide_render = not on
+            o.hide_viewport = not on
 
     for shot in shots:
-        pen.hide_render = True
-        if shot == "hero_clasp":
-            # paws overlapped across the middle, clasp closed
-            apply_pose_v2(objs, yaw=0, arm_l=CLASP_L, arm_r=CLASP_R)
+        show_props(False)
+        GLOBAL[0] = None
+        set_camera(*CAM0)
+        if shot == "hero_hug":
+            # hanging on a Ø12.5 round bag handle: handle in the belly groove, paws closed on it
+            GLOBAL[0] = hang_matrix()
+            apply_pose_v2(objs, yaw=-12, arm_l=HUG_OPEN, arm_r=HUG_OPEN, tilt=4)
+            show_props(True)
             set_cutters(objs, False)
             set_mode_hero(objs)
-            path = OUT / ("01_hero_clasp_preview.png" if preview else "01_hero_clasp.png")
-        elif shot == "clasp_pen":
-            # holding a Ø8 × 140 mm pen against the middle, head turned a little toward the camera
-            apply_pose_v2(objs, yaw=15, arm_l=PEN_L, arm_r=PEN_R)
-            pen.hide_render = False
+            set_camera((-26, -20, HANG_Z + 56), (200, -520, 110), 60)
+            shift_lights(HANG_Z)
+            path = OUT / ("01_hero_hug_handle_preview.png" if preview else "01_hero_hug_handle.png")
+            render_shot(path)
+            shift_lights(-HANG_Z)
+            continue
+        elif shot == "arms_open":
+            # paws pulled open to the 40° stop by hand, head panned and looking up
+            apply_pose_v2(objs, yaw=20, arm_l=ARM_OPEN, arm_r=ARM_OPEN, tilt=-8)
             set_cutters(objs, False)
             set_mode_hero(objs)
-            path = OUT / ("02_clasp_pen_preview.png" if preview else "02_clasp_pen.png")
+            set_camera((0, -16, 70), (240, -460, 158), 72)
+            path = OUT / ("02_arms_open_preview.png" if preview else "02_arms_open.png")
         else:
-            apply_pose_v2(objs, yaw=0, arm_l=CLASP_L, arm_r=CLASP_R)
+            apply_pose_v2(objs, yaw=0, arm_l=0, arm_r=0, tilt=8)
             set_mode_cutaway(objs, mats)
             set_cutters(objs, True)
-            path = OUT / ("03_cutaway_preview.png" if preview else "03_cutaway.png")
+            path = OUT / ("03_cutaway_hinge_tilt_preview.png" if preview else "03_cutaway_hinge_tilt.png")
         render_shot(path)
 
-    # restore the clasped hero pose in the blend
-    pen.hide_render = True
-    apply_pose_v2(objs, yaw=0, arm_l=CLASP_L, arm_r=CLASP_R)
+    # save the blend in the hanging hero pose
+    GLOBAL[0] = hang_matrix()
+    show_props(True)
+    apply_pose_v2(objs, yaw=-12, arm_l=HUG_OPEN, arm_r=HUG_OPEN, tilt=4)
     set_cutters(objs, False)
     set_mode_hero(objs)
+    set_camera((-26, -20, HANG_Z + 56), (200, -520, 110), 60)
+    shift_lights(HANG_Z)
     bpy.ops.wm.save_as_mainfile(filepath=str(BLEND))
     print(f"SAVED {BLEND}", flush=True)
 

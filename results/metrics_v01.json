@@ -1,158 +1,195 @@
 {
  "assumptions": {
-  "material": "solid PLA 1.24 g/cm\u00b3 (upper bound)",
-  "sleeve_fur_g": "4 g per arm, ASSUMED (not weighed)",
-  "horn_g": "1 g, ASSUMED",
-  "stall": "2.2 kg\u00b7cm / 0.8 A at 6 V (official); 5 V not specified",
+  "material": "PLA 1.24 g/cm\u00b3 \u00d7 0.75 effective fill (solid upper bound also given); TPU pads 1.21 g/cm\u00b3 solid",
+  "components": "FS90MG 13.4 g each (Feetech listing), horn 1 g, Adafruit 3351 speaker 25 g (ASSUMED), XIAO ESP32S3 Sense + camera 8 g, amp 2 g, mic 1 g, INA219 2 g, boost 5 g, wiring 8 g, fasteners 8 g, springs 2 \u00d7 1 g, fur skin 30 g (ASSUMED). Battery listed separately (portable power unresolved).",
   "cad_only": true,
   "physically_tested": false
  },
- "arm_drive": {
-  "arm_print_g": 20.99,
-  "total_moving_g": 25.99,
-  "arm_com_from_axis_mm": 35.8,
-  "fur_com_from_axis_mm": 42.9,
-  "gravity_torque_max_kgcm": 0.092,
-  "fraction_of_stall_6V": 0.042,
-  "paw_force_at_stall_N": 3.04,
-  "note": "Worst case is the arm horizontal. paw_force_at_stall = 2.2 kg\u00b7cm at r=71 mm (blade centre) \u2014 the most a blade can push on a finger before the servo stalls."
- },
- "clasp_grip": {
-  "mechanism": "Both FS90MG arm servos drive their forearm blades toward each other about the shared shoulder axis; the object is squeezed between the blades.",
-  "stall_torque_Nm": 0.2158,
-  "pinch_force_at_stall_N": {
-   "at_r66_inner_edge": 3.27,
-   "at_r71_blade_centre": 3.04,
-   "at_r76_outer_edge": 2.84
-  },
-  "pinch_force_at_stall_pen_pose_N": 2.92,
-  "pen_pose": {
-   "armL": -3.55,
-   "armR": -16.45,
-   "gap_mm": 8
-  },
-  "gravity_torque_one_arm_horizontal_Nm": 0.00905,
-  "continuous_hold_suggestion_N": 1.52,
-  "gap_control": {
-   "slope_deg_per_mm": 0.848,
-   "offset_deg": 6.62,
-   "gap25_delta_deg": 27.8,
-   "gap0_delta_deg": 6.6
-  },
-  "closed_gap_mm": 0.98,
-  "interlock_deg": 7.5,
-  "compliance": "2 mm fur sleeve over each blade (\u22484 mm of compressible pile in the clasp). Squeeze is set by commanding the blades past contact; the servo's position loop then pushes up to stall. No spring or breakaway part.",
-  "note": "Datasheet stall torque 2.2 kg\u00b7cm at 6 V, both servos at stall; 5 V torque is not specified (expect less). Not measured. Holding a stalled FS90MG continuously heats it: grip at \u226450 % for long holds, and let the INA219 trip limit current."
- },
- "arm_reach": {
-  "a-45": {
-   "front_y": -42.5,
-   "top_z": 73.0,
-   "bottom_z": 4.5
-  },
-  "a-15": {
-   "front_y": -60.9,
-   "top_z": 73.0,
-   "bottom_z": 37.0
-  },
-  "a0": {
-   "front_y": -63.0,
-   "top_z": 73.0,
-   "bottom_z": 47.0
-  },
-  "a15": {
-   "front_y": -60.9,
-   "top_z": 83.0,
-   "bottom_z": 47.0
-  },
-  "a30": {
-   "front_y": -53.9,
-   "top_z": 100.5,
-   "bottom_z": 47.0
-  },
-  "note": "Torso front is y=-40, head front \u2248 y=-37. Negative y = in front of the bear. The desk is z=0 (torso bottom)."
- },
- "arm_travel": {
-  "software_clamp_deg": [
-   -45,
-   30
+ "mass": {
+  "estimate_g": 263.0,
+  "solid_print_upper_bound_g": 310.0,
+  "with_2000mAh_battery_g": 301.0,
+  "centre_of_mass_mm": [
+   -1.0,
+   -4.6,
+   70.2
   ],
-  "interlock": "armL - armR >= 7.5 deg (left blade over right)",
-  "servo_deg_used": 75,
-  "servo_deg_available": 180,
-  "pulse_map": "\u2248 500\u20132500 \u00b5s over 180\u00b0 (FS90MG spec); calibrate centre per servo; \u22480.85\u00b0 of differential angle per mm of grip gap"
- },
- "head_pan": {
-  "servo": "FS90MG in the yaw collar (unchanged from v3)",
-  "software_clamp_deg": [
-   -42,
-   42
+  "centre_of_mass_with_battery_mm": [
+   -0.8,
+   -2.5,
+   63.1
   ],
-  "hard_stop_deg": 47,
-  "head_printed_plus_camera_g": 59.2,
-  "inertia_about_z_g_mm2": 49607.0,
-  "accel_torque_for_60deg_in_0p12s_kgcm": 0.1471,
-  "fraction_of_stall_6V": 0.0669,
-  "tilt": "not fitted",
-  "note": "Yaw axis is vertical, so gravity does not load the pan servo; friction on the 0.35 mm journal is untested."
+  "breakdown_g": {
+   "torso_front": 24.3,
+   "torso_back": 26.2,
+   "tray": 11.5,
+   "yaw_collar": 15.3,
+   "yaw_retainer_A": 0.8,
+   "yaw_retainer_B": 0.8,
+   "yaw_coupler": 0.5,
+   "yaw_thrust_washer": 0.4,
+   "neck_turret": 7.9,
+   "tilt_hub": 1.0,
+   "head_back": 15.2,
+   "head_front": 14.9,
+   "arm_L": 6.5,
+   "arm_R": 6.5,
+   "hip_cap_L": 1.3,
+   "hip_cap_R": 1.3,
+   "bezel": 5.8,
+   "shutter": 0.2,
+   "paw_pad_L": 1.2,
+   "paw_pad_R": 1.2,
+   "FS90MG pan + horn": 14.4,
+   "FS90MG tilt + horn": 14.4,
+   "speaker (Adafruit 3351)": 25.0,
+   "brain + camera": 8.0,
+   "amp": 2.0,
+   "mic": 1.0,
+   "INA219 + boost": 7.0,
+   "wiring": 8.0,
+   "fasteners": 8.0,
+   "springs": 2.0,
+   "fur skin": 30.0
+  },
+  "note": "Mirumi is 155 g. Tomo is bigger (92 \u00d7 80 mm torso, 150 mm tall) and carries a speaker and a camera brain, so it is heavier."
  },
- "pinch_gaps_mm": {
-  "hub_to_cap_face": 0.6,
-  "arm_to_shell_min": 0.6,
-  "sleeve_to_torso_fur_min": -1.21,
-  "clasp_blade_gap_range": [
-   0.98,
-   33.35
-  ],
-  "note": "The clasp is a deliberate pinch point: the blades close to ~1 mm and can trap a finger with up to ~3 N per the datasheet torque. Hub/shell rigid gaps are under 4 mm. Not assessed against any toy standard."
+ "hanging": {
+  "no_battery": {
+   "weight_N": 2.58,
+   "com_offset_from_strap_axis_mm": 40.6,
+   "body_leans_back_deg": 14.0,
+   "pitch_moment_Nmm": 105.0,
+   "couple_length_mm": 27.1,
+   "reaction_needed_at_paws_N": 3.86,
+   "spring_paw_force_total_N": 5.2,
+   "friction_capacity_N_mu0p5": 9.06,
+   "slip_safety_factor": 3.52,
+   "com_x_mm": -1.0
+  },
+  "with_battery": {
+   "weight_N": 2.95,
+   "com_offset_from_strap_axis_mm": 40.9,
+   "body_leans_back_deg": 14.0,
+   "pitch_moment_Nmm": 121.0,
+   "couple_length_mm": 27.1,
+   "reaction_needed_at_paws_N": 4.45,
+   "spring_paw_force_total_N": 5.2,
+   "friction_capacity_N_mu0p5": 9.65,
+   "slip_safety_factor": 3.27,
+   "com_x_mm": -0.8
+  },
+  "assumption": "Strap \u00d812.5 in the groove, hanging vertical, so the body leans back 14\u00b0 (the groove angle). \u03bc = 0.5 TPU/fur on a fabric strap (ASSUMED). Pitch moment W \u00d7 offset is carried by a couple between the paws (z\u224836) and the strap bearing on the belly at the top of the groove (z\u224862); that couple also adds clamping normal force. com_x \u2248 0 means no sideways roll. Not tested.",
+  "verdict": "On paper it holds: the springs give 5.2 N total at the paws, more than the 3.9 N (4.5 N with a battery) needed to carry the pitch moment, and the friction safety factor is about 3.5 (3.3 with a battery). The body hangs leaning back 14\u00b0 along the groove; com_x \u2248 0, so it does not roll sideways. Untested; real strap friction and fur squash will decide it."
  },
- "shoulder_pod_vs_fur_envelope": {
-  "max_protrusion_mm": 9.6,
-  "note": "Positive = the printed pod corner pokes outside the nominal 4 mm torso fur envelope (fur skin must be patterned over it)."
+ "hug_springs": {
+  "rate_Nmm_per_deg": 3.363,
+  "preload_deg": 35.0,
+  "torque_rest_Nmm": 117.7,
+  "torque_open_stop_Nmm": 252.3,
+  "finger_force_to_hold_open_N": 4.95,
+  "grip": {
+   "10.0": {
+    "open_deg": 1.9,
+    "paw_force_N": 2.42
+   },
+   "12.5": {
+    "open_deg": 4.39,
+    "paw_force_N": 2.6
+   },
+   "15.0": {
+    "open_deg": 6.83,
+    "paw_force_N": 2.77
+   },
+   "25": {
+    "open_deg": 2.62,
+    "paw_force_N": 2.88
+   }
+  },
+  "spring_stress_check": "\u03c3 \u2248 32\u00b7M\u00b7Ki/(\u03c0\u00b7d\u00b3) with M = 252 N\u00b7mm at the open stop, d = 1.22 mm, Ki \u2248 1.1: \u22481.55 GPa, at the catalogue 90\u00b0 rating (\u22481.86 GPa at 302.7 N\u00b7mm). Within rating; stop at 75\u00b0 total wind-up."
+ },
+ "head": {
+  "pan": {
+   "servo": "FS90MG in the yaw collar (unchanged)",
+   "software_clamp_deg": [
+    -42,
+    42
+   ],
+   "hard_stop_deg": 47.0,
+   "moving_inertia_g_mm2": 40117.0,
+   "accel_torque_60deg_in_0p12s_kgcm": 0.119,
+   "fraction_of_stall_6V": 0.0541,
+   "note": "Pan now also turns the turret and the tilt servo."
+  },
+  "tilt": {
+   "servo": "FS90MG on the neck turret, spline on the tilt axis (x direction, y=6, z=119)",
+   "software_clamp_deg": [
+    -10,
+    10
+   ],
+   "first_contact_deg": {
+    "nod_down": 12.0,
+    "look_up": -15.5
+   },
+   "head_mass_g": 41.2,
+   "head_com_from_axis_mm": 9.0,
+   "gravity_torque_kgcm": 0.037,
+   "fraction_of_stall_6V": 0.017
+  }
  },
  "servo_power": {
-  "servos": 3,
+  "servos": 2,
   "channels": [
    "head pan",
-   "arm L",
-   "arm R"
+   "head tilt"
   ],
   "stall_each_A_6V": 0.8,
-  "worst_case_all_stalled_A": 2.4,
-  "note": "Budget the 5 V servo rail for \u22652.4 A peak or stagger moves in firmware. The XL6009 module is not specified for that; the protected 2 A+ Pololu S13V20F5 is closer but still below an all-stalled peak."
+  "worst_case_all_stalled_A": 1.6,
+  "note": "Arms are passive and draw nothing; hugging costs no power. Budget the 5 V servo rail for \u22651.6 A peak."
  },
- "changed_vs_v4": {
-  "arm_L.stl": "changed (volume 13343 -> 16927 mm\u00b3)",
-  "arm_R.stl": "changed (volume 13343 -> 16927 mm\u00b3)",
+ "changed_vs_servo_clasp_bed94ce": {
+  "arm_L.stl": "changed (volume 16927 -> 6966 mm\u00b3)",
+  "arm_R.stl": "changed (volume 16927 -> 6966 mm\u00b3)",
   "bezel.stl": "geometrically unchanged (bytes differ)",
   "coupon.stl": "geometrically unchanged (bytes differ)",
-  "head_back.stl": "geometrically unchanged (bytes differ)",
-  "head_front.stl": "geometrically unchanged (bytes differ)",
-  "shoulder_bracket_L.stl": "geometrically unchanged (bytes differ)",
-  "shoulder_bracket_R.stl": "geometrically unchanged (bytes differ)",
-  "shutter.stl": "identical",
-  "torso_back.stl": "geometrically unchanged (bytes differ)",
-  "torso_front.stl": "geometrically unchanged (bytes differ)",
+  "head_back.stl": "changed (volume 25416 -> 16390 mm\u00b3)",
+  "head_front.stl": "changed (volume 17488 -> 16010 mm\u00b3)",
+  "hip_cap_L.stl": "new",
+  "hip_cap_R.stl": "new",
+  "neck_turret.stl": "new",
+  "paw_pad_L.stl": "new",
+  "paw_pad_R.stl": "new",
+  "shutter.stl": "geometrically unchanged (bytes differ)",
+  "tilt_hub.stl": "new",
+  "torso_back.stl": "changed (volume 39687 -> 28188 mm\u00b3)",
+  "torso_front.stl": "changed (volume 21184 -> 26140 mm\u00b3)",
   "tray.stl": "geometrically unchanged (bytes differ)",
   "yaw_collar.stl": "geometrically unchanged (bytes differ)",
   "yaw_coupler.stl": "geometrically unchanged (bytes differ)",
   "yaw_retainer_A.stl": "geometrically unchanged (bytes differ)",
   "yaw_retainer_B.stl": "geometrically unchanged (bytes differ)",
   "yaw_thrust_washer.stl": "geometrically unchanged (bytes differ)",
-  "reference/dummies.stl": "changed (volume 83776 -> 83776 mm\u00b3)",
+  "reference/dummies.stl": "changed (volume 83776 -> 75955 mm\u00b3)",
   "reference/dummy_amp.stl": "identical",
   "reference/dummy_cam.stl": "identical",
-  "reference/dummy_horn_arm_L.stl": "changed (volume 721 -> 721 mm\u00b3)",
-  "reference/dummy_horn_arm_R.stl": "changed (volume 721 -> 721 mm\u00b3)",
+  "reference/dummy_horn_tilt.stl": "new",
   "reference/dummy_horn_yaw.stl": "geometrically unchanged (bytes differ)",
   "reference/dummy_mic.stl": "identical",
   "reference/dummy_pi.stl": "identical",
-  "reference/dummy_servo_arm_L.stl": "geometrically unchanged (bytes differ)",
-  "reference/dummy_servo_arm_R.stl": "geometrically unchanged (bytes differ)",
+  "reference/dummy_servo_tilt.stl": "new",
   "reference/dummy_servo_yaw.stl": "geometrically unchanged (bytes differ)",
   "reference/dummy_speaker.stl": "identical",
-  "reference/fur_proxy_torso.stl": "geometrically unchanged (bytes differ)",
-  "reference/sleeve_proxy_L.stl": "changed (volume 20475 -> 30717 mm\u00b3)",
-  "reference/sleeve_proxy_R.stl": "changed (volume 20475 -> 30717 mm\u00b3)"
- }
+  "reference/fur_proxy_torso.stl": "changed (volume 89623 -> 90924 mm\u00b3)",
+  "reference/grip_rod.stl": "new",
+  "reference/sleeve_proxy_L.stl": "changed (volume 30717 -> 7697 mm\u00b3)",
+  "reference/sleeve_proxy_R.stl": "changed (volume 30717 -> 7697 mm\u00b3)"
+ },
+ "removed_vs_servo_clasp_bed94ce": [
+  "stl/shoulder_bracket_L.stl",
+  "stl/shoulder_bracket_R.stl",
+  "stl/reference/dummy_servo_arm_L.stl",
+  "stl/reference/dummy_servo_arm_R.stl",
+  "stl/reference/dummy_horn_arm_L.stl",
+  "stl/reference/dummy_horn_arm_R.stl"
+ ]
 }

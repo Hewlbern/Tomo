@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>evoKin V.01 — an open-source plush robot companion</title>
-  <meta name="description" content="evoKin V.01 is a small orange, Mirumi-style plush robot whose head pans and whose forward-facing arms clasp around its middle to hold onto things. Open-source CAD, STLs and a planned ESP32-S3 brain.">
-  <meta property="og:title" content="evoKin V.01">
-  <meta property="og:description" content="An open-source plush robot companion. Head pans, arms hug and wave.">
-  <meta property="og:image" content="media/evokin_poster.jpg">
+  <title>Tomo by DreamMachina (formerly evoKin V.01) — an open-source plush robot that hugs</title>
+  <meta name="description" content="Tomo by DreamMachina (formerly evoKin V.01) is a small orange, Mirumi-style plush robot that hugs a bag strap with spring-loaded arms, and pans and nods its head with two servos. Open-source CAD, STLs, firmware and a planned ESP32-S3 brain.">
+  <meta property="og:title" content="Tomo by DreamMachina">
+  <meta property="og:description" content="An open-source plush robot companion. Passive spring hug, head pan and nod.">
+  <meta property="og:image" content="https://hewlbern.github.io/Tomo/renders/01_hero_hug_handle.jpg">
   <link rel="icon" type="image/jpeg" href="media/evokin_poster.jpg">
   <style>
     :root {
@@ -191,10 +191,11 @@
 <body>
   <header class="top">
     <div class="wrap nav">
-      <a class="brand" href="#top">Evo<span>kin</span></a>
+      <a class="brand" href="#top">To<span>mo</span></a>
       <nav class="links">
         <a href="#looks">Looks</a>
         <a href="#works">Mechanism</a>
+        <a href="#tradeoffs">Trade-offs</a>
         <a href="#bom">BOM</a>
         <a href="#stls">STLs</a>
         <a href="#electronics">Electronics</a>
@@ -207,11 +208,11 @@
     <section class="hero">
       <div class="wrap">
         <p class="kicker">Open-source plush robot</p>
-        <h1>A small orange bear that turns its head and clasps its arms around its middle to hold onto things.</h1>
-        <p class="lede">evoKin V.01 is a Mirumi-style companion: a furry shell around a motorised head-pan joint and two forward-facing arms whose paws overlap across the belly to hold a pen, cable, small pole or strap, three Feetech FS90MG servos, and a planned ESP32-S3 brain with a camera and a voice.</p>
+        <h1>Tomo by DreamMachina</h1>
+        <p class="lede"><strong>Formerly evoKin V.01.</strong> A small orange, Mirumi-style bear that hugs a bag strap or handle with spring-loaded arms, and looks around, nods and turns away shyly with a two-servo head. A furry shell around a printed frame, two Feetech FS90MG servos (head pan and tilt), two small torsion springs, and a planned ESP32-S3 brain with a camera and a voice.</p>
         <div class="flags">
-          <span class="flag">V.01 CAD</span>
-          <span class="flag">23 / 23 CAD checks passed</span>
+          <span class="flag">V.01 passive spring hug</span>
+          <span class="flag">25 / 25 CAD checks passed</span>
           <span class="flag alert">Prototype — nothing printed or purchased</span>
           <span class="flag alert">Not child-ready</span>
         </div>
@@ -221,39 +222,39 @@
             Your browser cannot play this video. <a href="media/evokin_demo_ad_v3_real.mp4">Download the MP4</a>.
           </video>
         </div>
-        <p class="caption">A 10-second generated concept advertisement, not footage of a built unit, and it still shows the older v3 design (arms clasping backward around a strap), not V.01. The CAD and the renders below are the design source of truth. Earlier takes live in the repository’s <code>media/</code> folder.</p>
+        <p class="caption"><strong>This video shows an older design.</strong> It is a 10-second generated concept advertisement, not footage of a built unit, and it still shows the v3 design (arms clasping backward around a strap), not the passive hug. The CAD and the renders below are the design source of truth.</p>
       </div>
     </section>
 
     <section id="looks">
       <div class="wrap">
         <h2>How it looks</h2>
-        <p class="sub">Blender Cycles renders of the V.01 fur model, plus CAD stills of the mechanism. Click for the same frame at this page’s resolution; full-size PNGs are in the repository.</p>
-        <div class="gallery">
+        <p class="sub">Blender Cycles renders of the fur model, plus CAD stills of the mechanism. Full-size PNGs are in the <a href="https://github.com/Hewlbern/Tomo/tree/main/renders">repository</a>.</p>
+        <figure class="wide" style="margin-top:0">
+          <a href="renders/01_hero_hug_handle.jpg"><img src="renders/01_hero_hug_handle.jpg" width="960" height="720" alt="Tomo, an orange furry bear-like robot, hanging from a round brown bag handle with its paws closed around the handle in front of its belly"></a>
+          <figcaption>Hanging from a Ø12.5 mm round bag handle: the handle lies in the belly groove and the spring-loaded paws close on it.</figcaption>
+        </figure>
+        <div class="gallery" style="margin-top:16px">
           <figure>
-            <a href="renders/01_hero_clasp.jpg"><img src="renders/01_hero_clasp.jpg" width="960" height="720" alt="evoKin V.01, an orange furry bear-like robot, front three-quarter view with its forearms crossed and overlapped across its belly"></a>
-            <figcaption>Front 3/4, clasp closed: paws overlap across the middle.</figcaption>
+            <a href="renders/02_arms_open.jpg"><img src="renders/02_arms_open.jpg" width="960" height="720" alt="Tomo sitting with both arms pulled open, showing the groove down its belly, head turned and looking up"></a>
+            <figcaption>Arms pulled open by hand to the 40° stop; head panned 20° and looking up.</figcaption>
           </figure>
           <figure>
-            <a href="renders/02_clasp_pen.jpg"><img src="renders/02_clasp_pen.jpg" width="960" height="720" alt="evoKin V.01 holding a blue pen-sized cylinder against its belly between its two forearms, head turned 15 degrees"></a>
-            <figcaption>Holding a Ø8 × 140 mm pen against its middle.</figcaption>
-          </figure>
-          <figure>
-            <a href="renders/03_cutaway.jpg"><img src="renders/03_cutaway.jpg" width="960" height="720" alt="Colour-coded cutaway of evoKin V.01 showing the head, yaw stack, shoulder servos, speaker and clasp arms"></a>
-            <figcaption>Cutaway of the printed shell, yaw stack, shoulder servos and speaker.</figcaption>
-          </figure>
-          <figure>
-            <a href="renders/v01_clasp_open_head30.jpg"><img src="renders/v01_clasp_open_head30.jpg" width="960" height="540" alt="CAD view of evoKin V.01 with the head panned 30 degrees and the clasp open to 25 mm, beside the clasp closed"></a>
-            <figcaption>CAD: head pan +30° with the clasp open to 25 mm; clasp closed.</figcaption>
+            <a href="renders/03_cutaway_hinge_tilt.jpg"><img src="renders/03_cutaway_hinge_tilt.jpg" width="960" height="720" alt="Colour-coded cutaway of Tomo showing the hip hinges, neck turret with the tilt servo, speaker and board"></a>
+            <figcaption>Cutaway: hip hinges, neck turret and tilt servo, speaker and board; head nodding 8°.</figcaption>
           </figure>
         </div>
         <figure class="wide">
-          <a href="renders/v01_clasp_pen.jpg"><img src="renders/v01_clasp_pen.jpg" width="960" height="540" alt="CAD views of the V.01 forearm blades squeezing a pen-sized cylinder"></a>
-          <figcaption>CAD: the two forearm blades squeeze the pen like scissors.</figcaption>
+          <a href="renders/v01_hug_handle.jpg"><img src="renders/v01_hug_handle.jpg" width="960" height="540" alt="CAD views of the arms closing on a round handle lying in the belly groove"></a>
+          <figcaption>CAD: hugging a Ø12.5 handle (front 3/4 and a section through the arms).</figcaption>
         </figure>
         <figure class="wide">
-          <a href="renders/v01_shoulder_exploded.jpg"><img src="renders/v01_shoulder_exploded.jpg" width="960" height="540" alt="Exploded CAD view of the shoulder: pod, servo, cap, horn and arm hub"></a>
-          <figcaption>Shoulder, exploded (unchanged from v4): pod in the back shell, FS90MG, cap, horn, arm hub.</figcaption>
+          <a href="renders/v01_arms_open_tilt.jpg"><img src="renders/v01_arms_open_tilt.jpg" width="960" height="540" alt="CAD views with the arms open and the head panned and tilted"></a>
+          <figcaption>CAD: arms open, head pan +30° looking up 10°; side view nodding 10°.</figcaption>
+        </figure>
+        <figure class="wide">
+          <a href="renders/v01_hip_turret_exploded.jpg"><img src="renders/v01_hip_turret_exploded.jpg" width="960" height="540" alt="Exploded CAD views of the hip hinge and the pan/tilt neck"></a>
+          <figcaption>CAD: hip hinge and pan/tilt neck, exploded.</figcaption>
         </figure>
       </div>
     </section>
@@ -261,37 +262,57 @@
     <section id="works">
       <div class="wrap">
         <h2>How it works</h2>
-        <p class="sub">Three metal-gear micro servos do all of the motion. The shells are FDM-printed and closed on a registration lip. Fail-safe is a requirement, not a finished feature.</p>
+        <p class="sub">Two springs hold the hug; two metal-gear micro servos move the head. The shells are FDM-printed and closed on a registration lip.</p>
         <div class="grid-2">
           <article class="card">
-            <h3>Head pan</h3>
-            <p>An FS90MG in the yaw collar turns a coupler blade in a slot in the head. A printed 0.8&nbsp;mm thrust washer takes the axial load. Software clamps pan to ±42°; the printed hard stop is at about ±47°. No tilt axis — it does not fit cleanly beside the camera.</p>
+            <h3>Passive spring hug (Mirumi-style)</h3>
+            <p>Each arm is a curved band that follows the belly and curls into a paw. It turns on a vertical M3 pin at the hip. A music-wire torsion spring in the knuckle (Grainger 3HPG6 left-hand / 3HPD1 right-hand, 3.36&nbsp;N·mm per degree) is preloaded 35° against a printed rest stop. You open the arms by hand to a 40° stop and let go. Holding costs zero power.</p>
           </article>
           <article class="card">
-            <h3>Forward-facing arms</h3>
-            <p>One FS90MG per shoulder, direct drive, in a pod moulded into the back shell. Both arms turn on the same left–right axis; 0° is straight forward and + is up. Software range −45° to +30°.</p>
+            <h3>Belly groove and paws</h3>
+            <p>A rounded channel down the belly takes round straps and handles 10–15&nbsp;mm thick, or a flat strap up to 25&nbsp;mm laid across it. It leans 14° so a straight strap clears the upper belly. TPU paw pads take the squash; with the arms open there is 28&nbsp;mm between pad and belly.</p>
           </article>
           <article class="card">
-            <h3>Clasp around the middle (new in V.01)</h3>
-            <p>Each forearm turns inward across the belly and runs 18&nbsp;mm past the midline, so the paws overlap by 36&nbsp;mm. Lowering the left arm onto the right closes the blades like scissors: gap about 1&nbsp;mm to 25&nbsp;mm (≈0.85° per mm), squeeze about 3.0&nbsp;N at datasheet stall torque, not measured. No extra servo or part. Firmware keeps the left arm at least 7.5° above the right.</p>
+            <h3>Clamp force</h3>
+            <p>About <strong>2.4&nbsp;N</strong> per paw on Ø10, <strong>2.6&nbsp;N</strong> on Ø12.5, <strong>2.8&nbsp;N</strong> on Ø15 and <strong>2.9&nbsp;N</strong> on a flat 25&nbsp;mm strap. Assumption: catalogue spring rate, no hinge friction, force = spring torque ÷ the ≈51&nbsp;mm lever to the pad contact. On paper the ≈263&nbsp;g robot hangs with a friction safety factor of about 3.5 (μ ≈ 0.5 assumed). Not measured.</p>
           </article>
           <article class="card">
-            <h3>Fail-safe</h3>
-            <p>Direct drive has no mechanical breakaway; the only compliance in the clasp is the fur on the blades. The clasp is a deliberate pinch point (about 3&nbsp;N). The plan is to cap grip current and cut the 5&nbsp;V servo rail when a current sensor sees a stall or a forced arm, so the servos back-drive and the arms go limp. That trip is not built yet.</p>
+            <h3>Head pan and tilt</h3>
+            <p>Two FS90MG servos. Pan: in the yaw collar, ±42° (hard stop ±47°). Tilt: a second servo on a new neck turret nods the head about an axis near its centre, ±10° (first contact at +12° / −15.5°). The tilt servo lead and the camera ribbon cross the pan joint in loose loops.</p>
+          </article>
+          <article class="card">
+            <h3>Firmware</h3>
+            <p>A small ESP32Servo sketch for the XIAO ESP32S3 (<a href="https://github.com/Hewlbern/Tomo/blob/main/firmware/evokin_v01/evokin_v01.ino">firmware/evokin_v01</a>) with three behaviours: look-around, nod and a shy turn-away. No clasp logic — the arms need none. Untested.</p>
           </article>
           <article class="card">
             <h3>Shells and fasteners</h3>
-            <p>Male lip on the back half, female groove on the front, 0.25&nbsp;mm FDM clearance, 0.40&nbsp;mm elephant-foot chamfer. One scheme everywhere: M2.5 at 2.8&nbsp;mm clearance / 2.1&nbsp;mm pilot. Print the test coupon first.</p>
+            <p>Male lip on the back half, female groove on the front, 0.25&nbsp;mm FDM clearance, 0.40&nbsp;mm elephant-foot chamfer. M2.5 at 2.8&nbsp;mm clearance / 2.1&nbsp;mm pilot. The hip caps unscrew so an arm, pin and spring come out without opening the torso.</p>
           </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="tradeoffs">
+      <div class="wrap">
+        <h2>Trade-offs</h2>
+        <div class="card">
+          <ul>
+            <li><strong>The arms cannot move on their own.</strong> No wave, no motorised hug — but no arm current, no gears to strip and no grip interlock.</li>
+            <li><strong>Grip is modest and fixed</strong> (≈2.4–2.9&nbsp;N per paw). A stronger spring grips harder but is harder for small hands to open. The spring price is uncertain.</li>
+            <li><strong>The paws are a soft pinch point</strong> (≈2.5&nbsp;N); they open by hand.</li>
+            <li><strong>Strap range</strong> is Ø10–15&nbsp;mm round or up to 25&nbsp;mm flat. The strap leans 14° on the body, so Tomo hangs leaning back.</li>
+            <li><strong>Heavier than Mirumi</strong>: about 263&nbsp;g against 155&nbsp;g, because Tomo is bigger and carries a speaker and a camera brain.</li>
+            <li><strong>Tilt margin is tight</strong>: 2° between the +10° clamp and the first contact nodding down.</li>
+          </ul>
         </div>
       </div>
     </section>
 
     <section id="bom">
       <div class="wrap">
-        <h2>Bill of materials</h2>
-        <p class="sub">Prices are in Australian dollars, from November 2026 supplier quotes, and may have changed. The complete table, including unsourced fasteners, fur and the custom-board target, is in the repository as <a href="https://github.com/Hewlbern/evoKin-V.01/blob/main/BOM.csv">BOM.csv</a>.</p>
-        <p class="note">Nothing has been purchased. Every line below is planned or suggested only. Fasteners, fur, a battery and filament are still unsourced.</p>
+        <h2>Tomo by DreamMachina — bill of materials</h2>
+        <p class="sub">Prices are in Australian dollars, from November 2026 supplier quotes, and may have changed. The complete table, including springs, fasteners, fur and the custom-board target, is <a href="https://github.com/Hewlbern/Tomo/blob/main/BOM.csv">BOM.csv</a>.</p>
+        <p class="note">Nothing has been purchased. Every line is planned or shortlisted only. Springs, fasteners, fur, a battery and filament are not in the totals.</p>
 
         <h3 style="margin-top:0">Priced mechanical</h3>
         <div class="scroll">
@@ -301,18 +322,18 @@
             </thead>
             <tbody>
               <tr><td>Feetech FS90MG (head pan)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
-              <tr><td>Feetech FS90MG (left arm + clasp)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
-              <tr><td>Feetech FS90MG (right arm + clasp)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
+              <tr><td>Feetech FS90MG (head tilt / nod)</td><td class="num">1</td><td class="num">7.40</td><td class="num">7.40</td><td>Core Electronics</td></tr>
               <tr><td>Adafruit 3351 mono enclosed speaker, 3&nbsp;W 4&nbsp;Ω</td><td class="num">1</td><td class="num">8.95</td><td class="num">8.95</td><td>Core Electronics / Adafruit</td></tr>
             </tbody>
             <tfoot>
-              <tr><td>Subtotal</td><td></td><td></td><td class="num">31.15</td><td></td></tr>
+              <tr><td>Subtotal (was 31.15 with three servos)</td><td></td><td></td><td class="num">23.75</td><td></td></tr>
             </tfoot>
           </table>
         </div>
+        <p class="caption">Springs: one 6-pack each of Grainger 3HPG6 (left-hand) and 3HPD1 (right-hand) torsion springs. <strong>Price uncertain:</strong> Raptor Supplies Australia showed A$16.98 per pack on a category page but about A$108–109 on the product page (Nov 2026); confirm before ordering. Also needed and unpriced: 2 × M3 hinge-pin screws with nylocs, 4 × M2.5 hip-cap screws, an M3 tilt idler screw, M2 hub screws, longer M2.5 horn screws, and TPU for the paw pads.</p>
 
         <h3>Option A — project buy</h3>
-        <p class="sub">One first-article brain plus spare modules for a later custom board. About A$88.40 electronics, or A$92.90 with the optional TP4056, or about A$119.55 with the three priced servos and speaker.</p>
+        <p class="sub">One first-article brain plus spare modules for a later custom board. A$88.40 electronics, A$92.90 with the optional TP4056, or <strong>A$112.15</strong> (A$116.65 with the TP4056) with the two servos and speaker.</p>
         <div class="scroll">
           <table>
             <thead>
@@ -333,7 +354,7 @@
         </div>
 
         <h3>Option B — cheaper electronics, needs a servo driver</h3>
-        <p class="sub">About A$51.18 electronics, or about A$82.33 with the three priced servos and speaker, plus a PCA9685 servo driver (not yet sourced) and postage. The DFR1154 has only GPIO43/44 free, so it cannot drive three servos directly. It has no charger.</p>
+        <p class="sub">A$51.18 electronics, or <strong>A$74.93</strong> with the two servos and speaker, plus a PCA9685 servo driver (not yet sourced) and postage. The DFR1154 has only GPIO43/44 free, shared with the INA219 over I2C. It has no charger.</p>
         <div class="scroll">
           <table>
             <thead>
@@ -357,10 +378,10 @@
     <section id="stls">
       <div class="wrap">
         <h2>Printable STLs</h2>
-        <p class="sub">FDM in PLA or PETG is the intended process. No layer height or infill has been validated. Print the coupon first. A passing coupon is not a full fit-check.</p>
+        <p class="sub">FDM in PLA or PETG (TPU for the paw pads). No layer height or infill has been validated. Print the coupon first. A passing coupon is not a full fit-check.</p>
         <div class="btnrow">
-          <a class="btn" href="downloads/evokin-stls.zip">Download all STLs (zip, 1.1 MB)</a>
-          <a class="btn ghost" href="https://github.com/Hewlbern/evoKin-V.01/tree/main/stl">Browse on GitHub</a>
+          <a class="btn" href="downloads/evokin-stls.zip">Download all STLs (zip)</a>
+          <a class="btn ghost" href="https://github.com/Hewlbern/Tomo/tree/main/stl">Browse on GitHub</a>
         </div>
         <div class="scroll">
           <table>
@@ -368,19 +389,22 @@
               <tr><th>Part</th><th>File</th><th>Print notes</th><th class="num">Qty</th></tr>
             </thead>
             <tbody>
-              <tr><td>Torso front</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/torso_front.stl">torso_front.stl</a></td><td>Seam-down. 0.40 mm chamfer. M2.5 clearance 2.8 mm. Female groove.</td><td class="num">1</td></tr>
-              <tr><td>Torso back</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/torso_back.stl">torso_back.stl</a></td><td>Male lip, 1.2 mm. M2.5 pilots 2.1 mm. Shoulder servo pods moulded in.</td><td class="num">1</td></tr>
-              <tr><td>Tray</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/tray.stl">tray.stl</a></td><td>Spine with amp pocket; 10 mm tabs at x = ±29.</td><td class="num">1</td></tr>
-              <tr><td>Yaw collar</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/yaw_collar.stl">yaw_collar.stl</a></td><td>Servo hangers, stepped Ø34 bore.</td><td class="num">1</td></tr>
-              <tr><td>Yaw retainers</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/yaw_retainer_A.stl">yaw_retainer_A.stl</a>, <a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/yaw_retainer_B.stl">B</a></td><td>M2 clearance 2.3 mm.</td><td class="num">1+1</td></tr>
-              <tr><td>Yaw coupler</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/yaw_coupler.stl">yaw_coupler.stl</a></td><td>2.0 mm blade. Needs a longer M2.5 horn screw.</td><td class="num">1</td></tr>
-              <tr><td>Thrust washer</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/yaw_thrust_washer.stl">yaw_thrust_washer.stl</a></td><td>0.8 mm. Print flat, no supports.</td><td class="num">1</td></tr>
-              <tr><td>Head front / back</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/head_front.stl">head_front.stl</a>, <a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/head_back.stl">head_back.stl</a></td><td>Back prints skirt-down, 30° cone.</td><td class="num">1+1</td></tr>
-              <tr><td>Arms L / R</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/arm_L.stl">arm_L.stl</a>, <a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/arm_R.stl">arm_R.stl</a></td><td>Critter’s own left is +x. V.01 L-shaped clasp arm: hub screws to the servo horn, forearm blade crosses the belly to 18 mm past the midline. Exported at −15° (L) / −25° (R). Print on the blade’s broad side, PETG preferred.</td><td class="num">1+1</td></tr>
-              <tr><td>Shoulder caps</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/shoulder_bracket_L.stl">L</a>, <a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/shoulder_bracket_R.stl">R</a></td><td>4 mm plate; arm servo screws to it, 2 × M2.5 into the pod.</td><td class="num">1+1</td></tr>
-              <tr><td>Eye bezel</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/bezel.stl">bezel.stl</a></td><td>Print two (left and right are mirrors).</td><td class="num">2</td></tr>
-              <tr><td>Shutter</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/shutter.stl">shutter.stl</a></td><td>Camera shutter.</td><td class="num">1</td></tr>
-              <tr><td>Test coupon</td><td><a href="https://github.com/Hewlbern/evoKin-V.01/raw/main/stl/coupon.stl">coupon.stl</a></td><td>Print first. Journal, washer, tab, servo seat.</td><td class="num">1</td></tr>
+              <tr><td>Torso front</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/torso_front.stl">torso_front.stl</a></td><td>Seam-down. Belly groove with liner; hip webs and upper ears (spring spigot, stop lug).</td><td class="num">1</td></tr>
+              <tr><td>Torso back</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/torso_back.stl">torso_back.stl</a></td><td>Male lip, 1.2 mm. M2.5 pilots 2.1 mm. Shoulder pods removed.</td><td class="num">1</td></tr>
+              <tr><td>Tray</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/tray.stl">tray.stl</a></td><td>Spine with amp pocket; 10 mm tabs at x = ±29.</td><td class="num">1</td></tr>
+              <tr><td>Yaw collar</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/yaw_collar.stl">yaw_collar.stl</a></td><td>Pan-servo hangers, stepped Ø34 bore.</td><td class="num">1</td></tr>
+              <tr><td>Yaw retainers</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/yaw_retainer_A.stl">yaw_retainer_A.stl</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/yaw_retainer_B.stl">B</a></td><td>M2 clearance 2.3 mm.</td><td class="num">1+1</td></tr>
+              <tr><td>Yaw coupler</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/yaw_coupler.stl">yaw_coupler.stl</a></td><td>2.0 mm blade. Needs a longer M2.5 horn screw.</td><td class="num">1</td></tr>
+              <tr><td>Thrust washer</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/yaw_thrust_washer.stl">yaw_thrust_washer.stl</a></td><td>0.8 mm. Print flat, no supports.</td><td class="num">1</td></tr>
+              <tr><td>Neck turret (new)</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/neck_turret.stl">neck_turret.stl</a></td><td>Skirt, cone, coupler slot, pan stop, tilt-servo cradle and idler column. Skirt-down.</td><td class="num">1</td></tr>
+              <tr><td>Tilt hub (new)</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/tilt_hub.stl">tilt_hub.stl</a></td><td>On the tilt horn (2 × M2); key into head_back.</td><td class="num">1</td></tr>
+              <tr><td>Head front / back</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/head_front.stl">head_front.stl</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/head_back.stl">head_back.stl</a></td><td>Camera and bezel seats; tilt-hub socket and idler boss in the back.</td><td class="num">1+1</td></tr>
+              <tr><td>Arms L / R</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/arm_L.stl">arm_L.stl</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/arm_R.stl">arm_R.stl</a></td><td>Critter’s own left is +x. Curved hug band with the hip knuckle (spring recess, stop relief). PETG preferred, print flat.</td><td class="num">1+1</td></tr>
+              <tr><td>Hip caps (new)</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/hip_cap_L.stl">L</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/hip_cap_R.stl">R</a></td><td>2 × M2.5 to the hip web; M3 nyloc trap.</td><td class="num">1+1</td></tr>
+              <tr><td>Paw pads (new)</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/paw_pad_L.stl">L</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/paw_pad_R.stl">R</a></td><td>TPU 85A–95A, 1.5 mm.</td><td class="num">1+1</td></tr>
+              <tr><td>Eye bezel</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/bezel.stl">bezel.stl</a></td><td>Print two (left and right are mirrors).</td><td class="num">2</td></tr>
+              <tr><td>Shutter</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/shutter.stl">shutter.stl</a></td><td>Camera shutter.</td><td class="num">1</td></tr>
+              <tr><td>Test coupon</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/coupon.stl">coupon.stl</a></td><td>Print first. Journal, washer, tab, servo seat.</td><td class="num">1</td></tr>
             </tbody>
           </table>
         </div>
@@ -390,13 +414,14 @@
     <section id="electronics">
       <div class="wrap">
         <h2>Electronics</h2>
-        <p class="sub">The planned brain is an ESP32-S3, not the Raspberry Pi Zero still drawn as a tray dummy in the CAD. V.01 needs three servo PWM channels; the clasp uses the two arm channels. Planning notes, GPIO cautions and a bring-up checklist are in <a href="https://github.com/Hewlbern/evoKin-V.01/blob/main/electronics/esp32-board-notes.md">electronics/esp32-board-notes.md</a>.</p>
+        <p class="sub">The planned brain is an ESP32-S3, not the Raspberry Pi Zero still drawn as a tray dummy in the CAD. Tomo needs two servo PWM channels (head pan and tilt); the arms need none. Planning notes, GPIO cautions and a bring-up checklist are in <a href="https://github.com/Hewlbern/Tomo/blob/main/electronics/esp32-board-notes.md">electronics/esp32-board-notes.md</a>.</p>
         <div class="grid-2">
           <article class="card">
             <h3>Prototype paths</h3>
             <ul>
-              <li>Option A: Seeed XIAO ESP32S3 Sense, plus spare WROOM-1U-N16R8 modules. Three spare PWM pins confirmed (e.g. D0–D2).</li>
-              <li>Option B: DFRobot DFR1154. Only GPIO43/44 free, so add a PCA9685 servo driver over I2C.</li>
+              <li>Option A: Seeed XIAO ESP32S3 Sense, plus spare WROOM-1U-N16R8 modules. Pan on D0, tilt on D1.</li>
+              <li>Option B: DFRobot DFR1154. Only GPIO43/44 free, so a PCA9685 servo driver shares I2C with the INA219.</li>
+              <li>Two servos can draw up to 1.6&nbsp;A at stall; holding a hug draws nothing.</li>
             </ul>
           </article>
           <article class="card">
@@ -414,19 +439,21 @@
     <section id="validation">
       <div class="wrap">
         <h2>Validation and status</h2>
-        <p class="sub">The V.01 audit is CAD measurements and an imposed-motion collision sweep on the exported STLs. Nothing has been printed or physically tested.</p>
+        <p class="sub">CAD measurements and an imposed-motion collision sweep on the exported STLs. Nothing has been printed or physically tested.</p>
         <div class="scroll">
           <table>
             <thead><tr><th>Check</th><th>Result</th></tr></thead>
             <tbody>
-              <tr><td>Fit-audit interfaces</td><td class="ok">23 / 23 pass, 0 marginal, 0 fail</td></tr>
-              <tr><td>Imposed-motion sweep</td><td>988 poses, 238,108 pair tests, 64,792 booleans</td></tr>
-              <tr><td>Rigid overlaps in travel</td><td class="ok">0 (arms −45…+30° with armL − armR ≥ 7.5°, head ±42°)</td></tr>
-              <tr><td>Clasp closure</td><td class="ok">Blades overlap 36 mm; gap 0.98 mm closed, up to 33 mm open</td></tr>
-              <tr><td>Grip clearance</td><td class="ok">Ø4–25 mm test cylinders all fit in travel, ≥ 0.57 mm off the shell</td></tr>
-              <tr><td>Grip force (datasheet)</td><td>≈ 3.0 N at stall; not measured</td></tr>
-              <tr><td>Head pan hard stop</td><td>Collar ↔ head contact at ±47°, beyond the ±42° clamp</td></tr>
-              <tr><td>Arm clearances</td><td>0.6 mm to shell and cap, 17.8 mm to head; forearm ≥ 4.5 mm above the desk</td></tr>
+              <tr><td>Fit-audit interfaces</td><td class="ok">25 / 25 pass, 0 marginal, 0 fail</td></tr>
+              <tr><td>Imposed-motion sweep</td><td>457 poses, 147,154 pair tests, 15,815 booleans</td></tr>
+              <tr><td>Rigid overlaps in travel</td><td class="ok">0 (pan ±42°, tilt ±10°, arms 0–40°)</td></tr>
+              <tr><td>Hug on Ø10 / 12.5 / 15 mm</td><td class="ok">Arms open 1.9° / 4.4° / 6.8°; 2.4 / 2.6 / 2.8 N per paw</td></tr>
+              <tr><td>Hug on a flat 25 × 2.5 mm strap</td><td class="ok">Arms open 2.6°; 2.9 N per paw</td></tr>
+              <tr><td>Arms open</td><td class="ok">Pad ↔ belly 28.3 mm (≥ 20 mm), a Ø15 rod slides in clear</td></tr>
+              <tr><td>Arm stops</td><td>Engage at −0.5° and 40.5°; arm ↔ hip cap 0.4 mm</td></tr>
+              <tr><td>Head pan hard stop</td><td>±47°, beyond the ±42° clamp</td></tr>
+              <tr><td>Head tilt</td><td>First contact +12° / −15.5°, beyond the ±10° clamp; camera ↔ tilt servo ≥ 4.9 mm</td></tr>
+              <tr><td>Mass (estimate)</td><td>≈ 263 g; hangs with slip safety factor ≈ 3.5</td></tr>
               <tr><td>Printable meshes</td><td class="ok">Watertight</td></tr>
             </tbody>
           </table>
@@ -434,10 +461,9 @@
         <div class="card" style="margin-top:18px">
           <h3>Status</h3>
           <ul>
-            <li>Prototype. V.01 CAD is complete and unprinted. Motion, grip force, fail-safe behaviour and wear are untested.</li>
-            <li>The concept video still shows the v3 design.</li>
-            <li>The clasp is a ~3 N pinch point with no mechanical breakaway.</li>
-            <li>Nothing has been ordered or purchased.</li>
+            <li>Prototype. V.01 passive-hug CAD is complete and unprinted. Grip, hanging, spring life and wear are untested.</li>
+            <li>The concept video shows an older design (v3).</li>
+            <li>Nothing has been ordered or purchased. The spring price is uncertain.</li>
             <li>Power is bench-tethered only. Portable power is unresolved.</li>
             <li>Not production, not child-ready, not waterproof.</li>
           </ul>
@@ -448,8 +474,8 @@
 
   <footer>
     <div class="wrap">
-      <p>Released under the <a href="https://github.com/Hewlbern/evoKin-V.01/blob/main/LICENSE">MIT License</a>. Designed by Mike Holborn.</p>
-      <p><a href="https://github.com/Hewlbern/evoKin-V.01">github.com/Hewlbern/evoKin-V.01</a></p>
+      <p>Tomo by DreamMachina (formerly evoKin V.01). Everything — CAD, STLs, BOM, firmware, renders and docs — is released under the <a href="https://github.com/Hewlbern/Tomo/blob/main/LICENSE">MIT License</a>: free to use, modify and share, including commercially, as long as the copyright notice and licence are kept; no warranty. Designed by Mike Holborn.</p>
+      <p><a href="https://github.com/Hewlbern/Tomo">github.com/Hewlbern/Tomo</a> · <a href="https://hewlbern.github.io/Tomo/">hewlbern.github.io/Tomo</a></p>
     </div>
   </footer>
 </body>

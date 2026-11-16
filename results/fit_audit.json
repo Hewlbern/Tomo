@@ -7,7 +7,8 @@
   "servo_source": "Official Feetech FS90MG drawing p.5, edition A/0, 2021-04-30, \u00b10.1 mm. File copied to datasheets/FS90MG.pdf.",
   "horn": "ASSUMED typical 2.0 mm disc + 4-arm star, \u00d824. Not on the drawing. p.6 says No Accessories.",
   "spline_teeth": "Drawing and 6-9 say 20T/\u00d84.7; product pages say 21T. Measure on arrival.",
-  "arm_servos": "2\u00d7 FS90MG, one per arm, spline along x at y=13 z=60, direct drive on the horn. Forearms overlap across the middle and clasp (V.01).",
+  "arm_servos": "None. Arms are passive: vertical hip hinge + torsion spring (3HPG6 LH / 3HPD1 RH, 3.36 N\u00b7mm/\u00b0, 35\u00b0 preload), printed stops at 0\u00b0 and 40\u00b0.",
+  "head_servos": "2\u00d7 FS90MG: pan in the yaw collar, tilt on the neck turret (spline on the tilt axis).",
   "speaker": "Adafruit 3351 Mono Enclosed 3W 4\u03a9, 70\u00d730\u00d717, Core A$8.95",
   "amp": "Adafruit 3006 MAX98357A 19.4\u00d717.8\u00d73.0",
   "mic": "Adafruit 3421 16.7\u00d712.7\u00d71.8 bottom-ported",
@@ -29,18 +30,18 @@
  },
  "rows": [
   {
-   "interface": "Arm servo seat L (FS90MG in shoulder pod + cap, official 27.7 span)",
-   "parts": "shoulder_bracket_L, torso_back (pod), dummy_servo_arm_L, tray, dummy_pi, dummy_amp, dummy_servo_yaw",
-   "measured": "Tab pilots in the cap (design 1.7): [{'dia': 1.698, 'n': 350, 'p05': 1.697, 'p95': 1.7}, {'dia': 1.698, 'n': 350, 'p05': 1.697, 'p95': 1.7}]. Cap screw clearance (design 2.8): [{'dia': 2.797, 'n': 350, 'p05': 2.796, 'p95': 2.8}, {'dia': 2.797, 'n': 350, 'p05': 2.796, 'p95': 2.8}]. Pod pilots (design 2.1): [{'dia': 2.098, 'n': 350, 'p05': 2.097, 'p95': 2.1}, {'dia': 2.098, 'n': 350, 'p05': 2.097, 'p95': 2.1}]. Boss hole in cap (design 12.8 for the \u00d811.8 boss): {'dia': 12.786, 'n': 355, 'p05': 12.78, 'p95': 12.8}. Overlaps (mm\u00b3, must be ~0): {'servo_cap': 0.0, 'servo_torso_back': 0.0, 'cap_torso_back': 0.0, 'servo_tray': 0.0, 'servo_pi': 0.0, 'servo_amp': 0.0, 'servo_yaw_servo': 0.0, 'servo_yaw_collar': 0.0, 'servo_torso_front': 0.0}. Case top at |x|=42.0, cap 42.0..46.0, boss top 46.3, horn 46.3..48.3. Servo long axis vertical, spline at y=13.0, z=60.0.",
+   "interface": "Tilt servo seat (FS90MG in the neck_turret cradle, official 27.7 span)",
+   "parts": "neck_turret, dummy_servo_tilt, head_back, head_front, dummy_cam",
+   "measured": "Tab pilots in the cradle plate (design 1.7): [{'dia': 1.698, 'n': 360, 'p05': 1.697, 'p95': 1.7}, {'dia': 1.698, 'n': 360, 'p05': 1.697, 'p95': 1.7}]. Overlaps (mm\u00b3, must be ~0): {'servo_turret': 0.0, 'servo_head_back': 0.0, 'servo_head_front': 0.0, 'servo_cam': 0.0}. Spline on the tilt axis (x direction) at y=6.0, z=119.0; case top x=-22, horn x -26.3..-28.3, tilt_hub keyed into head_back. Body window 0.3 mm per side through the cradle.",
    "verdict": "pass",
-   "fix": "Bench-assemble servo to cap (self-tappers from the inner side), then drop the pair into the pod from outside and fit 2\u00d7 M2.5 cap screws."
+   "fix": "Install servo from the +x side through the cradle window, tabs on the -x face, 2 self-tappers. Turret deck is notched for the lower tab."
   },
   {
-   "interface": "Arm servo seat R (FS90MG in shoulder pod + cap, official 27.7 span)",
-   "parts": "shoulder_bracket_R, torso_back (pod), dummy_servo_arm_R, tray, dummy_pi, dummy_amp, dummy_servo_yaw",
-   "measured": "Tab pilots in the cap (design 1.7): [{'dia': 1.698, 'n': 350, 'p05': 1.697, 'p95': 1.7}, {'dia': 1.698, 'n': 350, 'p05': 1.697, 'p95': 1.7}]. Cap screw clearance (design 2.8): [{'dia': 2.797, 'n': 350, 'p05': 2.796, 'p95': 2.8}, {'dia': 2.797, 'n': 350, 'p05': 2.796, 'p95': 2.8}]. Pod pilots (design 2.1): [{'dia': 2.098, 'n': 350, 'p05': 2.097, 'p95': 2.1}, {'dia': 2.098, 'n': 350, 'p05': 2.097, 'p95': 2.1}]. Boss hole in cap (design 12.8 for the \u00d811.8 boss): {'dia': 12.786, 'n': 355, 'p05': 12.78, 'p95': 12.8}. Overlaps (mm\u00b3, must be ~0): {'servo_cap': 0.0, 'servo_torso_back': 0.0, 'cap_torso_back': 0.0, 'servo_tray': 0.0, 'servo_pi': 0.0, 'servo_amp': 0.0, 'servo_yaw_servo': 0.0, 'servo_yaw_collar': 0.0, 'servo_torso_front': 0.0}. Case top at |x|=42.0, cap 42.0..46.0, boss top 46.3, horn 46.3..48.3. Servo long axis vertical, spline at y=13.0, z=60.0.",
+   "interface": "Hip hinge (vertical M3 pin, knuckle between the torso ear and hip_cap)",
+   "parts": "torso_front (upper ear, spigot, stop lug, web), arm_L/R (knuckle), hip_cap_L/R",
+   "measured": "Axis at x=\u00b149.95, y=-16.19. {'L': {'upper_ear_pin': {'dia': 3.196, 'n': 360, 'p05': 3.195, 'p95': 3.2}, 'spigot_bore': {'dia': 3.196, 'n': 360, 'p05': 3.195, 'p95': 3.2}, 'knuckle_bore': {'dia': 3.396, 'n': 360, 'p05': 3.395, 'p95': 3.4}, 'hip_cap_pin': {'dia': 3.196, 'n': 360, 'p05': 3.195, 'p95': 3.2}, 'spring_recess': {'dia': 10.988, 'n': 354, 'p05': 10.983, 'p95': 11.0}, 'knuckle_to_cap_axial': np.float64(0.4), 'web_pilots': [{'dia': 2.098, 'n': 350, 'p05': 2.097, 'p95': 2.1}, {'dia': 2.098, 'n': 355, 'p05': 2.097, 'p95': 2.1}], 'cap_clearance': [{'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}, {'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}], 'arm_cap_overlap': 0.0, 'arm_torso_overlap': 4.775486119054188e-05}, 'R': {'upper_ear_pin': {'dia': 3.196, 'n': 360, 'p05': 3.195, 'p95': 3.2}, 'spigot_bore': {'dia': 3.196, 'n': 360, 'p05': 3.195, 'p95': 3.2}, 'knuckle_bore': {'dia': 3.396, 'n': 360, 'p05': 3.395, 'p95': 3.4}, 'hip_cap_pin': {'dia': 3.196, 'n': 360, 'p05': 3.195, 'p95': 3.2}, 'spring_recess': {'dia': 10.988, 'n': 354, 'p05': 10.983, 'p95': 11.0}, 'knuckle_to_cap_axial': np.float64(0.4), 'web_pilots': [{'dia': 2.098, 'n': 350, 'p05': 2.097, 'p95': 2.1}, {'dia': 2.098, 'n': 355, 'p05': 2.097, 'p95': 2.1}], 'cap_clearance': [{'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}, {'dia': 2.797, 'n': 360, 'p05': 2.796, 'p95': 2.8}], 'arm_cap_overlap': 0.0, 'arm_torso_overlap': 5.3724115329746115e-05}}. Design: M3 pin screw \u00d83.2 in the ears and spigot, \u00d83.4 running bore in the knuckle, 0.4 mm axial gap each end, \u00d811 spring recess around a \u00d85.9 spigot (spring ID 7.09 free, \u22486.8 at 75\u00b0 wind-up), M3 nyloc in the cap's hex trap, hip_cap held by 2 \u00d7 M2.5 (2.8 clearance / 2.1 pilots in the web).",
    "verdict": "pass",
-   "fix": "Bench-assemble servo to cap (self-tappers from the inner side), then drop the pair into the pod from outside and fit 2\u00d7 M2.5 cap screws."
+   "fix": "Assembly: spring on the spigot, torso leg in the lug slot; knuckle up from below with the arm leg in its slot; wind the arm 35\u00b0 open so the lug enters the relief; fit hip_cap and the pin."
   },
   {
    "interface": "Yaw servo seat (FS90MG, official 27.7 span, 1.7 pilots)",
@@ -50,11 +51,11 @@
    "fix": "Included M2.5x4 horn screw is too short for horn+coupler; use a longer M2.5 and confirm on arrival."
   },
   {
-   "interface": "Arm hub on horn / cap face clearance",
-   "parts": "arm_L/R, dummy_horn_arm_L/R, shoulder_bracket_L/R",
-   "measured": "{'L': {'cap_face': np.float64(46.0), 'horn_inner': np.float64(46.3), 'arm_inner': np.float64(46.6), 'horn_to_cap': np.float64(0.3), 'hub_to_cap': np.float64(0.6), 'arm_horn_overlap': 2.4253192047278085e-12, 'arm_servo_overlap': 0.0}, 'R': {'cap_face': np.float64(46.0), 'horn_inner': np.float64(46.3), 'arm_inner': np.float64(46.6), 'horn_to_cap': np.float64(0.3), 'hub_to_cap': np.float64(0.6), 'arm_horn_overlap': 1.2126596023639042e-12, 'arm_servo_overlap': 0.0}}. Design: horn sits on the boss 0.3 mm proud of the cap face; hub face 0.6 mm off the cap; horn pocket \u00d825 to horn top; spline tip pocket \u00d85.5 to x=50.8; axial M2.5\u00d712 horn screw from the paw-side counterbore. Horn is an ASSUMED 2.0 mm / \u00d824 envelope.",
+   "interface": "Arm hard stops (printed lug in the knuckle relief)",
+   "parts": "torso_front (stop lug), arm_L/R (relief sector)",
+   "measured": "First rigid contact closing past rest: L -0.5\u00b0, R -0.5\u00b0; opening: L 40.5\u00b0, R 40.5\u00b0 (design 0\u00b0 and 40\u00b0, sweep step 0.5\u00b0). Lug 24\u00b0 wide, r 5.7\u20137.7, 2.6 mm deep; spring torque on the open stop 252 N\u00b7mm \u2248 38 N on the lug face.",
    "verdict": "pass",
-   "fix": "Measure the included horn; if its hub is taller than 2.0 mm, deepen the pocket. Horn-to-hub pilots at r=7 are assumed."
+   "fix": "Print torso_front so the lug is loaded across layers, not in peel. The spring cannot over-rotate past 75\u00b0 total wind-up (rated 90\u00b0)."
   },
   {
    "interface": "Torso front \u2194 back seam and fasteners",
@@ -66,34 +67,34 @@
   {
    "interface": "Head front \u2194 back seam and fasteners",
    "parts": "head_front, head_back",
-   "measured": "Boolean overlap 0.0 mm\u00b3. Registration lip/groove same scheme as the torso (male on back). M2.5 front 2.8 / back 2.1. Holes: [{'xz': [-30, 110], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.795, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}, {'xz': [30, 110], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.795, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}, {'xz': [-26, 138], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.795, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}, {'xz': [26, 138], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.795, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}]",
+   "measured": "Boolean overlap 0.0 mm\u00b3. Registration lip/groove same scheme as the torso (male on back). M2.5 front 2.8 / back 2.1. Holes: [{'xz': [-32, 106], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.795, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}, {'xz': [32, 106], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.795, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}, {'xz': [-28, 138], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.795, 'p95': 2.8}, 'back': {'dia': 2.097, 'n': 355, 'p05': 2.097, 'p95': 2.099}}, {'xz': [28, 138], 'front': {'dia': 2.797, 'n': 360, 'p05': 2.795, 'p95': 2.8}, 'back': {'dia': 2.098, 'n': 360, 'p05': 2.097, 'p95': 2.1}}]",
    "verdict": "pass",
    "fix": ""
   },
   {
    "interface": "Yaw journal radial (skirt on journal)",
-   "parts": "head_back, yaw_collar",
+   "parts": "neck_turret, yaw_collar",
    "measured": "Journal {'dia': 43.946, 'r': 21.973, 'n': 600, 'p05': 43.931, 'p95': 44.0}, skirt ID {'dia': 44.645, 'r': 22.323, 'n': 598, 'p05': 44.63, 'p95': 44.7}, radial clearance 0.35 mm (design 0.35). Justified: tight end of the requested 0.35\u20130.4 mm FDM running-fit band; 0.30 (v2) is too tight after typical hole shrinkage. Head\u2194collar overlap 0.0 mm\u00b3.",
    "verdict": "pass",
    "fix": ""
   },
   {
    "interface": "Yaw thrust (printed washer + 0.30 mm axial gap + 30\u00b0 cone)",
-   "parts": "yaw_thrust_washer, yaw_collar, head_back",
-   "measured": "Journal top {'zmin': 97.4, 'zmax': 97.4, 'med': 97.4, 'n': 115}. Washer {'zmin': 97.4, 'zmax': 98.2, 'med': 97.8, 'n': 224} (design 97.4\u201398.2, 0.8 mm, printed flat, no supports). Head floor/cone in r=17\u201322, z=97.5\u2013106: {'zmin': 100.508, 'zmax': 106.0, 'med': 104.01, 'n': 154}. Design: washer top 98.2, head at 98.5, gap 0.30 mm. Washer\u2194head overlap 0.0 mm\u00b3. Skirt-down print: vertical skirt then a 30\u00b0-from-vertical cone so a 35\u00b0 support threshold does not land supports on a flat thrust face. The flat thrust is the washer.",
+   "parts": "yaw_thrust_washer, yaw_collar, neck_turret",
+   "measured": "Journal top {'zmin': 97.4, 'zmax': 97.4, 'med': 97.4, 'n': 115}. Washer {'zmin': 97.4, 'zmax': 98.2, 'med': 97.8, 'n': 224} (design 97.4\u201398.2, 0.8 mm, printed flat, no supports). Head floor/cone in r=17\u201322, z=97.5\u2013106: {'zmin': 98.6, 'zmax': 106.0, 'med': 104.0, 'n': 164}. Design: washer top 98.2, head at 98.5, gap 0.30 mm. Washer\u2194head overlap 0.0 mm\u00b3. Skirt-down print: vertical skirt then a 30\u00b0-from-vertical cone so a 35\u00b0 support threshold does not land supports on a flat thrust face. The flat thrust is the washer.",
    "verdict": "pass",
    "fix": ""
   },
   {
    "interface": "Yaw retainers (under journal lip)",
-   "parts": "yaw_retainer_A/B, yaw_collar, head_back",
+   "parts": "yaw_retainer_A/B, yaw_collar, neck_turret",
    "measured": "Retainer top {'zmin': 88.6, 'zmax': 91.65, 'med': 90.125, 'n': 114}, journal lip {'zmin': 92.0, 'zmax': 92.0, 'med': 92.0, 'n': 76}, axial play 0.35 mm (design 0.35). Retainer hole (clearance, design 2.3) {'dia': 2.297, 'n': 212, 'p05': 2.296, 'p95': 2.3}. Head skirt pilot (design 1.7) {'dia': 1.698, 'n': 360, 'p05': 1.697, 'p95': 1.7}.",
    "verdict": "pass",
    "fix": ""
   },
   {
-   "interface": "Coupler blade in head slot",
-   "parts": "yaw_coupler, head_back",
+   "interface": "Coupler blade in turret slot",
+   "parts": "yaw_coupler, neck_turret",
    "measured": "Blade thickness 2.0 mm (design 2.00). Slot width 2.7 mm (design 2.70). Side clearance 0.35 mm (design 0.35). Backlash at r=8 mm \u2248 5.01\u00b0 total. Software yaw clamp \u00b142\u00b0 so the ~47\u00b0 hard stop is not a running face. 0.35 mm is the tight end of 0.35\u20130.4 mm FDM; revisit after the first article.",
    "verdict": "pass",
    "fix": ""
@@ -128,52 +129,66 @@
   },
   {
    "interface": "Camera ribbon path",
-   "parts": "head_front, head_back, yaw_collar, dummy_cam",
-   "measured": "Design: loop bay r=14 mm (\u03c0\u00b714 \u2248 44 mm extra vs the \u22659.4 mm requirement), slot 17\u00d72.5 mm for a 15\u00d71 mm FPC, path camera \u2192 loop \u2192 floor slot at x=14 \u2192 +x side of the \u00d834 yaw bore (beside coupler and servo) \u2192 torso duct \u2192 Pi CSI. Floor slot probe at (14,0,100) width=30.2 mm.",
+   "parts": "head_front, head_back, neck_turret, yaw_collar, dummy_cam",
+   "measured": "Design: loop bay r=14 mm (\u03c0\u00b714 \u2248 44 mm extra vs the \u22659.4 mm requirement), slot 17\u00d72.5 mm for a 15\u00d71 mm FPC, path camera \u2192 loop \u2192 floor slot at x=14 \u2192 +x side of the \u00d834 yaw bore (beside coupler and servo) \u2192 torso duct \u2192 Pi CSI. Turret deck slot probe at (20,0,105) width=2.5 mm.",
    "verdict": "pass",
    "fix": ""
   },
   {
    "interface": "Pi envelope",
    "parts": "tray, dummy_pi",
-   "measured": "Pi dummy extents [65.0, 8.5, 30.0] (65\u00d78.5\u00d730: 8.5 mm y-envelope allows a header). Camera is the standard 25\u00d724\u00d711.5 Module 3, not the Wide. Pi\u2194tray 0.0 mm\u00b3, Pi\u2194arm servos 0.0 / 0.0 mm\u00b3.",
+   "measured": "Pi dummy extents [65.0, 8.5, 30.0] (65\u00d78.5\u00d730: 8.5 mm y-envelope allows a header). Camera is the standard 25\u00d724\u00d711.5 Module 3, not the Wide. Pi\u2194tray 0.0 mm\u00b3, Pi\u2194torso_front (groove liner) 0.0 mm\u00b3 (arm servos removed in the hug redesign).",
    "verdict": "pass",
    "fix": ""
   },
   {
    "interface": "Head pan joint (motorised yaw, FS90MG in the collar)",
-   "parts": "yaw_collar, yaw_coupler, head_back, head_front, dummy_servo_yaw, dummy_horn_yaw",
-   "measured": "Pan servo is the v3 collar FS90MG (unchanged): horn \u2192 coupler blade \u2192 slot in head_back. Software clamp \u00b142\u00b0 (84\u00b0 of the 180\u00b0 servo travel), hard stop \u2248 \u00b147\u00b0. Sweep: 988 poses, rigid overlaps in travel = 0; first yaw stop contact {'yaw': 47.0, 'armL': -15.0, 'armR': -25.0, 'a': 'yaw_collar', 'b': 'head_back', 'vol_mm3': 0.619, 'compliant': ''}.",
+   "parts": "yaw_collar, yaw_coupler, neck_turret, head_back, head_front, dummy_servo_yaw, dummy_horn_yaw",
+   "measured": "Pan servo is the v3 collar FS90MG (unchanged): horn \u2192 coupler blade \u2192 slot in neck_turret (the slot, skirt, cone and retainers moved from head_back to the turret). Software clamp \u00b142\u00b0. Sweep: 457 poses, rigid overlaps in travel = 0; first yaw stop contact at 47.0\u00b0 / -47.0\u00b0 (collar lug \u2194 turret lug).",
    "verdict": "pass",
-   "fix": "Tilt was not added: a nod yoke plus a 4th FS90MG does not fit cleanly in the 64 mm head beside the camera and FPC loop."
+   "fix": ""
   },
   {
-   "interface": "Neck cable path (pan servo + camera FPC)",
-   "parts": "yaw_collar, head_back, torso",
-   "measured": "The pan servo is fixed in the torso-side collar, so its 3-wire lead never crosses the moving joint: it drops straight down beside the servo body into the torso. Only the camera FPC crosses the neck: floor slot (x=14) \u2192 \u00d834 collar bore \u2192 r=14 U-bend loop bay in the head (\u03c0\u00b714 \u2248 44 mm slack for \u00b142\u00b0). Floor slot probe width 30.2 mm (design 2.5). Collar bore \u00d834 stays open above the boss for service.",
+   "interface": "Head tilt / nod joint (FS90MG on the neck turret, NEW)",
+   "parts": "neck_turret, tilt_hub, head_back, head_front, dummy_servo_tilt, dummy_horn_tilt, dummy_cam, yaw_collar",
+   "measured": "Tilt axis along x through y=6, z=119 (near the head centre, so the shell barely moves). Firmware clamp \u00b110\u00b0 (+ = nod down). First rigid contact: nod down 12.0\u00b0 (yaw_collar \u2194 head_front), look up -15.5\u00b0 (neck_turret \u2194 head_back). Clearances by tilt: {'t-12': {'head_to_turret': 0.6, 'head_to_collar': 2.02, 'camera_to_tilt_servo': 4.94, 'head_to_tilt_servo': 2.5}, 't-6': {'head_to_turret': 0.6, 'head_to_collar': 4.28, 'camera_to_tilt_servo': 6.51, 'head_to_tilt_servo': 2.5}, 't0': {'head_to_turret': 0.6, 'head_to_collar': 7.0, 'camera_to_tilt_servo': 7.95, 'head_to_tilt_servo': 2.11}, 't6': {'head_to_turret': 0.6, 'head_to_collar': 3.03, 'camera_to_tilt_servo': 6.73, 'head_to_tilt_servo': 2.06}, 't12': {'head_to_turret': 0.6, 'head_to_collar': -0.17, 'camera_to_tilt_servo': 5.36, 'head_to_tilt_servo': 2.12}}. Head shell now starts at z=103.5 (was 101) and the front of the turret deck is cut away so the chin and camera clear when nodding. Lower seam bosses moved to x \u00b132, z 106; upper to x \u00b128.",
    "verdict": "pass",
-   "fix": "Do not twist the FPC around the yaw axis; let it roll in the U-bend."
+   "fix": "Margin to the first contact is only 2\u00b0 nodding down (head rim on the collar ring at +12\u00b0). Keep the firmware clamp; fur in the neck gap is compliant."
   },
   {
-   "interface": "Arm travel (forward/up swing, direct drive)",
-   "parts": "arm_L/R, sleeve_proxy_L/R, torso_back, fur_proxy_torso, head_front/back",
-   "measured": "Arm angle 0 = straight forward, + = up. Software clamp \u221245\u00b0..+30\u00b0 per arm, plus the clasp interlock armL \u2212 armR \u2265 7.5\u00b0 (the left forearm always passes over the right). \u221245\u00b0 keeps the forearm \u22652 mm off the desk; +30\u00b0 keeps it under the eye bezels. Sweep min clearances: {'arm_to_shell': 0.6, 'arm_to_cap': 0.6, 'arm_to_head': 17.83, 'sleeve_to_fur': -1.21, 'arm_lowest_z_mm': 4.49, 'sleeve_lowest_z_mm': 1.66, 'arm_top_z_under_bezels_mm': 100.53, 'ok': True}. First arm/head contact {'yaw': 0.0, 'armL': 42.0, 'armR': -25.0, 'a': 'head_front', 'b': 'arm_L', 'vol_mm3': 4.939, 'compliant': ''}.",
+   "interface": "Neck cable path (pan + tilt servo leads, camera FPC)",
+   "parts": "yaw_collar, neck_turret, head_back, torso",
+   "measured": "Pan servo lead: fixed in the collar, never crosses a moving joint. Tilt servo lead: rides on the turret, so it crosses the PAN joint only; route it down the \u00d834 collar bore beside the FPC with a loose service loop (\u226540 mm) for \u00b142\u00b0. Camera FPC crosses pan and tilt: turret deck slot (x 5.5\u201322.5) \u2192 r=14 U-bend loop bay in the head, which sits close to the tilt axis (\u00b110\u00b0 \u2248 \u00b13 mm of FPC travel). Turret deck slot probe width 2.5 mm (design 2.5).",
    "verdict": "pass",
-   "fix": "Direct drive: a child forcing an arm back-drives the FS90MG gear train. No mechanical breakaway."
+   "fix": "Do not twist the FPC around the yaw axis; let it roll in the U-bend. Tie the tilt lead to the FPC so they move together."
   },
   {
-   "interface": "Clasp closure (forearms overlap across the middle)",
-   "parts": "arm_L, arm_R",
-   "measured": "Forearm blades overlap 35.96 mm in x across the midline. Rigid blade gap 0.98 mm at the interlock (\u0394 = 7.5\u00b0), 33.35 mm at the widest in-travel opening. Gap \u2248 (\u0394 \u2212 6.62\u00b0) / 0.848\u00b0/mm, the same at mean angles \u221230\u00b0, \u221210\u00b0 and +10\u00b0; 25 mm needs \u0394 \u2248 27.8\u00b0. Blade contact in the sweep at \u0394 \u2248 6.5\u00b0 (outside travel).",
+   "interface": "Arm swing (passive, vertical hip hinge, 0\u201340\u00b0)",
+   "parts": "arm_L/R, paw_pad_L/R, sleeve_proxy_L/R, torso_front, hip_cap_L/R, fur_proxy_torso",
+   "measured": "Arms turn about vertical hip pins; 0\u00b0 = hugging on the rest stop, 40\u00b0 = open stop. Min clearances by angle {'a0': {'arm_to_torso_front': -0.0, 'pad_to_torso_front': 1.04, 'arm_to_hip_cap': 0.4}, 'a10': {'arm_to_torso_front': 0.39, 'pad_to_torso_front': 7.87, 'arm_to_hip_cap': 0.4}, 'a20': {'arm_to_torso_front': 0.39, 'pad_to_torso_front': 15.3, 'arm_to_hip_cap': 0.4}, 'a30': {'arm_to_torso_front': 0.39, 'pad_to_torso_front': 22.19, 'arm_to_hip_cap': 0.4}, 'a40': {'arm_to_torso_front': -0.0, 'pad_to_torso_front': 28.28, 'arm_to_hip_cap': 0.4}}; worst {'arm_to_shell': -0.0, 'pad_to_shell': 1.04, 'arm_to_hip_cap': 0.4, 'arm_lowest_z_mm': 22.0, 'ok': True} (arm_to_shell 0 = the lug resting on its stop face). Rotation about z keeps the band at z 22\u201338, well clear of the desk and the head.",
    "verdict": "pass",
-   "fix": "Firmware must enforce armL \u2212 armR \u2265 7.5\u00b0 before either servo moves; the blades cannot pass each other."
+   "fix": "Passive: a child can push the arms open against \u22485 N at the paw; nothing is driven, so there is no gear train to strip. The paws are a deliberate (soft) pinch point at \u22482.5 N."
   },
   {
-   "interface": "Grip clearance (pen / cable / small pole in the clasp)",
-   "parts": "arm_L, arm_R, torso_front, torso_back, fur_proxy_torso, head_front/back",
-   "measured": "Test cylinders \u00d84/8/12/20/25 \u00d7 140 mm along x, centred between the blades at r = 71 mm, mean angles \u221230/\u221210/+10\u00b0: 15/15 reachable inside travel. Opening needed: \u00d84 \u2192 \u0394 9.65\u00b0, \u00d88 \u2192 \u0394 12.9\u00b0, \u00d812 \u2192 \u0394 16.15\u00b0, \u00d820 \u2192 \u0394 22.67\u00b0, \u00d825 \u2192 \u0394 26.83\u00b0. Worst clearance to the torso shell 0.57 mm, to the 4 mm torso fur -1.98 mm, to the head 23.33 mm.",
+   "interface": "Passive hug grip (round \u00d810 / 12.5 / 15 in the groove, flat 25 mm strap)",
+   "parts": "arm_L/R, paw_pad_L/R, torso_front (groove), grip test objects",
+   "measured": "round \u00d810.0 lying in the groove (leans 14\u00b0): opens 1.9\u00b0, paw force 2.42 N each (lever 51.3 mm, spring 124.1 N\u00b7mm), rigid arm 1.48 mm clear; round \u00d812.5 lying in the groove (leans 14\u00b0): opens 4.39\u00b0, paw force 2.6 N each (lever 51.0 mm, spring 132.5 N\u00b7mm), rigid arm 1.46 mm clear; round \u00d815.0 lying in the groove (leans 14\u00b0): opens 6.83\u00b0, paw force 2.77 N each (lever 50.8 mm, spring 140.7 N\u00b7mm), rigid arm 1.48 mm clear; flat strap 25 x 2.5 resting on the belly across the groove: opens 2.62\u00b0, paw force 2.88 N each (lever 43.9 mm, spring 126.5 N\u00b7mm), rigid arm 1.48 mm clear. Spring: music-wire torsion spring, 0.048 in (1.22 mm) wire, 3/8 in (9.5 mm) OD, 90\u00b0 legs (trim to ~6 mm); catalogue 3HPG6 (LH) / 3HPD1 (RH), 3.363 N\u00b7mm/\u00b0, preload 35.0\u00b0. Assumption: Spring rate from the catalogue (2.679 lbf\u00b7in at 90\u00b0), linear; no friction in the hinge; force = torque / perpendicular lever from the hinge axis to the pad contact line. TPU pads assumed rigid for the angle (real pads add ~1 mm of squash). Not measured.",
    "verdict": "pass",
-   "fix": "Faces are flat and parallel to each blade, so they meet at an angle \u0394 (\u224813\u00b0 for a pen, \u224828\u00b0 at 25 mm): large objects are squeezed outward."
+   "fix": "Forces are from the catalogue spring rate, not measured. Contact sits low on the pad (z\u224836); the TPU pads take the squash."
+  },
+  {
+   "interface": "Hand opening (paws on the open stop)",
+   "parts": "arm_L/R, paw_pad_L/R, torso_front",
+   "measured": "At 40\u00b0: pad \u2194 belly 28.28 mm (spec \u226520), pad tip \u2194 tip 53.97 mm; a \u00d815 rod slides into the groove without touching the arms: True. Closed: pad \u2194 shell 1.04 mm.",
+   "verdict": "pass",
+   "fix": ""
+  },
+  {
+   "interface": "Belly groove (R8 channel, floor leans 14\u00b0)",
+   "parts": "torso_front, dummy_speaker, dummy_pi, grip_rod (\u00d812.5 reference)",
+   "measured": "Floor line y = \u221230 \u2212 0.25\u00b7(z \u2212 30), capsule z 4\u202670, 2.4 mm liner. \u00d812.5 reference rod lying on the floor \u2194 torso_front 0.05615044037511204 mm\u00b3 (touching), \u2194 speaker 0.0 mm\u00b3. The lean lets a straight strap clear the upper-belly bulge and the speaker grille; the liner leaves \u22480.9 mm to the speaker pocket at z\u224853.",
+   "verdict": "pass",
+   "fix": "The fur skin needs a matching channel (or a slit) down the belly."
   },
   {
    "interface": "Test coupon",
@@ -185,14 +200,14 @@
   {
    "interface": "Mesh watertight (printable parts)",
    "parts": "all printable STLs",
-   "measured": "{'torso_front': True, 'torso_back': True, 'tray': True, 'yaw_collar': True, 'yaw_retainer_A': True, 'yaw_retainer_B': True, 'yaw_coupler': True, 'yaw_thrust_washer': True, 'head_back': True, 'head_front': True, 'arm_L': True, 'arm_R': True, 'shoulder_bracket_L': True, 'shoulder_bracket_R': True, 'coupon': True, 'bezel': True}",
+   "measured": "{'torso_front': True, 'torso_back': True, 'tray': True, 'yaw_collar': True, 'yaw_retainer_A': True, 'yaw_retainer_B': True, 'yaw_coupler': True, 'yaw_thrust_washer': True, 'neck_turret': True, 'tilt_hub': True, 'head_back': True, 'head_front': True, 'arm_L': True, 'arm_R': True, 'hip_cap_L': True, 'hip_cap_R': True, 'paw_pad_L': True, 'paw_pad_R': True, 'coupon': True, 'bezel': True}",
    "verdict": "pass",
    "fix": ""
   }
  ],
  "summary": {
-  "n": 23,
-  "pass_n": 23,
+  "n": 25,
+  "pass_n": 25,
   "marginal_n": 0,
   "fail_n": 0,
   "cad_only": true,

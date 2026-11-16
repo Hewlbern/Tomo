@@ -1,4 +1,4 @@
-# evoKin V.01 electronics — ESP32-S3 notes
+# Tomo by DreamMachina (formerly evoKin V.01) — electronics: ESP32-S3 notes
 
 **Nothing on this page has been purchased, fabricated or brought up.** These are
 planning notes for a first prototype and for a later custom board. Prices in
@@ -17,17 +17,18 @@ A condensed source for the custom-board section is a Gemini (Code and analysis
 | Camera | OV2640 or OV3660, on a 24-pin 0.5 mm FPC through the hollow neck journal |
 | Voice in | I2S or PDM MEMS microphone |
 | Voice out | I2S amplifier (MAX98357A) into the Adafruit 3351 3 W 4 Ω enclosed speaker already seated in the torso |
-| Motion | **Three** Feetech FS90MG servos (V.01): head pan, left arm, right arm — three PWM channels. The V.01 clasp uses the two arm servos, so no fourth channel |
+| Motion | **Two** Feetech FS90MG servos (V.01 passive hug): head pan and head tilt/nod — two PWM channels. The arms are passive (torsion spring per hip, opened by hand) and need no electronics |
 | Power | USB-C in, 1S LiPo, a clean 3.3 V rail that holds up as the pack sags, and a **separate 5 V servo rail** with bulk capacitance |
-| Fail-safe | Sense current on the 5 V rail and cut servo power so the arms go limp if a child forces them. The arms are direct drive with **no mechanical breakaway**, so this electronic trip is the only protection planned. V.01 clasp: both arm servos can sit near stall while gripping (≈0.8 A each at 6 V); cap grip current in firmware and enforce the blade interlock armL − armR ≥ 7.5°. |
+| Fail-safe | Sense current on the 5 V rail and cut servo power so the head goes limp if a child forces it. The arms are no longer motorised, so there is no grip current and no clasp interlock; the only driven parts are the pan and tilt servos (firmware clamps ±42° pan, ±10° tilt). |
 
-Budget about 800 mA stall per FS90MG, conservatively — **2.4 A** if all three
+Budget about 800 mA stall per FS90MG, conservatively — **1.6 A** if both
 stall at once — and keep the first bench bring-up on a current-limited supply.
+Holding a hug costs no power at all.
 Stagger moves in firmware or size the 5 V rail for the peak. Portable power is unresolved.
 
 ## Two prototype options (planned, not purchased)
 
-### Option A — about A$88–93 electronics, or about A$119.55–124.05 with the three priced servos and speaker
+### Option A — about A$88–93 electronics, or about A$112.15–116.65 with the two priced servos and speaker
 
 A project buy, not a single-robot kit: one first-article board plus spare
 modules for a later custom PCB.
@@ -53,7 +54,7 @@ protection; put 470–1000 µF on the 5 V servo header, and prefer a protected
 regulator (Pololu S13V20F5, about A$29.55) when you can. Clone INMP441 modules
 are often fake; the Sense already has a mic, so you may not need one yet.
 
-### Option B — about A$51 electronics, or about A$82.33 with the three priced servos and speaker, plus a PCA9685 (not yet sourced)
+### Option B — about A$51 electronics, or about A$74.93 with the two priced servos and speaker, plus a PCA9685 (not yet sourced)
 
 | Item | Qty | AUD | Supplier (Nov 2026) |
 |---|---:|---:|---|
@@ -61,14 +62,14 @@ are often fake; the Sense already has a mic, so you may not need one yet.
 | INA219 breakout (clone) | 1 | 7.00 | AuscomTech |
 | XL6009 boost, set to 5 V | 1 | 6.95 | AuscomTech |
 | **Subtotal** | | **51.18** | |
-| PCA9685 16-ch I2C servo driver (needed for 3 servos) | 1 | not yet sourced | — |
+| PCA9685 16-ch I2C servo driver (needed for the 2 servos + INA219 on one bus) | 1 | not yet sourced | — |
 
 There is no charger on this board. Confirm the board outline against the tray
 before ordering.
 
 ## Servo channels — do the boards have spare PWM GPIOs? (checked Nov 2026)
 
-V.01 (like v4) needs three servo PWM outputs plus I2C for the INA219. On the ESP32-S3 any
+V.01 (passive hug) needs two servo PWM outputs (head pan, head tilt) plus I2C for the INA219. On the ESP32-S3 any
 free GPIO can output servo PWM through the LEDC peripheral, so the question is
 only whether pins are free.
 
@@ -76,8 +77,8 @@ only whether pins are free.
 wiki pin table:** only **GPIO43 and GPIO44** (the Gravity / UART port) are
 free. The rest are used by the OV3660 camera (DVP bus), the PDM mic (GPIO38/39),
 the MAX98357 amp (GPIO45/46/42), the SD slot (GPIO10–13), the IR LED (GPIO47),
-the status LED (GPIO3) and BOOT (GPIO0). So the DFR1154 **cannot drive three
-servos directly**. Plan: run GPIO43/44 as I2C to a **PCA9685** 16-channel servo
+the status LED (GPIO3) and BOOT (GPIO0). GPIO43/44 could drive the two head
+servos directly, but then there is no I2C left for the INA219. Plan: run GPIO43/44 as I2C to a **PCA9685** 16-channel servo
 driver (also gives spare channels), shared with the INA219. Losing the UART
 port means logging over native USB. The PCA9685 is not yet sourced or priced.
 
@@ -88,12 +89,13 @@ D8–D10. A workable map:
 
 | Use | Pins |
 |---|---|
-| Servo PWM: head pan, arm L, arm R | D0, D1, D2 |
+| Servo PWM: head pan, head tilt (D2 now spare) | D0, D1 |
 | I2S to MAX98357A (BCLK, LRCLK, DIN) | D3, D6, D7 |
 | I2C to INA219 (SDA, SCL) | D4, D5 |
 | Spare (or SD card) | D8, D9, D10 |
 
-That is 8 of 11 header pins, leaving D8–D10 spare if the SD card is unused.
+That is 7 of 11 header pins, leaving D2 and D8–D10 spare if the SD card is unused.
+`firmware/evokin_v01/evokin_v01.ino` uses D0 = pan and D1 = tilt.
 Pin choice is a plan, not bring-up tested.
 
 ### Name-brand alternatives (Core Electronics, Nov 2026)
@@ -119,7 +121,7 @@ USB-C 5 V ──► BQ24074 power-path & LiPo charger ◄── 1S LiPo (2000–
  3.3 V MCU    5.0 V servo rail + 470–1000 µF   ► Adafruit 3351
  & camera        │
                  ▼
-           INA219 + TPS259241 eFuse  ► 3× FS90MG
+           INA219 + TPS259241 eFuse  ► 2× FS90MG
      ESP32-S3-WROOM-1-N16R8 ── I2S mic (INMP441 / ICS-43434)
                              ── OV2640 / OV3660 on 24-pin FPC
                              ── native USB D+/D− to USB-C
@@ -131,19 +133,21 @@ Notes worth keeping:
   U.FL), not a bare ESP32-S3.
 - On N16R8 modules, **do not use GPIO 33–37** — they are taken by Octal PSRAM.
 - Trip the eFuse when INA219 sees current above a threshold for about 200 ms,
-  and also when the arms are parked. The “about 450 mA” figure in the design
+  and also when the head is parked. The “about 450 mA” figure in the design
   discussion is a starting guess only: **measure the real FS90MG moving and
   stall current on the bench before you freeze a threshold.**
 - When the 5 V rail is cut, the FS90MG back-drives reasonably easily, which is
   what makes an electronic limp mode possible. That is not a substitute for a
   rated mechanical breakaway.
 - Route the camera FPC as a loose vertical U-bend through the hollow journal.
-  Do not twist the flat cable around the yaw axis.
+  Do not twist the flat cable around the yaw axis. The tilt servo rides on the
+  neck turret, so its 3-wire lead also crosses the pan joint: give it a ≥40 mm
+  service loop down the Ø34 collar bore and tie it to the FPC.
 - Keep a 15 × 7 mm copper keep-out under a PCB antenna, and keep servo wires,
   the speaker magnet and the battery at least 20 mm away.
 - Rough cost from the design discussion: about A$120 at JLCPCB for five 4-layer
   boards and two assembled, plus about A$60 of local parts (camera, mic,
-  speaker, FS90MGs, 2000 mAh pack) per robot. v4 adds a third FS90MG (A$7.40).
+  speaker, FS90MGs, 2000 mAh pack) per robot. V.01 (passive hug) uses two FS90MGs.
 
 A first bring-up checklist, before anyone spins a board: smoke-test the rails
 with peripherals unplugged; enumerate native USB (GPIO19/20); confirm
@@ -151,7 +155,7 @@ with peripherals unplugged; enumerate native USB (GPIO19/20); confirm
 camera over Wi-Fi while moving the head by hand; then sweep the servos and log
 INA219 current.
 
-## Fit against the V.01 CAD (electronics unchanged from v4)
+## Fit against the V.01 CAD (electronics pockets unchanged from v4)
 
 - Speaker pocket and grille: Adafruit 3351 — keep this part.
 - Amp pocket: sized for Adafruit 3006 (19.4 × 17.8 × 3.0 mm + 8 mm headroom).
@@ -162,5 +166,6 @@ INA219 current.
   fits easily. A 65 × 55 mm custom board, or the DFR1154, needs a tray
   overlay before you commit.
 - Neck ribbon path: loop bay r = 14 mm, 17 × 2.5 mm slot for a 15 × 1 mm FPC,
-  then the +x side of the Ø34 yaw bore. Still the right idea for an OV2640 /
-  OV3660 ribbon.
+  now in the neck_turret deck, then the +x side of the Ø34 yaw bore. Still the
+  right idea for an OV2640 / OV3660 ribbon. The loop bay sits close to the tilt
+  axis, so ±10° of nod moves the FPC only about ±3 mm.

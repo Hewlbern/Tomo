@@ -4,7 +4,7 @@
 
 **[Watch the 10-second photoreal ad (MP4, 3.3 MB)](media/evokin_demo_ad_v3_real.mp4)** · [Mirumi-style take](media/evokin_demo_ad_v2.mp4) · [First hatch take](media/evokin_demo_ad.mp4)
 
-Tomo is an open-source plush robot companion: a small, long-haired, Mirumi-style critter (ivory or pink) that **hugs** a bag strap or handle with spring-loaded arms, and looks around, nods and turns away shyly with a two-servo head. Inside the fur is a lightened 3D-printed shell, two 9 g Feetech FS90 servos (head pan and head tilt), two small torsion springs for the arms, a 400 mAh LiPo and a planned ESP32-S3 brain with a camera and a voice. It weighs about **194 g with its battery** (estimate; was ≈334 g). This repository holds the V.01 CAD, the printable STLs, the bill of materials, a head-motion firmware sketch and the concept renders.
+Tomo is an open-source plush robot companion: a small, long-haired, Mirumi-style critter (ivory or pink) that **hugs** a bag strap or handle with spring-loaded arms, and looks around, nods and turns away shyly with a two-servo head. Inside the fur is a lightened 3D-printed shell, two 9 g Feetech FS90 servos (head pan and head tilt), two small torsion springs for the arms, a 400 mAh LiPo and a planned ESP32-S3 brain with a camera and a voice. It weighs about **195 g with its battery** (estimate; was ≈334 g). This repository holds the V.01 CAD, the printable STLs, the bill of materials, a head-motion firmware sketch and the concept renders.
 
 Repository: [github.com/Hewlbern/Tomo](https://github.com/Hewlbern/Tomo) · Landing page: [hewlbern.github.io/Tomo](https://hewlbern.github.io/Tomo/)
 
@@ -12,7 +12,7 @@ Repository: [github.com/Hewlbern/Tomo](https://github.com/Hewlbern/Tomo) · Land
 
 ## How it looks
 
-Sitting on a tote and clinging to the upright leg of its Ø12.5 mm handle the way Mirumi does: the handle runs up the centre groove, then rises past the side of the head and over the shoulder, and the two short, thick, furry arms come round from the shoulders and meet in front of it under spring force. Short pear / bell-shaped body (wider at the bottom), long shaggy ivory locks falling downward, two stubby splayed feet on the bag top, small black bead eyes set high and wide, and a barely visible nose (Blender fur model):
+Sitting on a tote and clinging to the upright leg of its Ø12.5 mm handle the way Mirumi does: the handle runs up the centre groove, then rises past the side of the head and over the shoulder, and the two short, thick, furry arms come round from the shoulders and meet in front of it under spring force. Short pear / bell-shaped body (wider at the bottom), long shaggy locks in warm cream falling downward in layers, a face in short fur of the same colour with only two glossy black bead eyes showing, the arms hugging high just under the face, and two stubby splayed feet on the bag top (Blender fur model):
 
 [![Tomo hugging the upright of a bag handle](renders/web/01_hero_hug_handle.jpg)](renders/blender/01_hero_hug_handle.png)
 
@@ -51,12 +51,12 @@ Estimated from the exported STLs (PLA 1.24 g/cm³ × an ASSUMED effective fill p
 | Item | Before (6ad85c3) g | After g | Change |
 |---|---:|---:|---|
 | shells (torso + head, 4 parts) | 106.3 | 61.5 | lightening windows (Ø14 on a 17.5 mm hex, only on plain 2.4 mm wall; fur covers them) + 1-perimeter/10 % print profile |
-| arms | 22.3 | 9.1 | two short symmetric arms (≈55 mm along the spine, were ≈82 / 111 mm), band r 3.0, 2-perimeter PETG profile |
+| arms | 22.3 | 8.0 | two short symmetric arms hugging the upper chest (≈46 mm along the spine, were ≈82 / 111 mm), band r 3.0, 2-perimeter PETG profile |
 | TPU pads | 4.0 | 2.1 | on the paws only |
 | tray | 11.5 | 7.7 | 0.50 profile |
 | yaw collar | 15.3 | 12.2 | 0.60 profile |
 | turret + hub + yaw small parts | 10.4 | 9.9 | 0.60 turret profile |
-| eye bezels + shutter (removed) | 6.0 | 0.0 | replaced by 8 mm safety eyes |
+| eye bezels + shutter (removed) | 6.0 | 0.0 | replaced by 10 mm safety eyes |
 | servos (2 × FS90MG → 2 × FS90, + horns) | 28.8 | 20.0 | Feetech FS90, same case |
 | speaker (Adafruit 3351 → 3923) | 25.0 | 3.0 | 30 × 20 × 5 mm mini oval |
 | brain + camera | 8.0 | 7.5 | XIAO Sense 6.6 g + long-FPC camera |
@@ -65,14 +65,14 @@ Estimated from the exported STLs (PLA 1.24 g/cm³ × an ASSUMED effective fill p
 | wiring | 8.0 | 5.0 | trimmed 30 AWG (assumed) |
 | fasteners (→ nylon M2.5 shell screws) | 8.0 | 5.5 | nylon shell screws |
 | springs | 2.0 | 2.0 | unchanged (grip kept) |
-| 8 mm safety eyes | 0.0 | 0.8 | new |
+| 10 mm safety eyes | 0.0 | 1.4 | new |
 | fur skin (→ long pile + feet) | 30.0 | 21.0 | light knit-backed long pile ≈380 g/m² (assumed) + feet |
 | thick arm sleeves (fibrefill + extra fur) | 0.0 | 1.4 | stuffed Ø16–18 mm tubes, shoulder caps, mittens (assumed 15 kg/m³, 380 g/m²) |
-| pear padding, feet, shaggy pile | 0.0 | 8.8 | fibrefill padding in the lower body (78 cm³) and two plush feet (12 cm³), 1.4 g; longer, heavier shaggy pile (assumed 480 g/m² vs 380) + extra skin, 7.4 g |
+| pear padding, feet, shaggy pile | 0.0 | 12.1 | fibrefill padding in the lower body (78 cm³) and two plush feet (12 cm³), 1.4 g; longer, heavier shaggy pile (assumed 540 g/m² vs 380) + extra skin, 10.7 g |
 | battery (1S 2000 mAh → 400 mAh) | 38.0 | 11.0 | Core CE04375 |
-| **Total with battery** | **334** | **194** | **−140 g (−42 %)** |
+| **Total with battery** | **334** | **195** | **−139 g (−42 %)** |
 
-**194 g against a 160–180 g target (200 g ceiling)** (185 g at 494c22f; the closer-to-Mirumi soft goods — pear padding, feet and a heavier shaggy pile — add ≈9 g; 191 g at b458259). Mirumi is about 135–155 g. The last ≈14 g is in the shaggy coat and in parts this pass kept on purpose: the two servos (20 g with horns) and the printed yaw collar / neck turret that carry pan **and** tilt, which Mirumi does not have, plus the spring hinges. The next step down would be two sub-micro servos (≈4–5 g each, ≈−11 g) with new seats in the collar and turret; dropping the camera saves only ≈1.5 g. Print profiles: shells 1 perimeter per face + 10 % gyroid (≈0.48 of solid), arms 2 perimeters PETG (0.62), collar / turret 0.60, tray 0.50, small bearing parts 0.75. Solid-print upper bound (every printed part 100 % solid, no battery): 276 g.
+**195 g against a 160–180 g target (200 g ceiling)** (194 g at 03bc2f7: the longer locks add ≈3 g and the 10 mm eyes ≈0.6 g, the lighter torso_front saves ≈2–3 g; 185 g at 494c22f; the closer-to-Mirumi soft goods — pear padding, feet and a heavier shaggy pile — add ≈9 g; 191 g at b458259). Mirumi is about 135–155 g. The last ≈14 g is in the shaggy coat and in parts this pass kept on purpose: the two servos (20 g with horns) and the printed yaw collar / neck turret that carry pan **and** tilt, which Mirumi does not have, plus the spring hinges. The next step down would be two sub-micro servos (≈4–5 g each, ≈−11 g) with new seats in the collar and turret; dropping the camera saves only ≈1.5 g. Print profiles: shells 1 perimeter per face + 10 % gyroid (≈0.48 of solid), arms 2 perimeters PETG (0.62), collar / turret 0.60, tray 0.50, small bearing parts 0.75. Solid-print upper bound (every printed part 100 % solid, no battery): 276 g.
 
 **Parts swapped (planned, nothing bought):**
 
@@ -82,7 +82,7 @@ Estimated from the exported STLs (PLA 1.24 g/cm³ × an ASSUMED effective fill p
 | Adafruit 3351 enclosed speaker (25 g) | **Adafruit 3923** mini oval, 8 Ω 1 W, 30 × 20 × 5 mm, on the inside of the back shell | 3 g | [Adafruit 3923](https://www.adafruit.com/product/3923) · [Core ADA3923, A$4.80](https://core-electronics.com.au/mini-oval-speaker-8-ohm-1-watt.html) (out of stock Nov 2026) |
 | XL6009 boost module | **Pololu U3V16F5** 5 V step-up, 13.1 × 8.1 × 3 mm | 0.4 g | [Pololu 4941](https://www.pololu.com/product/4941) · [Core, A$11.70](https://core-electronics.com.au/5v-step-up-voltage-regulator-u3v16f5.html) |
 | 1S 2000 mAh (≈38 g, not sourced) | **1S 400 mAh LiPo**, 38 × 25 × 6 mm, PCM, 2C, JST-PH | 11 g | [Core CE04375, A$5.55](https://core-electronics.com.au/polymer-lithium-ion-battery-400mah-38456.html) |
-| Printed eye bezels + shutter (6 g) | **8 mm black safety eyes** with push-on washers (Ø5 shank holes) | 0.8 g | not sourced |
+| Printed eye bezels + shutter (6 g) | **10 mm glossy black safety eyes** with push-on washers (Ø5 shank holes) | 1.4 g | not sourced |
 | Pi-camera block behind the eyes | XIAO ESP32S3 Sense camera (OV3660/OV5640) on a long FPC in a small **nose pod** behind a Ø3.5 window | — | [Seeed XIAO ESP32S3 Sense](https://www.seeedstudio.com/XIAO-ESP32S3-Sense-p-5639.html) |
 
 The springs are unchanged, so the grip is unchanged, and the lighter body makes both holding cases safer (below).
@@ -91,8 +91,8 @@ The springs are unchanged, so the grip is unchanged, and the lighter body makes 
 
 - **Pear / bell silhouette.** A soft-goods body (`stl/reference/soft_body.stl`, not printed): a 4 mm skin layer over the egg plus fibrefill padding sewn into the lower body, up to 9 mm thick below z 28 and blending out by z 50, so the body is widest at the bottom and tapers to a rounded head. Over the pile Tomo reads about **136 mm wide at the bottom, ≈106 mm at the head and ≈156 mm tall (height ≈1.15× width)**, against ≈120 × 160 mm before (estimates from the proxy plus the pile length).
 - **Feet.** Two stubby, rounded plush feet (ellipsoids 32 × 26 × 18 mm) at the bottom front, splayed ±34° from the front centre, resting on the bag top. Fibrefill and fur only.
-- **Long shaggy fur.** Clumped, wavy locks that fall downward: ≈13 mm undercoat and 36 mm guard hair on the body, 11 / 27 mm on the head, 9 / 20 mm on the arms, 14 mm on the feet; one uniform colour (ivory or pink), no white-tipped halo. The face cap's pile runs past the seam and falls over the body pile, hiding the 3 mm running gap when the head is level (it can still part when the face looks up).
-- **Small, flatter face.** Two 8 mm black bead eyes set high and wide (x ±14, z 121; were ±10.5, z 114), a tiny, barely visible nose over the camera window at z 110, and a small oval of shorter, trimmed fur round them; the crown fur is shorter so the face reads flatter.
+- **Long shaggy fur.** Heavier, smoother clumped locks with a slow wave that fall downward in layers: ≈15 mm undercoat and 44 mm guard hair on the body, 12 / 32 mm on the head, 11 / 25 mm on the arms, 17 mm on the feet; one uniform colour (warm cream or saturated candy pink), no white-tipped halo. The face cap's pile runs past the seam and falls over the body pile, hiding the 3 mm running gap when the head is level (it can still part when the face looks up).
+- **Furred face.** The face is short fur of the same colour (no bare patch); the long locks above and round it are cut short so they frame the face rather than cover it. Only two 10 mm glossy black bead eyes show (x ±14, z 121); no nose bead (the Ø3.5 camera window at z 110 sits under a thin parting in the face fur).
 - **No visible hardware.** Each shoulder knuckle sits under a stuffed shoulder cap; the TPU pads sit on the inner face of the mittens, fur-coloured and hidden by the pile.
 - **Two thick, stubby arms.** Each printed arm is a short spine inside a stuffed fur sleeve (Ø16 at the root, Ø18 along the arm, Ø21 mitten, Ø22 shoulder cap; ≈Ø26–30 mm over the pile). The two mittens are flattened where they meet in front of the handle, 1.5 mm apart at rest, so the paws never cross or overlap.
 - **Pose on the handle.** In the renders the handle runs up the centre groove past the paws, then curves up beside the head and over the right shoulder (staging only; the groove and grip are unchanged), and the feet rest on the bag top.
@@ -103,7 +103,7 @@ The springs are unchanged, so the grip is unchanged, and the lighter body makes 
 - **One egg, no snowman.** Head and body are a single egg of revolution: radius 46 mm at z = 58, an ellipse below and a blunt superellipse dome (n = 3.4) above, 148 mm tall. With the earlier 4–7 mm fur Tomo was about **106 × 104 × 152 mm** (width over the arm knuckles × depth × height) against Mirumi's ≈100 × 118 × 143 mm. It is about 9 mm taller than Mirumi because the eyes, camera and tilt servo have to sit at z ≈ 120.
 - **The face is a cap.** A seam sphere centred on the tilt-axis line (radius ≈48.3 mm, meeting the skin at z ≈ 101 with a 3 mm gap) cuts the face cap off the egg. Because the egg is round in plan, the cap pans and tilts inside the body with a matching skin. The long pile and a fur lip on the cap now cover the 3 mm seam (see Mirumi look).
 - **Shoulder arms.** The arm hinges moved from the hip (z 22–38) to the shoulders, just under the face (knuckle z 70–86, axis 54.4 mm from the centre at azimuth ±35° from the side).
-- **Two short, symmetric arms (two-arms pass).** Each arm runs from its own shoulder round its own side of the body to the front, ≈55 mm along the spine, ending at z ≈ 48 with the paw at azimuth ±7.5° from the front centre. The right arm is the left mirrored. The printed spine is a 6 × 14 mm band that follows the skin 8.5 mm out (5.3 mm at the paws). The earlier asymmetric arms (left over the chest, right under the belly, 82 and 111 mm long) crossed each other in front of the belly and read as one tangled limb.
+- **Two short, symmetric arms (two-arms pass).** Each arm runs from its own shoulder nearly level round its own side of the upper chest to the front, ≈46 mm along the spine, ending at z ≈ 70 (just under the face; was z 48 before the Mirumi polish pass) with the paw at azimuth ±7.5° from the front centre. The right arm is the left mirrored. The printed spine is a 6 × 14 mm band that follows the skin 8.5 mm out (5.3 mm at the paws). The earlier asymmetric arms (left over the chest, right under the belly, 82 and 111 mm long) crossed each other in front of the belly and read as one tangled limb.
 - **Upright, centre grip.** The belly groove runs down the front centre, **5.9° from vertical**, so the upright leg of a bag handle runs up the belly between the paws like Mirumi's. It is shallow (floor 2.5 mm below the skin at z 33, 4 mm at z 64): the paws reach round the front of the handle, so it does not need to sit deep.
 
 ### Passive spring hug
@@ -111,7 +111,7 @@ The springs are unchanged, so the grip is unchanged, and the lighter body makes 
 - **Hinge.** Each knuckle turns on a **vertical M3 × 30 pin** thread-formed into an ear moulded into `torso_front` (z 86.4–92.4), with a washer and nyloc under the knuckle. There is no lower cap any more, so the arm band can leave the knuckle downwards; a rear post ties the ear back into the shell, away from the arm swing.
 - **Spring.** A music-wire **torsion spring** sits in a Ø11 recess in each knuckle: 0.048 in (1.22 mm) wire, 3/8 in OD, 90° legs — catalogue part Approved Vendor / Grainger **3HPG6 (left-hand)** and **3HPD1 (right-hand)**, rated 2.679 lbf·in (302.7 N·mm) at 90°, so **3.36 N·mm per degree**. It is preloaded **30°** at the closed stop and winds to **90°** at the open stop: exactly its catalogue rating, with no margin (≈1.87 GPa against ≈1.86 GPa at the rating). The preload was cut from 50° when the open stop went from 30° to 60°.
 - **Stops.** A printed lug on the torso ear runs in a relief in the top of the knuckle: the arm rests closed at 0° and opens to a hard stop at **60°** (was 30°: at 30° no straight path in for a Ø15 handle existed). Zero power holds the hug; you open the arms by hand (about 7.7 N at each paw on the open stop) and let go.
-- **Pads.** 1.5 mm **TPU sleeves** (`paw_pad_L/R`) cover the paw end of each arm (the last ≈15 mm) and press on the front quarters of the handle from either side; they take the squash and give the grip its friction, and the rigid arm stays ≈1.4 mm clear of the handle. At rest the two pads are 2.2 mm apart and 0.28 mm off the belly. With both arms on the open stop the pads are ≈29 mm off the belly and a Ø15 handle comes straight in (any approach within ±30° of the groove normal is clear). You load it like Mirumi: open the arms, put the handle upright against the belly, let go.
+- **Pads.** 1.5 mm **TPU sleeves** (`paw_pad_L/R`) cover the paw end of each arm (the last ≈15 mm) and press on the front quarters of the handle from either side; they take the squash and give the grip its friction, and the rigid arm stays ≈1.4 mm clear of the handle. At rest the two pads are 2.2 mm apart and 0.28 mm off the belly. With both arms on the open stop the pads are ≈26 mm off the belly and a Ø15 handle comes straight in. You load it like Mirumi: open the arms, put the handle upright against the belly, let go.
 - **Handles.** Round **Ø10–15 mm** and a flat strap up to **25 × 2.5 mm** laid along the groove.
 
 **Clamp force (catalogue spring rate, not measured).** The two paws close on the handle from either side; pad force = spring torque ÷ the lever from the hinge axis to the pad contact (≈39–41 mm; 32 mm on the strap):
@@ -123,7 +123,7 @@ The springs are unchanged, so the grip is unchanged, and the lighter body makes 
 | Ø15 round | 9.0° / **3.2 N** | 9.0° / **3.2 N** | 6.4 N | 4.0 N |
 | Flat strap 25 × 2.5 | 5.0° / **3.7 N** | 5.0° / **3.7 N** | 7.4 N | 7.4 N |
 
-Assumptions: linear catalogue rate, no hinge friction, rigid TPU for the angle. The rest of each round-handle force (≈2.2 N per paw) squeezes the handle sideways between the paws. **Clinging check (Mirumi pose):** about 183 g without the battery, **194 g with it** (centre of mass at z ≈ 71–74). Sitting on the bag top, the bag carries the weight and the hug only has to keep it upright: with 6.0 N on the handle at a mean height of 52 mm, the springs give **2.28×** the moment needed even to hold it horizontal (2.35× before the heavier coat). **Hanging free** from a vertical handle is held by friction only (μ ≈ 0.5 assumed): slip safety factor **≈3.15 with the battery** (3.34 without; was 3.3 / 3.5), 3.15–4.1 across the handle sizes without the battery. On paper both hold; real handles and fur will decide.
+Assumptions: linear catalogue rate, no hinge friction, rigid TPU for the angle. The rest of each round-handle force (≈2.2 N per paw) squeezes the handle sideways between the paws. **Clinging check (Mirumi pose):** about 184 g without the battery, **195 g with it** (centre of mass at z ≈ 72). Sitting on the bag top, the bag carries the weight and the hug only has to keep it upright: with 6.1 N on the handle at a mean height of 66 mm (the higher hug; was 52 mm), the springs give **2.94×** the moment needed even to hold it horizontal (was 2.28×). **Hanging free** from a vertical handle is held by friction only (μ ≈ 0.5 assumed): slip safety factor **≈3.19 with the battery** (3.38 without; was 3.15 / 3.34), 3.2–4.1 across the handle sizes without the battery. On paper both hold; real handles and fur will decide.
 
 ### Head: pan and tilt (2 × Feetech FS90)
 
@@ -146,7 +146,7 @@ Naming: `arm_L` is the **critter's own left** (+x). Units are millimetres; the C
 - **Spring at its rating.** Fully open, the springs sit exactly at their 90° catalogue rating with no margin; do not force the arms past the stop.
 - **Small handles have little follow-through.** A Ø10 handle opens the pads only 3.2° (the rigid spine 1.1°): about 2 mm of squash at the paw. Handles under Ø10 may not be held.
 - **Taller than Mirumi.** The printed egg stays 148 mm tall (≈156 mm over the shorter crown pile) against ≈143 mm; the pear shape comes from soft padding and fur, not the shell: the pan/tilt neck stack and the tilt servo reach the dome, so lowering it needs a new neck stack or sub-micro servos. The arm knuckles stick out ≈8 mm beyond the egg at the shoulders, under the stuffed shoulder caps.
-- **Arms hug at mid-body, not the upper chest.** The paws still meet at z ≈ 48; Mirumi's hug sits higher. Raising it needs new arm geometry and a new groove/handle check, so this pass only restaged the handle to rise beside the head.
+- **The groove runs up to the torso rim.** To hug at the upper chest the belly groove was raised (z ≈ 36–94) so a straight handle clears the shell above the paws; it now notches the front of the torso rim under the face-cap seam (the liner stops at the seam). The handle sits in front of the lower face when seen straight on.
 - **The coat is soft and squashes.** The pear padding and pile sit ≈3 mm under the paws at rest (they compress; the rigid parts stay clear), and the shaggy pile is heavier (≈+9 g, assumed 480 g/m²). Feet and padding are sewn soft goods with no printed support.
 - **The face seam is hidden, not gone.** The cap needs a 3 mm running gap round the egg. The long pile and the cap's soft fur lip cover it when the head is level; a faint line can still show at some angles, and it opens when the face looks up.
 - **The groove is shallow.** 2.5–4 mm deep, so the handle stands proud of the belly and the paws do the locating; a handle that is not upright (more than ≈30° off) will want to roll out between the paws.
@@ -184,7 +184,7 @@ Naming: `arm_L` is the **critter's own left** (+x). Units are millimetres; the C
 | M7–M12 | Longer M2.5 horn screws (2), M2 hub/key screws (3), M3 tilt idler screw (1), M2.5 shell/collar screws (12), M2 retainer screws (2), servo-tab screws (4) | | Not sourced. Measure the horns on arrival. |
 | M13 | Long-pile fur skin (ivory or pink) with a vertical belly channel (or slit) for the handle upright, two short thick stuffed arm sleeves (shoulder cap + mitten, pad slot on the inner face of each mitten), a soft lip over the face seam, and two stubby feet | 1 | Not sourced; ≈21 g + ≈1 g extra arm pile assumed. |
 | M20 | Polyester fibrefill for the two arm sleeves | ≈0.5 g | Not sourced; stuff loosely so the mittens squash round the handle. |
-| M18 | 8 mm black safety eyes with washers | 2 | Not sourced. |
+| M18 | 10 mm glossy black safety eyes with washers | 2 | Not sourced. |
 | M14 | TPU pads on the paws (printed) | 2 | 85A–95A, fur-coloured, hidden under the mittens. |
 
 Servo seats are drawn from the official FS90MG drawing [`datasheets/FS90MG.pdf`](datasheets/FS90MG.pdf); the FS90 has the same case per Feetech (Pololu lists 23.2 × 12.5 × 22 mm, so check on arrival). Removed with the servo clasp: the two arm FS90MGs, the M2.5×12 arm-hub screws, the arm horn screws and the shoulder caps.
@@ -288,19 +288,29 @@ Measurements and an imposed-motion collision sweep on the exported STLs. **Nothi
 | Imposed-motion sweep | 537 poses (pan −50…+50°, tilt −25…+25°, each arm −5…+70°, and a pan × tilt × arm {0, 30, 60}² grid), 155,730 pair tests, 30,086 booleans |
 | Rigid overlaps in travel | **0** (pan ±42°, tilt ±10°, arms 0–60°); the stuffed sleeves are soft goods and only report squash |
 | Arm stops | engage at −0.5° (closed) and 60.5° (open); knuckle ↔ ear 0.4 mm; closed pad ↔ shell 0.28 mm; left ↔ right rigid arm ≥ 5.1 mm at any common angle, pads 2.2 mm apart at rest, mittens never overlap |
-| Hug on Ø10 / 12.5 / 15 round (upright) | each arm opens 3.2° / 6.1° / 9.0°; 5.7 / 6.0 / 6.4 N total pad force; rigid arm ≈1.4 mm clear of the handle |
-| Hug on a 25 × 2.5 flat strap | arms open 5.0°; 7.4 N total |
-| Arms open (60°) | pads ↔ belly 29.0 / 29.1 mm (spec ≥ 15); a Ø15 rod comes straight in onto the groove floor without touching the rigid arms, pads or shell (clear for approaches within ±30° of the groove normal) |
+| Hug on Ø10 / 12.5 / 15 round (upright, paws at z ≈ 66–70) | each arm opens 3.4° / 6.2° / 9.1°; 5.8 / 6.1 / 6.5 N total pad force; rigid arm ≈1.45 mm clear of the handle |
+| Hug on a 25 × 2.5 flat strap | arms open 5.4°; 7.4 N total |
+| Arms open (60°) | pads ↔ belly 26.0 / 26.0 mm (spec ≥ 15); a Ø15 rod comes straight in onto the groove floor without touching the rigid arms, pads or shell |
 | Head pan hard stop | collar ↔ turret at ±47°, 5° beyond the clamp |
 | Head tilt | first contact +13.5° (camera pod on the collar) and −23.5° (head_back on the collar); at ±12° turret clearance 0.6 mm, collar ≥ 1.7 mm |
-| Mass (estimate) | ≈183 g, **194 g with the 400 mAh battery** (185 g at 494c22f); centre of mass (−0.8, −2.4, 71.2) mm with battery |
-| Holding | seated on the bag: hug moment 2.28× the toppling moment at 90° lean (2.34× without battery); free hang: slip safety factor 3.15 with battery, 3.34 without (μ 0.5 assumed) |
+| Mass (estimate) | ≈184 g, **195 g with the 400 mAh battery** (194 g at 03bc2f7); centre of mass (−0.8, −1.9, 71.9) mm with battery |
+| Holding | seated on the bag: hug moment 2.94× the toppling moment at 90° lean (3.01× without battery); free hang: slip safety factor 3.19 with battery, 3.38 without (μ 0.5 assumed) |
 | Loads (datasheet) | tilt gravity 1.7 % of FS90 stall; pan accel. 8.4 % of stall for 60° in 0.12 s |
 | Printable meshes | Watertight |
 
 Full tables: [`results/fit_audit_table.csv`](results/fit_audit_table.csv), [`results/fit_audit.json`](results/fit_audit.json), [`results/summary_sweep.json`](results/summary_sweep.json), [`results/metrics_v01.json`](results/metrics_v01.json).
 
 ## Changelog
+
+### V.01 — Mirumi polish (colour, furred face, higher hug)
+
+- **Higher hug:** the arms now run nearly level round the upper chest, so the paws meet at z ≈ 70, just under the face (were z 48); ≈46 mm along the spine. The belly groove moved up with them (floor z 48–80, 1.7° from vertical, capsule up to the torso rim; liner stops at the face-cap seam).
+- **Grip and hang:** 5.8 / 6.1 / 6.5 / 7.4 N on Ø10 / 12.5 / 15 / flat 25 mm (shorter lever); seated margin 2.94× (was 2.28×) because the hug is higher; free-hang slip SF 3.19 with battery (was 3.15). Ø15 straight-in loading still clear.
+- **Colour:** saturated soft candy pink and a warm cream; weaker white hair specular.
+- **Face:** short fur of the coat colour over the whole face (no bare patch or glow), 10 mm glossy black bead eyes, no nose bead.
+- **Fur:** longer (≈44 mm body guard hair), heavier, smoother clumped locks with a slow wave, falling downward in layers; the handle channel and paws are furred (no bare patches in the arms-open render).
+- **≈195 g with battery** (was 194 g). Audit 27/27, 0 rigid overlaps in 537 poses.
+
 
 ### V.01 — closer to Mirumi (pear body, feet, shaggy fur)
 

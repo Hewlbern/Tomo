@@ -10,6 +10,12 @@ Source: [`evokin_v01.scad`](evokin_v01.scad) (internal file names keep the `evok
 
 Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (opening angle, 0 = closed on the rest stop). STLs are exported at all zeros. Pose a part by hand with `-D yaw=… -D tilt=… -D armL=… -D armR=…`.
 
+## What changed in the Mirumi polish pass (vs 03bc2f7)
+
+- **Higher hug.** `ARM_PATH_L` now runs nearly level from the shoulder (z 78) to the paw at azimuth −82.5°, z 70 (was z 48); ≈46 mm along the spine; R mirrored.
+- **Groove raised** (`scripts/groove_geo.py`): floor from z 48.3 (2.5 mm deep) to z 80 (4 mm), 1.7° from vertical; `G_T1` 46 so the capsule runs up to the torso rim (z ≈ 94) and a straight 50 mm test rod clears the shell; `G_MIDT` 22 (z ≈ 70). `groove_liner()` is intersected with `body_region()` so it stops at the face-cap seam. `soft_body` keeps a handle channel down to the bag top.
+- Grip 5.8 / 6.1 / 6.5 / 7.4 N (lever ≈39–41 mm); seated margin 2.94×, free-hang slip SF 3.19 with battery; mass ≈195 g with battery (10 mm eyes, longer pile ASSUMED 540 g/m²).
+
 ## What changed in the closer-to-Mirumi pass (vs 494c22f)
 
 - **Soft body** (`soft_body`, reference only, `stl/reference/soft_body.stl`, soft goods, not printed): the egg profile + `FUR_SKIN` 4 mm + `pear_pad(z)` fibrefill padding (`PEAR_P` 9 mm from z 10 to `PEAR_Z[0]` 28, smoothstep to 0 at `PEAR_Z[1]` 50) revolved, plus `plush_feet()` (two ellipsoids `FOOT_R` [16, 13, 9] at azimuth −90 ± `FOOT_PSI` 34°, z `FOOT_Z` 9, `FOOT_OFF` 15 mm out). The body egg and the groove capsule (swept 30 mm out along the groove normal) are subtracted so the handle path stays open. Widest ≈112 mm before the pile at z ≈ 26; ≈136 × 156 mm over the pile (estimate).
@@ -71,7 +77,7 @@ Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (
 | Shape | capsule of R8 spheres along the floor line, t = −12…42 mm (≈ z 21…75), 2.4 mm liner inside the shell |
 | Floor line | from (0, −38.8, 32.9) (bottom, 2.5 mm below the skin) to (0, −42.0, 64.0) (top, 4 mm below) at azimuth −90°; **5.9° from vertical**, so a handle upright runs up the belly between the paws. Constants in `scripts/groove_geo.py` |
 | Clearance | Ø12.5 reference rod touches the floor only; rod ↔ speaker 0 mm³, ↔ Pi 0 mm³; torso_front ↔ speaker 0 mm³ |
-| Objects | round Ø10–15; flat strap 25 × 2.5 laid along the groove line, all centred at z ≈ 48 |
+| Objects | round Ø10–15; flat strap 25 × 2.5 laid along the groove line, all centred at z ≈ 70 |
 
 ### Grip (catalogue rate, not measured)
 
@@ -86,7 +92,7 @@ The two paws close on the handle from either side. Pad force = spring torque ÷ 
 
 The rigid arm stays ≈1.40–1.46 mm clear of each object; the 1.5 mm TPU pad makes the contact (the rigid spine alone would open only 1.1° / 4.1° / 6.9° on Ø10 / 12.5 / 15). Holding the arms fully open takes ≈7.7 N at each paw. Open (60°): pads ↔ belly 29.0 / 29.1 mm. Loading: a Ø15 × 50 rod brought in on straight lines perpendicular to its axis reaches the groove floor without touching the rigid arms, pads or shell for every approach within ±30° of the groove normal (not at ±45° or wider); the soft sleeves are not squashed on the way in. Until this pass the check iterated over an empty range (`np.arange` with the wrong step sign) and always passed; with the old 30° stop there is no clear straight path.
 
-**Clinging.** Mass ≈183 g (no battery) / 194 g with the 400 mAh cell, COM (−0.8, −2.4, 71.2) with battery, ≈46 mm from the handle axis. *Seated on the bag* (Mirumi's pose): the bag carries the weight and the hug only resists toppling; at 90° of lean the hug moment is 2.34× (2.28× with battery) the toppling moment. *Free hang* from a vertical handle: slip is held by friction only, 2 × 6.0 N × μ 0.5 (assumed) → safety factor 3.34 (3.15 with the battery).
+**Clinging.** Mass ≈184 g (no battery) / 195 g with the 400 mAh cell, COM (−0.8, −1.9, 71.9) with battery, ≈46 mm from the handle axis. *Seated on the bag* (Mirumi's pose): the bag carries the weight and the hug only resists toppling; at 90° of lean the hug moment is 3.01× (2.94× with battery) the toppling moment. *Free hang* from a vertical handle: slip is held by friction only, 2 × 6.0 N × μ 0.5 (assumed) → safety factor 3.38 (3.19 with the battery).
 
 ### Head tilt
 
@@ -207,7 +213,7 @@ python3 scripts/render_v01.py
 - The fur skin needs a vertical channel or slit down the centre groove, two stuffed arm sleeves with pad slots in the mittens, shoulder-knuckle openings, bare TPU pads and a pile-covered seam round the face cap.
 - Horn size and screw radius (assumed Ø24, r = 7), tooth count (20T vs 21T) and the included screws must be measured on arrival.
 - Two FS90s can draw ≈1.4 A at stall, more than the 400 mAh cell (0.8 A) or the U3V16F5 (≈1 A) supply: move one joint at a time (firmware default) and set the INA219 trip below ≈0.6 A.
-- Heavier than Mirumi (≈194 g with battery vs ≈135–155 g; target was 160–180 g) and taller (148 mm egg, ≈156 mm over the pile, vs ≈143 mm). The arms hug at z ≈ 48 (mid-body), lower than Mirumi's upper-chest hug. Next ≈5–11 g: sub-micro servos with new seats.
+- Heavier than Mirumi (≈195 g with battery vs ≈135–155 g; target was 160–180 g) and taller (148 mm egg, ≈156 mm over the pile, vs ≈143 mm). The arms now hug at z ≈ 70, just under the face; the groove runs up to the torso rim to allow it. Next ≈5–11 g: sub-micro servos with new seats.
 - Windowed 2.4 mm shells at a 1-perimeter profile are unprinted and undropped.
 - Portable power (400 mAh + U3V16F5) is planned, untested. Not child-ready.
 

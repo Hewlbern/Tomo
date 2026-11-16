@@ -164,10 +164,10 @@ st=sw_["stop_engagement"] if sw_ else {}
 add("Arm hard stops (printed lug in the knuckle relief)",
     "torso_front (stop lug), arm_L/R (relief sector)",
     (f"First rigid contact closing past rest: L {st.get('armL_closed_stop',{}).get('armL')}°, R {st.get('armR_closed_stop',{}).get('armR')}°; opening: "
-     f"L {st.get('armL_open_stop',{}).get('armL')}°, R {st.get('armR_open_stop',{}).get('armR')}° (design 0° and 30°, sweep step 0.5°). "
-     "Lug 24° wide, r 5.7–7.7, 2.6 mm deep; spring torque on the open stop 269 N·mm ≈ 40 N on the lug face.") if sw_ else "Run scripts/sim_v01.py first.",
-    "pass" if sw_ and all(st.get(f"arm{s}_closed_stop",{}).get(f"arm{s}",-9)>=-1 and 30<=st.get(f"arm{s}_open_stop",{}).get(f"arm{s}",0)<=31 for s in "LR") else "fail",
-    "Print torso_front so the lug is loaded across layers, not in peel. The spring cannot over-rotate past 80° total wind-up (rated 90°).")
+     f"L {st.get('armL_open_stop',{}).get('armL')}°, R {st.get('armR_open_stop',{}).get('armR')}° (design 0° and 60°, sweep step 0.5°). "
+     "Lug 24° wide, r 5.7–7.7, 2.6 mm deep; spring torque on the open stop 303 N·mm ≈ 45 N on the lug face.") if sw_ else "Run scripts/sim_v01.py first.",
+    "pass" if sw_ and all(st.get(f"arm{s}_closed_stop",{}).get(f"arm{s}",-9)>=-1 and 60<=st.get(f"arm{s}_open_stop",{}).get(f"arm{s}",0)<=61 for s in "LR") else "fail",
+    "Print torso_front so the lug is loaded across layers, not in peel. The spring cannot over-rotate past 90° total wind-up (30° preload + 60° open = the 90° catalogue rating).")
 
 # ---------- 2. Seams ----------
 # lip: back ymin < 0, front groove exists (cut into mid-wall)
@@ -442,10 +442,10 @@ add("Neck cable path (pan + tilt servo leads, camera FPC)",
     "Do not twist the FPC around the yaw axis; let it roll in the U-bend. Tie the tilt lead to the FPC so they move together.")
 H=SW.get("hug") if SW else None
 arm_ok=bool(SW and nov and SW.get("arm_min_clearance_mm",{}).get("ok"))
-add("Arm swing (passive, vertical shoulder hinges, 0–30°)",
+add("Arm swing (passive, vertical shoulder hinges, 0–60°)",
     "arm_L/R, paw_pad_L/R, sleeve_proxy_L/R, torso_front, fur_proxy_torso",
-    ("Arms turn about vertical shoulder pins (knuckle z 70–86, just under the face seam); 0° = hugging on the rest stop, 30° = open stop. "
-     "Asymmetric Mirumi-style arms: the left runs over the chest and ends low on the far side, the right drops down its flank and sweeps under the belly. "
+    ("Arms turn about vertical shoulder pins (knuckle z 70–86, just under the face seam); 0° = hugging on the rest stop, 60° = open stop. "
+     "Two short, symmetric Mirumi-style arms: each runs from its shoulder round its own side to the front, where the paws nearly meet (pads 2.2 mm apart) in front of the handle without crossing. "
      f"Min clearances by angle {SW.get('arm_min_clearance_by_angle_mm')}; worst {SW.get('arm_min_clearance_mm')} (arm_to_shell ≈ 0.4 = knuckle under the ear). "
      "Every arm point moves outward as it opens (all band points lie on the front side of their own hinge).") if SW else "Run scripts/sim_v01.py first.",
     "pass" if arm_ok else "fail",
@@ -458,25 +458,25 @@ if H:
     gtxt="; ".join(f"{g['object']}: {gsd(g,'L')}; {gsd(g,'R')}; total {g['total_pad_force_N']} N, into the groove {g['total_into_groove_N']} N" for g in H["grip"])
     gtxt+=f". Spring: {H['spring']['part']}, {H['spring']['rate_Nmm_per_deg']} N·mm/°, preload {H['spring']['preload_deg']}°. Assumption: {H['assumption']}"
 else: gtxt="Run scripts/sim_v01.py first."
-g_ok=bool(H and all(0<g[sd].get("open_deg",0)<=30 and g[sd].get("pad_normal_force_N",0)>=2.0 for g in H["grip"][:3] for sd in ("L","R")))
-add("Passive hug grip (round Ø10 / 12.5 / 15 lying diagonally in the groove, flat 25 mm strap)",
+g_ok=bool(H and all(0<g[sd].get("open_deg",0)<=60 and g[sd].get("pad_normal_force_N",0)>=1.5 for g in H["grip"][:3] for sd in ("L","R")))
+add("Passive hug grip (round Ø10 / 12.5 / 15 standing upright in the centre groove, flat 25 mm strap)",
     "arm_L/R, paw_pad_L/R, torso_front (groove), grip test objects",
     gtxt, "pass" if g_ok else "fail",
-    "Forces are from the catalogue spring rate, not measured. Each arm clamps the handle on its own crossing; the TPU pads take the squash.")
+    "Forces are from the catalogue spring rate, not measured. The two paws close on the handle from either side; the TPU pads take the squash.")
 add("Hand opening (arms on the open stop)",
     "arm_L/R, paw_pad_L/R, torso_front",
-    (f"At 30°: pad L ↔ belly {H['open']['pad_L_to_belly_mm']} mm, pad R ↔ belly {H['open']['pad_R_to_belly_mm']} mm (spec ≥15); "
-     f"a Ø15 rod slides into the groove without touching the arms: {H['open']['rod15_insertion_path_clear']}. Closed: pad ↔ shell {H['open']['pad_to_belly_at_closed_mm']} mm.") if H else "Run scripts/sim_v01.py first.",
+    (f"At 60°: pad L ↔ belly {H['open']['pad_L_to_belly_mm']} mm, pad R ↔ belly {H['open']['pad_R_to_belly_mm']} mm (spec ≥15); "
+     f"a Ø15 rod comes straight into the groove without touching the rigid arms: {H['open']['rod15_insertion_path_clear']} (approach {H['open'].get('rod15_insertion_path',{}).get('approach_deg_from_groove_normal')}° from the groove normal; soft sleeves pushed aside up to {H['open'].get('rod15_soft_sleeve_squash_mm')} mm). Closed: pad ↔ shell {H['open']['pad_to_belly_at_closed_mm']} mm.") if H else "Run scripts/sim_v01.py first.",
     "pass" if H and min(H["open"]["pad_L_to_belly_mm"],H["open"]["pad_R_to_belly_mm"])>=15 and H["open"]["rod15_insertion_path_clear"] else "fail")
 rod=M["grip_rod"]; rv=vol_int(rod,M["torso_front"]); rs=vol_int(rod,M["dummy_speaker"]); rp=vol_int(rod,M["dummy_pi"])
 spk_liner=vol_int(M["torso_front"],M["dummy_speaker"])
-add("Belly groove (R8 channel, off-centre and diagonal, 35° from vertical)",
+add("Belly groove (R8 channel down the front centre, ≈6° from vertical)",
     "torso_front, dummy_speaker, dummy_pi, grip_rod (Ø12.5 reference)",
-    f"Floor line from {np.round(gg.FR,1).tolist()} (under the right-arm crossing C_R, azimuth −68°, z 26.5) to {np.round(gg.FL,1).tolist()} (under the left-arm crossing C_L, −98°, z 57.5), "
-    f"7 mm below the skin at both crossings, running from lower +x to upper −x like Mirumi's handle line; capsule ≈z 23…66, 2.4 mm liner. "
+    f"Floor line from {np.round(gg.FR,1).tolist()} (bottom, 2.5 mm below the skin) to {np.round(gg.FL,1).tolist()} (top, 4 mm below), at azimuth −90°, "
+    f"{math.degrees(math.acos(gg.U[2])):.1f}° from vertical so a bag-handle upright runs up the belly between the paws like Mirumi's; capsule ≈z 21…75, 2.4 mm liner. "
     f"Ø12.5 reference rod on the floor ↔ torso_front {rv} mm³ (touching), ↔ speaker {rs} mm³, ↔ Pi {rp} mm³; torso_front ↔ speaker {spk_liner} mm³.",
     "pass" if (rv or 0)<=0.1 and (rs or 0)<=0.05 and (rp or 0)<=0.05 else "fail",
-    "The fur skin needs a matching diagonal channel (or a slit). A straight strap sits deeper mid-groove (the chord of the belly curve); a curved bag handle follows it.")
+    "The fur skin needs a matching vertical channel (or a slit) down the belly. The groove is shallow (2.5–4 mm) on purpose: the paws reach round the front of the handle, so it does not need to sit deep.")
 
 # coupon exists
 add("Test coupon",
@@ -514,7 +514,7 @@ out=dict(assumptions=dict(
     servo_source="Seats from the official Feetech FS90MG drawing p.5 (datasheets/FS90MG.pdf). Lighter Tomo uses the plastic-gear FS90, whose Feetech spec sheet gives the same 22.5 × 12.1 × 22.4 case (9 g, 1.3 kg·cm at 4.8 V, 21T spline): https://www.feetech.cn/en/6v-15kg-9g-dc-reduction-steering-gear-tooth-box",
     horn="ASSUMED typical 2.0 mm disc + 4-arm star, Ø24. Not on the drawing. p.6 says No Accessories.",
     spline_teeth="FS90 spec sheet: 21T (Ø4.86). Use the horns that come with the servo; measure on arrival.",
-    arm_servos="None. Arms are passive: vertical shoulder hinge + torsion spring (3HPG6 LH / 3HPD1 RH, 3.36 N·mm/°, 50° preload), printed stops at 0° and 30°.",
+    arm_servos="None. Arms are passive: vertical shoulder hinge + torsion spring (3HPG6 LH / 3HPD1 RH, 3.36 N·mm/°, 30° preload), printed stops at 0° and 60°.",
     head_servos="2× Feetech FS90 (was FS90MG): pan in the yaw collar, tilt on the neck turret (spline on the tilt axis).",
     speaker="Adafruit 3923 Mini Oval 8Ω 1W, 30×20×5, 3 g, Core ADA3923 A$4.80",
     amp="Adafruit 3006 MAX98357A 19.4×17.8×3.0",

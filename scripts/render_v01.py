@@ -39,7 +39,7 @@ def T(p,yaw=0,tilt=0,aL=0,aR=0):
 def rod(d,h=90):
     c=trimesh.creation.cylinder(radius=d/2,height=h,sections=48)
     z=np.array([0,0,1.0]); v=np.cross(z,gg.U); c.apply_transform(Rm(math.atan2(np.linalg.norm(v),gg.U[2]),v/np.linalg.norm(v)))
-    c.apply_translation(gg.FR+gg.U*19.0+gg.N*(d/2+0.1)); return c
+    c.apply_translation(gg.FR+gg.U*gg.MIDT+gg.N*(d/2+0.1)); return c
 Lv=np.array([0.45,-0.7,0.6]); Lv/=np.linalg.norm(Lv)
 def draw(ax,parts,pose,explode=None,alpha=None,lim=None,view=(16,-58),clip=None):
     tris=[]; cols=[]
@@ -71,21 +71,21 @@ def hug():
     M["rod"]=rod(12.5); COL["rod"]="#8b4513"
     fig=plt.figure(figsize=(16,9),dpi=130); pose=dict(aL=aL,aR=aR)
     ax=fig.add_subplot(121,projection="3d"); draw(ax,SHELL+["rod"],pose,view=(10,-70))
-    ax.set_title(f"Front 3/4 — hugging a Ø12.5 round handle lying diagonally in the belly groove\n"
+    ax.set_title(f"Front 3/4 — hugging a Ø12.5 round handle upright in the centre belly groove\n"
                  f"(left arm open {aL}°, {g['L']['pad_normal_force_N']} N; right arm open {aR}°, {g['R']['pad_normal_force_N']} N)",fontsize=11)
     ax=fig.add_subplot(122,projection="3d"); draw(ax,SHELL+["rod"],pose,view=(0,-90),lim=(-80,80,-80,40,-5,155))
-    ax.set_title("Front: shoulder hinges just under the face; the left arm crosses the handle high (C_L),\nthe right arm low under the belly (C_R); TPU pads at both crossings",fontsize=11)
-    fig.suptitle(f"{NAME} — Mirumi proportions: one egg, shoulder arms, diagonal grip (zero power to hold)",fontsize=14)
+    ax.set_title("Front: shoulder hinges just under the face; two short symmetric arms,\npaws nearly meeting in front of the handle; TPU pads on the paws",fontsize=11)
+    fig.suptitle(f"{NAME} — Mirumi proportions: one egg, two short arms, upright grip (zero power to hold)",fontsize=14)
     fig.text(0.5,0.02,FOOT,ha="center",fontsize=8.5); plt.subplots_adjust(0.0,0.05,1.0,0.9,0.0)
     fig.savefig("renders/cad/v01_hug_handle.png",facecolor="white"); plt.close(fig); del M["rod"]; print("wrote renders/cad/v01_hug_handle.png")
 def opened():
     fig=plt.figure(figsize=(16,9),dpi=130)
-    ax=fig.add_subplot(121,projection="3d"); draw(ax,SHELL,dict(yaw=30,tilt=-10,aL=30,aR=30),view=(14,-62))
+    ax=fig.add_subplot(121,projection="3d"); draw(ax,SHELL,dict(yaw=30,tilt=-10,aL=60,aR=60),view=(14,-62))
     o=SW["hug"]["open"]
-    ax.set_title(f"Arms on the 30° open stop (pads ↔ belly L {o['pad_L_to_belly_mm']} / R {o['pad_R_to_belly_mm']} mm)\nhead pan +30°, looking up 10°",fontsize=11)
+    ax.set_title(f"Arms on the 60° open stop (pads ↔ belly L {o['pad_L_to_belly_mm']} / R {o['pad_R_to_belly_mm']} mm)\nhead pan +30°, looking up 10°",fontsize=11)
     ax=fig.add_subplot(122,projection="3d"); draw(ax,SHELL,dict(yaw=0,tilt=10,aL=0,aR=0),view=(2,0),lim=(-80,80,-90,70,-5,155))
     ax.set_title("Side — face cap nodding 10° inside the egg (tilt axis y=6, z=119)\narms closed on their rest stops",fontsize=11)
-    fig.suptitle(f"{NAME} — hand-opened arms (0–30°) and head pan ±42° / tilt ±10° (2 × Feetech FS90)",fontsize=14)
+    fig.suptitle(f"{NAME} — hand-opened arms (0–60°) and head pan ±42° / tilt ±10° (2 × Feetech FS90)",fontsize=14)
     fig.text(0.5,0.02,FOOT,ha="center",fontsize=8.5); plt.subplots_adjust(0.0,0.05,1.0,0.9,0.0)
     fig.savefig("renders/cad/v01_arms_open_tilt.png",facecolor="white"); plt.close(fig); print("wrote renders/cad/v01_arms_open_tilt.png")
 def exploded():
@@ -95,7 +95,7 @@ def exploded():
     parts=["torso_front","arm_L","paw_pad_L"]
     draw(ax,parts,dict(),explode=ex,alpha={"torso_front":0.45},lim=(10,75,-65,0,40,100),view=(22,-40),clip=[(14,200),(-200,200),(30,110)])
     ax.set_title("Left shoulder hinge, arm dropped 24 mm: torso ear (spigot + stop lug + rear post) → arm knuckle\n"
-                 "(spring recess, relief for 0–30°). M3 × 30 pin thread-formed into the ear, washer + nyloc under the knuckle.",fontsize=10)
+                 "(spring recess, relief for 0–60°). M3 × 30 pin thread-formed into the ear, washer + nyloc under the knuckle.",fontsize=10)
     ax=fig.add_subplot(122,projection="3d")
     ex={"head_back":[0,22,30],"head_front":[0,-40,30],"tilt_hub":[-14,0,0],"dummy_cam":[0,-40,30]}
     parts=["yaw_collar","neck_turret","dummy_servo_tilt","dummy_horn_tilt","tilt_hub","head_back","head_front","dummy_cam","dummy_servo_yaw"]

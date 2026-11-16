@@ -10,6 +10,14 @@ Source: [`evokin_v01.scad`](evokin_v01.scad) (internal file names keep the `evok
 
 Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (opening angle, 0 = closed on the rest stop). STLs are exported at all zeros. Pose a part by hand with `-D yaw=… -D tilt=… -D armL=… -D armR=…`.
 
+## What changed in the two-arms pass (vs b458259)
+
+- **Two short, symmetric arms.** `ARM_PATH_L` runs from the left shoulder round its own side to the front (11 samples, ≈55 mm, ending at azimuth −82.5°, z 48, offset 5.3); `ARM_PATH_R` is the same list mirrored (`psi → −180 − psi`). The old long asymmetric paths (82 / 111 mm) crossed over the belly. `PAD_SEC_L = PAD_SEC_R = [7, 10]`: the pads cover the paw ends, 2.2 mm apart at rest.
+- **Thick soft sleeves** (`sleeve_proxy_L/R`, soft goods, not printed): a chain of spheres whose inner face sits on the band's inner face (`SLV_ROOT` 8, `SLV_R` 9), a shoulder cap on the hinge axis (`SLV_CAP_R` 11, z 68–90) and a mitten (`MIT_R` 10.5, 3 mm forward). The mittens are cut flat at x = ±`SLV_MEET` (0.75) so the two never overlap. Body egg subtracted.
+- **Centre groove**, 5.9° from vertical, floor 2.5 mm (z 33) to 4 mm (z 64) under the skin at azimuth −90°; capsule t −12…42; test objects centred at `G_MIDT` 15 (z ≈ 48). Constants from `scripts/groove_geo.py`.
+- **Stops / spring:** `ARM_OPEN` 30 → 60 (the knuckle relief grows with it), `SPRING_PRE` 50 → 30, so the open stop is at the 90° catalogue rating.
+- Mass ≈185 g with battery (191 g before).
+
 ## What changed in the lighter Tomo / Mirumi-look pass (vs 6ad85c3)
 
 - **Mass ≈191 g with battery** (was ≈334 g; ASSUMED print profiles, see `results/metrics_v01.json` → `mass.budget_before_after` and the README table).
@@ -24,8 +32,8 @@ Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (
 
 - **One egg body.** `torso_front/back` and `head_front/back` are now cut from one egg of revolution (`begg`): R 46 at z = 58, ellipse below, superellipse n = 3.4 above, top at z = 148. The face cap is split off by a **seam sphere** centred at (0, 0, 119) on the tilt-axis line, radius √(r(101)² + 18²) ≈ 48.3 mm, meeting the skin at z ≈ 101 with a 2 × 1.5 mm gap. Because the egg is round in plan and the sphere is centred near the tilt axis, the cap pans and tilts inside the body.
 - **Shoulder hinges** replace the hip hinges (z 22–38 → knuckle z 70–86). The **hip caps are gone**: the M3 pin is thread-formed into the ear and spigot, with a washer and nyloc under the knuckle, so the arm band can leave the knuckle downwards.
-- **Long asymmetric arms** built as "path bands": hulls of sphere pairs (r 3.5, ±5 mm across the path; r 4 at the root, 3.5 at the tip) placed along an azimuth/height path (`ARM_PATH_L/R`) at an offset off the skin (8.5 mm, 6.5 mm at the handle crossing). The left arm crosses the chest high (C_L, z ≈ 57) and ends low on the far side; the right arm drops down its own flank and sweeps under the belly (C_R, z ≈ 26). TPU sleeves (`paw_pad_L/R`) cover the crossing sections.
-- **Diagonal off-centre groove**, 35° from vertical, floor 7 mm under the skin at both crossings.
+- *(superseded by the two-arms pass)* **Long asymmetric arms** built as "path bands": hulls of sphere pairs (r 3.5, ±5 mm across the path; r 4 at the root, 3.5 at the tip) placed along an azimuth/height path (`ARM_PATH_L/R`) at an offset off the skin (8.5 mm, 6.5 mm at the handle crossing). The left arm crosses the chest high (C_L, z ≈ 57) and ends low on the far side; the right arm drops down its own flank and sweeps under the belly (C_R, z ≈ 26). TPU sleeves (`paw_pad_L/R`) cover the crossing sections.
+- *(superseded)* **Diagonal off-centre groove**, 35° from vertical, floor 7 mm under the skin at both crossings.
 - Spring preload 35° → **50°**, open stop 40° → **30°**. Camera 4 mm forward (y −24). Upper head seam bosses moved to x ±27, z 136; the tilt-hub key pocket is cut through the head_back shell.
 
 ## What changed vs the servo clasp (bed94ce)
@@ -33,44 +41,44 @@ Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (
 - **Arm servos removed.** Shoulder pods in `torso_back`, `shoulder_bracket_L/R`, arm hubs, arm-servo and arm-horn dummies are gone.
 - **Passive hug arms** on vertical sprung hinges (now at the shoulders, see above).
 - **Head tilt.** New `neck_turret` (rides the yaw journal, carries the tilt servo) and `tilt_hub`; `head_back` / `head_front` changed. Servo count stays at two.
-- Reference module `grip_rod(d, h = 50)` (Ø12.5 test rod lying diagonally on the groove floor, `stl/reference/grip_rod.stl`).
+- Reference module `grip_rod(d, h = 50)` (Ø12.5 test rod upright on the groove floor, `stl/reference/grip_rod.stl`).
 
 ### Shoulder hinge (each side, mirrored)
 
 | Item | Value |
 |---|---|
 | Axis | vertical (z), x = ±44.58, y = −31.21 (azimuth 35° forward of the side, 54.4 mm from the centre = skin at z 78 + 8.5) |
-| Arm knuckle | Ø16, z 70–86; Ø3.4 running bore for the M3 pin; Ø11 spring recess; arm-side leg slot; relief sector in the top (stop lug travel 0–30°) |
+| Arm knuckle | Ø16, z 70–86; Ø3.4 running bore for the M3 pin; Ø11 spring recess; arm-side leg slot; relief sector in the top (stop lug travel 0–60°) |
 | Ear | moulded into `torso_front`, z 86.4–92.4 (6 mm), tied back into the shell by a rear post; Ø2.5 pilot for the thread-formed pin; **Ø5.9 spigot** down into the spring (spring ID 7.1 free); **stop lug** 24° wide, r 5.7–7.7, 2.6 mm deep |
 | Pin | M3 × 30, thread-formed into the ear and spigot; M3 washer (Ø7.2 seat) and nyloc under the knuckle; snug, not clamped |
 | Spring | music wire 0.048 in (1.22 mm), 3/8 in OD, 90° legs (trim to ~6 mm); Grainger 3HPG6 (LH, left arm) / 3HPD1 (RH, right arm); 2.679 lbf·in = 302.7 N·mm at 90° → **3.363 N·mm/°** |
-| Preload / travel | 50° at the closed stop (168.2 N·mm), 80° at the 30° open stop (269.1 N·mm, inside the 90° rating; bending stress ≈1.66 GPa vs ≈1.86 GPa at the rating; ≈40 N on the lug face) |
+| Preload / travel | 30° at the closed stop (100.9 N·mm), 90° at the 60° open stop (302.7 N·mm = the catalogue rating, no margin; bending stress ≈1.87 GPa vs ≈1.86 GPa at the rating; ≈45 N on the lug face) |
 | Stops | sweep: closed stop engages at −0.5°, open at 30.5° |
-| Clearances | knuckle ↔ ear 0.4 mm axial; arm ↔ shell 0.4 mm in travel (0 at the stops, where the lug touches); closed pad ↔ shell 1.01 mm; left ↔ right arm ≥ 2.95 mm with both at the same angle, 9.85 mm (L closed / R open), 25.1 mm (L open / R closed); lowest arm point z 16.7 (right) / 39.4 (left) |
+| Clearances | knuckle ↔ ear 0.4 mm axial; arm ↔ shell 0.4 mm in travel (0 at the stops, where the lug touches); closed pad ↔ shell 0.28 mm; left ↔ right arm ≥ 5.14 mm with both at the same angle, 46.9 mm (L closed / R open), 46.4 mm (L open / R closed); lowest arm point z 41.8 |
 
 ### Belly groove
 
 | Item | Value |
 |---|---|
-| Shape | capsule of R8 spheres along the floor line, t = −8…46 mm (≈ z 23…66), 2.4 mm liner inside the shell |
-| Floor line | from (12.1, −30.0, 29.7) under the right-arm crossing (azimuth −68°, z 26.5) to (−5.4, −38.6, 57.5) under the left-arm crossing (−98°, z 57.5); **35° from vertical**, lower +x to upper −x, 7 mm below the skin at both crossings. Constants in `scripts/groove_geo.py` |
+| Shape | capsule of R8 spheres along the floor line, t = −12…42 mm (≈ z 21…75), 2.4 mm liner inside the shell |
+| Floor line | from (0, −38.8, 32.9) (bottom, 2.5 mm below the skin) to (0, −42.0, 64.0) (top, 4 mm below) at azimuth −90°; **5.9° from vertical**, so a handle upright runs up the belly between the paws. Constants in `scripts/groove_geo.py` |
 | Clearance | Ø12.5 reference rod touches the floor only; rod ↔ speaker 0 mm³, ↔ Pi 0 mm³; torso_front ↔ speaker 0 mm³ |
-| Objects | round Ø10–15; flat strap 25 × 2.5 laid along the groove line |
+| Objects | round Ø10–15; flat strap 25 × 2.5 laid along the groove line, all centred at z ≈ 48 |
 
 ### Grip (catalogue rate, not measured)
 
-Each arm clamps on its own crossing. Pad force = spring torque ÷ perpendicular lever from the hinge axis to the deepest pad contact.
+The two paws close on the handle from either side. Pad force = spring torque ÷ perpendicular lever from the hinge axis to the deepest pad contact.
 
 | Object | L opens | L torque / lever | L pad | R opens | R torque / lever | R pad | Total | Into groove |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Ø10 | 4.14° | 182.1 N·mm / 53.5 mm | 3.40 N | 3.90° | 181.3 / 56.6 | 3.20 N | 6.60 N | 6.52 N |
-| Ø12.5 | 6.85° | 191.2 / 53.5 | 3.57 N | 6.43° | 189.8 / 55.6 | 3.41 N | 6.99 N | 6.88 N |
-| Ø15 | 9.53° | 200.2 / 53.5 | 3.74 N | 8.96° | 198.3 / 56.0 | 3.54 N | 7.29 N | 7.24 N |
-| Flat 25 × 2.5 | 6.17° | 188.9 / 58.8 | 3.22 N | 6.33° | 189.5 / 66.9 | 2.83 N | 6.05 N | 6.05 N |
+| Ø10 | 3.22° | 111.7 N·mm / 39.4 mm | 2.83 N | 3.22° | 111.7 / 39.6 | 2.82 N | 5.65 N | 3.61 N |
+| Ø12.5 | 6.13° | 121.5 / 40.4 | 3.01 N | 6.13° | 121.5 / 40.6 | 3.00 N | 6.00 N | 3.83 N |
+| Ø15 | 8.98° | 131.1 / 41.0 | 3.20 N | 8.98° | 131.1 / 41.0 | 3.20 N | 6.39 N | 3.99 N |
+| Flat 25 × 2.5 | 5.01° | 117.7 / 32.0 | 3.68 N | 5.01° | 117.7 / 32.0 | 3.68 N | 7.36 N | 7.36 N |
 
-The rigid arm stays ≈1.42–1.47 mm clear of each object; the 1.5 mm TPU pad makes the contact. Holding the arms fully open takes ≈4.6 N (L) / 4.1 N (R) at the pads. Open: pads ↔ belly 24.7 / 23.9 mm. Loading: a Ø15 rod slides in sideways at 4 mm stand-off and drops onto the floor without touching the arms or shell (it cannot go straight in along the groove normal, because the open arms still lie across the groove).
+The rigid arm stays ≈1.40–1.46 mm clear of each object; the 1.5 mm TPU pad makes the contact (the rigid spine alone would open only 1.1° / 4.1° / 6.9° on Ø10 / 12.5 / 15). Holding the arms fully open takes ≈7.7 N at each paw. Open (60°): pads ↔ belly 29.0 / 29.1 mm. Loading: a Ø15 × 50 rod brought in on straight lines perpendicular to its axis reaches the groove floor without touching the rigid arms, pads or shell for every approach within ±30° of the groove normal (not at ±45° or wider); the soft sleeves are not squashed on the way in. Until this pass the check iterated over an empty range (`np.arange` with the wrong step sign) and always passed; with the old 30° stop there is no clear straight path.
 
-**Clinging (lighter Tomo).** Mass ≈180 g (no battery) / 191 g with the 400 mAh cell, COM (−1.0, −4.4, 73.4), ≈44 mm from the handle axis. *Seated on the bag* (Mirumi's pose): the bag carries the weight and the hug only resists toppling; at 90° of lean the hug moment is 2.30× (2.24× with battery) the toppling moment. *Free hang*: the body rolls about the round handle until the COM is underneath (≈35° sideways for a vertical handle); slip along a vertical handle is held by friction only, 7.03 N × μ 0.5 (assumed) → safety factor 4.0 (3.8 with the battery). Springs unchanged.
+**Clinging.** Mass ≈174 g (no battery) / 185 g with the 400 mAh cell, COM (−0.8, −2.4, 72.2) with battery, ≈46 mm from the handle axis. *Seated on the bag* (Mirumi's pose): the bag carries the weight and the hug only resists toppling; at 90° of lean the hug moment is 2.41× (2.35× with battery) the toppling moment. *Free hang* from a vertical handle: slip is held by friction only, 2 × 6.0 N × μ 0.5 (assumed) → safety factor 3.5 (3.3 with the battery).
 
 ### Head tilt
 
@@ -147,7 +155,7 @@ File: [`../datasheets/FS90MG.pdf`](../datasheets/FS90MG.pdf) (edition A/0, model
 
 ## Assembly order (so the pilots are reachable)
 
-1. **Shoulders:** spring into the knuckle recess (arm leg in its slot); knuckle under the ear with the spring over the spigot; wind 50° and hook the torso leg; M3 × 30 pin down through the ear (thread-forming), washer and nyloc under the knuckle, snug. Stretch the TPU sleeves onto the crossings.
+1. **Shoulders:** spring into the knuckle recess (arm leg in its slot); knuckle under the ear with the spring over the spigot; wind 30° and hook the torso leg; M3 × 30 pin down through the ear (thread-forming), washer and nyloc under the knuckle, snug. Stretch the TPU sleeves onto the crossings.
 2. **Tray** into the torso pockets; close the torso shells on the registration lip (M2.5 front → back).
 3. **Head pan:** FS90 into the collar hangers from below; collar onto the torso. From above, through the Ø34 bore: horn, coupler, longer M2.5 horn screw; thrust washer on the journal. Lower the `neck_turret`; retainers from the side into its skirt.
 4. **Head tilt:** tilt FS90 to the turret cradle (tab self-tappers). Centre it, horn on, `tilt_hub` on the horn (2 × M2). Hang `head_back` on the hub key and the M3 idler screw; push the safety eyes through `head_front` and fit their washers, seat the camera in the nose pod, then close `head_front` (M2.5, nylon).
@@ -171,7 +179,7 @@ File: [`../datasheets/FS90MG.pdf`](../datasheets/FS90MG.pdf) (edition A/0, model
 ```bash
 # from the repository root
 EXPORT_CHECK=1 bash scripts/build_stl.sh   # needs OpenSCAD 2021.01+; posed copies go to check/
-python3 scripts/sim_v01.py                 # sweep + hug checks, 417 poses, several minutes
+python3 scripts/sim_v01.py                 # sweep + hug checks, 537 poses, several minutes
 python3 scripts/fit_audit.py
 python3 scripts/metrics_v01.py
 python3 scripts/validation_summary.py
@@ -181,17 +189,17 @@ python3 scripts/render_v01.py
 
 ## Residual blockers
 
-- Nothing here has been printed or assembled. The audit is CAD measurements on exported STLs (27/27 fit-audit rows, 0 rigid overlaps in a 417-pose sweep).
+- Nothing here has been printed or assembled. The audit is CAD measurements on exported STLs (27/27 fit-audit rows, 0 rigid overlaps in a 537-pose sweep).
 - Grip forces come from the catalogue spring rate with no hinge friction; real pads, fur and friction will change them. Spring price on Raptor Supplies AU is inconsistent (A$16.98 vs ≈A$108 per 6-pack); confirm the part and winding hand before ordering.
-- The pads close to a soft ≈3.5 N pinch; the arms open by hand.
-- The open arms still lie across the groove, so handles load sideways, not straight in.
+- The pads close to a soft ≈3 N pinch per paw; the arms open by hand.
+- Fully open, the springs sit exactly at their 90° rating. A Ø10 handle gets only 3.2° of follow-through (≈2 mm of squash at the paw).
 - Free hanging from a handle rolls the body ≈35° until the COM is under the handle; the seated Mirumi pose is the intended one.
 - Tilt margin is 3.5° nodding down (+10° clamp, +13.5° contact: the camera pod on the collar). Keep the firmware clamp.
 - The tilt servo lead now crosses the pan joint beside the FPC.
-- The fur skin needs a diagonal slit down the groove, shoulder-knuckle openings, bare TPU pads and a pile-covered seam round the face cap.
+- The fur skin needs a vertical channel or slit down the centre groove, two stuffed arm sleeves with pad slots in the mittens, shoulder-knuckle openings, bare TPU pads and a pile-covered seam round the face cap.
 - Horn size and screw radius (assumed Ø24, r = 7), tooth count (20T vs 21T) and the included screws must be measured on arrival.
 - Two FS90s can draw ≈1.4 A at stall, more than the 400 mAh cell (0.8 A) or the U3V16F5 (≈1 A) supply: move one joint at a time (firmware default) and set the INA219 trip below ≈0.6 A.
-- Heavier than Mirumi (≈191 g with battery vs ≈135–155 g; target was 160–180 g) and taller (148 mm egg, ≈160 mm over the pile, vs ≈143 mm). Next ≈11 g: sub-micro servos with new seats.
+- Heavier than Mirumi (≈185 g with battery vs ≈135–155 g; target was 160–180 g) and taller (148 mm egg, ≈160 mm over the pile, vs ≈143 mm). Next ≈5–11 g: sub-micro servos with new seats.
 - Windowed 2.4 mm shells at a 1-perimeter profile are unprinted and undropped.
 - Portable power (400 mAh + U3V16F5) is planned, untested. Not child-ready.
 

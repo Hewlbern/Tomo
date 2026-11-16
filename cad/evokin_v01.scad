@@ -10,9 +10,10 @@
 //    through HX,HY; left arm at +x, right mirrored). A music-wire torsion spring (0.048 in / 1.22 mm wire, 3/8 in
 //    OD, 90 deg legs; catalogue 3HPG6 LH / 3HPD1 RH, 2.679 lbf.in = 0.303 N.m at 90 deg, i.e. 3.36 N.mm/deg) sits in
 //    the knuckle, preloaded SPRING_PRE deg against a printed hard stop, so the arms hug with zero power. The arms
-//    are long, curved and asymmetric: the left crosses the chest high and ends low on the far side, the right drops
-//    down its flank and sweeps under the belly. Open by hand to the ARM_OPEN stop, slide a handle in sideways, let go.
-//  * BELLY GROOVE: off-centre R8 channel, 35 deg from vertical (lower +x to upper -x, like Mirumi's handle line),
+//    are short, thick and symmetric (two-arms pass): each runs from its shoulder round its own side to the front,
+//    where the two paws nearly meet in front of the handle without crossing. Open by hand to the ARM_OPEN stop,
+//    bring the handle straight in, let go.
+//  * BELLY GROOVE: centre R8 channel, near-vertical (5.9 deg), so a bag-handle upright runs up the belly like Mirumi's,
 //    for 10-15 mm round handles or a flat strap up to 25 mm; TPU sleeves (paw_pad_L/R) at both arm crossings.
 //  * HEAD: pan (FS90MG in the yaw collar) + tilt/nod (FS90MG on a neck_turret that rides the yaw journal; spline on
 //    the tilt axis, x direction, through y=TILT_Y z=TILT_Z). 2x FS90MG total; the arm servos are gone.
@@ -103,30 +104,29 @@ EAR_T=6; EAR_GAP=0.4;                                 // ear (moulded into torso
 PIN_D=2.5; PIN_RUN=3.4;                               // M3 pin: 2.5 thread-forming pilot in the ear/spigot, 3.4 running in the knuckle
 REC_D=11; REC_Z0=KN_Z0+8;                             // spring recess Ø11 from KN_Z0+8 to the knuckle top
 SPIG_D=5.9; SPIG_Z0=KN_Z0+8.4;                        // arbor spigot on the upper ear (spring ID 7.09 free)
-ARM_OPEN=30;                                          // printed open stop (deg); 30 deg opens the crossing ≈ 27 mm
-SPRING_PRE=50;                                        // spring preload at the rest stop (deg); 80 deg wind-up at the open stop (rated 90)
+ARM_OPEN=60;                                          // printed open stop (deg); thick-arm pass: 60 (was 30, which left no straight path in for a handle)
+SPRING_PRE=30;                                        // spring preload at the rest stop (deg); 90 deg wind-up at the 60 deg open stop (= catalogue rating)
 SPRING_K=0.3027/90*1000;                              // N.mm per deg (3HPG6/3HPD1 catalogue: 2.679 lbf.in at 90 deg)
 LUG_A=60; LUG_W=24; LUG_R=[5.7,7.7]; LUG_Z0=KN_Z0+13.8;   // stop lug on the upper ear, hangs into the knuckle relief
 REL_R=[5.3,8.6]; REL_Z0=KN_Z0+13.4;                   // relief sector in the knuckle top: [LUG_A-LUG_W/2-ARM_OPEN, LUG_A+LUG_W/2]
 PAD_T=1.5;                                            // TPU pad thickness
-/* ---- arm paths [azimuth, z, offset of the band centre from the skin]. Asymmetric, Mirumi-style:
-   LEFT (over) arm runs from the left shoulder down across the chest, crosses the handle at C_L and ends low on
-   the far (right) side. RIGHT (under) arm drops down the right flank and sweeps across the lower belly, crossing
-   the handle at C_R. Offset 8.5 clears 4 mm fur; 6.5 at the crossings (pads). ---- */
-ARM_PATH_L=[[PSI_H,78,O_ARM],[-43,77.5,8.5],[-51,76.5,8.5],[-59,75,8.5],[-67,72.5,8.5],[-75,68.5,8.5],[-83,64.5,8],[-91,60.5,7],
-            [-98,57.5,6.5],[-104,54,6.5],[-108,49,7.5],[-110,44,7.5]];
-ARM_PATH_R=[[180-PSI_H,78,O_ARM],[-140,76.5,8.5],[-136,72,8.5],[-134,66,8.5],[-133,57,8.5],[-132,48,8.5],[-129,40,8.5],
-            [-124,33,8.5],[-116,28,8.5],[-106,25.3,8.5],[-95,24.5,8.5],[-85,24.8,8],[-76,25.6,7],[-68,26.5,6.5],[-61,27.5,6.5],[-55,29,7.5]];
-PAD_SEC_L=[7,10]; PAD_SEC_R=[12,15];                   // path sections covered by the TPU pads (around the crossings)
-/* ---- belly groove: R8 channel down the front, floor line y = GF - G_SLOPE*(z-30) (leans 14 deg so a straight strap
-   clears the upper-belly bulge and the speaker grille), capsule from z=GZ0 to GZ1, wall GW ---- */
-/* ---- DIAGONAL belly groove (Mirumi grips to one side): floor line through G_FL (under the left-arm crossing
-   C_L, azimuth -98, z 57.5) and G_FR (under the right-arm crossing C_R, -68, z 26.5), each 7 mm below the skin
-   along the egg normal. Line direction G_U runs from lower +x to upper -x, 35 deg from vertical. G_N = outward
-   groove normal. R8 capsule from t=G_T0 to G_T1 along the line, wall GW. Constants from scripts/groove_geo.py. ---- */
-GR=8; GW=2.4; G_DEPTH=7;
-G_FR=[12.136,-30.037,29.695]; G_FL=[-5.428,-38.619,57.548];
-G_U=[-0.5161,-0.2522,0.8185]; G_N=[0.0972,-0.9667,-0.2366]; G_T0=-8; G_T1=46;
+/* ---- arm paths [azimuth, z, offset of the band centre from the skin]. TWO SYMMETRIC, SHORT, Mirumi-style arms
+   (two-arms pass; the v0.1 asymmetric arms crossed each other over the belly). Each runs from its shoulder hinge
+   forward and down round its own side of the body to the front, where the paws nearly meet in front of a
+   near-vertical handle lying in the centre belly groove. The RIGHT path is the left path mirrored (psi -> -180-psi).
+   Offset 8.5 clears 4 mm fur; 5.3 at the paws (pads ≈0.3 mm off the skin at rest). ---- */
+ARM_PATH_L=[[PSI_H,78,O_ARM],[-41,76,8.5],[-47,73,8.5],[-53,69,8.5],[-58,64.5,8.5],[-63,60,8.5],[-68,55.5,8],
+            [-74,52,6.5],[-78,49.5,5.3],[-81,48.5,5.3],[-82.5,48,5.3]];
+ARM_PATH_R=[for(p=ARM_PATH_L) [-180-p[0],p[1],p[2]]];
+PAD_SEC_L=[7,10]; PAD_SEC_R=[7,10];                    // path sections covered by the TPU pads (the paws, in front of the handle)
+/* ---- CENTRE belly groove (two-arms pass): R8 channel down the front centre (azimuth -90) for a near-vertical handle;
+   floor line from G_FR (bottom, z 32.9, 2.5 mm below the skin) to G_FL (top, z 64, 4 mm below), 5.9 deg from vertical;
+   shallow so a Ø10 handle stands proud enough for the paws to reach round it.
+   G_U = line direction (up), G_N = outward groove normal. R8 capsule from t=G_T0 to G_T1 along the line, wall GW.
+   Constants from scripts/groove_geo.py. ---- */
+GR=8; GW=2.4;
+G_FR=[0.0000,-38.7962,32.9239]; G_FL=[0.0000,-41.9986,63.9969];
+G_U=[0.0000,-0.1025,0.9947]; G_N=[0.0000,-0.9947,-0.1025]; G_T0=-12; G_T1=42; G_MIDT=15;
 function gline(t)=G_FR+t*G_U;
 /* ---- head tilt (nod): spline axis along x through (TILT_Y, TILT_Z); FS90MG case top at x=-TS_X, spline pointing -x ---- */
 TILT_Y=6; TILT_Z=119; TS_X=22;
@@ -484,14 +484,29 @@ module arm(side) arm_pose(side) arm_local(side);
 // TPU pad: a 1.5 mm sleeve over the band where it crosses the handle (glue or stretch on). Shore 85-95A.
 function padsec(side)=side=="L"?PAD_SEC_L:PAD_SEC_R;
 module paw_pad(side) arm_pose(side) difference(){ arm_band(side,PAD_T,padsec(side)[0],padsec(side)[1]); arm_band(side,0.02); }
-// fur sleeve proxy (2 mm) over the band, not over the knuckle or the pads
-module sleeve_proxy(side) arm_pose(side) difference(){
-  union(){ arm_band(side,2,1,padsec(side)[0]); if(padsec(side)[1]<npath(side)-1) arm_band(side,2,padsec(side)[1],npath(side)-1); }
-  mir(side) translate([HX,HY,0]) cylinder(r=KN_R+2.5,h=200);
-  arm_band(side,PAD_T+0.2,padsec(side)[0],padsec(side)[1]);
+// Mirumi-style SOFT ARM SLEEVE (soft goods, not printed): a stuffed fur tube, SLV_R round, around the printed band.
+// Each section is a sphere whose INNER face (toward the body) coincides with the band's inner face, so the sleeve
+// adds bulk outward and sideways only: the pads (1.5 mm below the band) still make the handle contact and the
+// grip geometry is unchanged. A shoulder cap centred on the hinge axis hides the knuckle and blends into the
+// body; a rounded mitten closes the tip. Body egg subtracted at rest. Pile (≈5–8 mm) goes on top of this.
+SLV_R=9.0; SLV_ROOT=8.0; SLV_CAP_R=11.0; SLV_CAP_Z=[68,90]; MIT_R=10.5; MIT_FWD=3.0;
+function sc(side,i,r)=ac(side,i)+an(side,i)*(r-ARM_RS);
+function slv_r(side,i)= i<=1 ? SLV_ROOT : SLV_R;
+module ssec(side,i) let(r=slv_r(side,i)) translate(sc(side,i,r)) sphere(r=r,$fn=32);
+module sleeve_solid(side) {
+  n=npath(side);
+  for(i=[1:n-2]) hull(){ ssec(side,i); ssec(side,i+1); }
+  hull(){ mir(side) translate([HX,HY,SLV_CAP_Z[0]+SLV_CAP_R*0.6]) cylinder(r=SLV_CAP_R,h=SLV_CAP_Z[1]-SLV_CAP_Z[0]-SLV_CAP_R*1.2,$fn=48);
+          mir(side) translate([HX,HY,SLV_CAP_Z[1]-SLV_CAP_R*0.6]) sphere(r=SLV_CAP_R*0.6,$fn=32);
+          mir(side) translate([HX,HY,SLV_CAP_Z[0]+SLV_CAP_R*0.6]) sphere(r=SLV_CAP_R,$fn=32);
+          ssec(side,1); }
+  hull(){ ssec(side,n-2); translate(sc(side,n-1,MIT_R)+at(side,n-1)*MIT_FWD) sphere(r=MIT_R,$fn=32); }   // mitten paw
 }
-// grip test object (reference only): round handle Ø d lying in the diagonal groove on the floor line
-module grip_rod(d=12.5,h=50) translate(gline(G_T0/2+G_T1/2)+G_N*(d/2+0.1)) multmatrix(rotmat_to(G_U)) translate([0,0,-h/2]) cylinder(d=d,h=h,$fn=48);
+SLV_MEET=0.75;   // the two stuffed mittens are flattened where they meet in front of the handle: 1.5 mm apart at rest, never overlapping
+module sleeve_proxy(side) arm_pose(side) difference(){ sleeve_solid(side); begg(0);
+  translate([aside(side)*(SLV_MEET-100),0,0]) cube([200,400,400],center=true); }
+// grip test object (reference only): round handle Ø d lying in the centre groove on the floor line
+module grip_rod(d=12.5,h=50) translate(gline(G_MIDT)+G_N*(d/2+0.1)) multmatrix(rotmat_to(G_U)) translate([0,0,-h/2]) cylinder(d=d,h=h,$fn=48);
 function rotmat_to(u)=let(z=[0,0,1], v=cross(z,u), c=u*z, s=norm(v), k=v/(s>1e-9?s:1))
   // Rodrigues: rotate z onto u
   let(K=[[0,-k[2],k[1]],[k[2],0,-k[0]],[-k[1],k[0],0]], I=[[1,0,0],[0,1,0],[0,0,1]], R=I+s*K+(1-c)*K*K)

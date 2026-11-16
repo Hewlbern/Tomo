@@ -66,12 +66,13 @@ HL = (_RAX * math.cos(math.radians(-35)), _RAX * math.sin(math.radians(-35)), 0.
 HR = (-HL[0], HL[1], 0.0)
 TILT_AX = (0.0, 6.0, 119.0) # head tilt axis along x through y=6, z=119 (+ = nose down)
 REST_L, REST_R = 0.0, 0.0   # STL export pose: arms closed on their rest stops
-ARM_OPEN = 30.0             # open stop
-# diagonal belly groove: floor line G_FR + t*G_U (scripts/groove_geo.py), outward normal G_N, capsule t -8..46, R8
-G_FR = Vector((12.1359, -30.0374, 29.6951))
-G_U = Vector((-0.5161, -0.2522, 0.8185))
-G_N = Vector((0.0972, -0.9667, -0.2366))
-G_T0, G_T1, GR = -8.0, 46.0, 8.0
+ARM_OPEN = 60.0             # open stop (thick-arm pass; was 30)
+# centre belly groove (two-arms pass): floor line G_FR + t*G_U (scripts/groove_geo.py), outward normal G_N, capsule t -12..42, R8
+G_FR = Vector((0.0, -38.7962, 32.9239))
+G_U = Vector((0.0, -0.1025, 0.9947))
+G_N = Vector((0.0, -0.9947, -0.1025))
+G_T0, G_T1, GR = -12.0, 42.0, 8.0
+G_MIDT = 15.0
 HANDLE_D = 12.5             # round bag handle
 try:
     import json as _json
@@ -426,7 +427,7 @@ def torso_fur_ok(pt):
     x, y, z = pt
     if z < -2:
         return False
-    # diagonal belly groove: keep the channel bare so a handle sits in it
+    # centre belly groove: keep the channel bare so a handle sits in it
     t, tc, dn, dw, c = _groove_local(pt)
     if (Vector(pt) - c).length < GR + 2.0 and y < -10:
         return False
@@ -435,7 +436,7 @@ def torso_fur_ok(pt):
 
 
 def groove_fur_emitter(obj):
-    """Press a channel into the body fur egg along the diagonal belly groove."""
+    """Press a channel into the body fur egg along the centre belly groove."""
     import bmesh
     bm = bmesh.new()
     bm.from_mesh(obj.data)
@@ -535,9 +536,21 @@ def head_fur_ok(pt):
 DROOP = [0.55]
 
 
+def _arm_flow(hinge, tip_psi, tip_z, tip_off, k=1.1, droop=0.35):
+    r = eggr(tip_z) + tip_off
+    tip = (r * math.cos(math.radians(tip_psi)), r * math.sin(math.radians(tip_psi)), tip_z)
+    d = [tip[i] - hinge[i] for i in range(3)]
+    n = math.sqrt(sum(c * c for c in d))
+    return (k * d[0] / n, k * d[1] / n, k * d[2] / n - droop)
+
+
+# shoulder -> mitten direction in the arm's rest frame (symmetric paths end at [-82.5, 48, 5.3] / [-97.5, 48, 5.3] in cad)
+ARM_FLOW = {"L": _arm_flow((44.58, -31.21, 78.0), -82.5, 48, 5.3), "R": _arm_flow((-44.58, -31.21, 78.0), -97.5, 48, 5.3)}
+
+
 def add_hair(obj, name, length_m, count, children, material,
              clump=0.55, rough=0.10, kink_amp=0.04, kink_freq=4.0,
-             length_rand=0.18, density_vg=None, root_m=0.00040, tip_m=0.00010):
+             length_rand=0.18, density_vg=None, root_m=0.00040, tip_m=0.00010, align=None):
     # Ensure a material slot for hair
     if material.name not in [m.name for m in obj.data.materials]:
         obj.data.materials.append(material)
@@ -558,8 +571,9 @@ def add_hair(obj, name, length_m, count, children, material,
     # comb the pile downwards so it drapes like plush (and the cap coat falls over the face seam).
     # hair_length only rescales normal_factor, so set it first and give the downward comb in the same units
     # (strand length grows by ~sqrt(1 + DROOP^2); the lengths below already allow for it).
-    ps.hair_length = length_m / (1.0 + DROOP[0] ** 2) ** 0.5
-    ps.object_align_factor = (0.0, 0.0, -DROOP[0] * ps.normal_factor)
+    al = align if align is not None else (0.0, 0.0, -DROOP[0])
+    ps.hair_length = length_m / (1.0 + sum(c * c for c in al)) ** 0.5
+    ps.object_align_factor = tuple(c * ps.normal_factor for c in al)
     ps.length_random = length_rand
     ps.hair_step = 5
     ps.display_step = 3
@@ -728,7 +742,7 @@ def inflate_mesh(obj, offset_m):
     bm.free()
 
 
-def make_solid_arm_emitter(src, name):
+def make_solid_arm_emitter(src, name, inflate=0.0020):
     """Plump sock from the printed arm: voxel remesh + light smooth + 2 mm inflate.
 
     V.01 arms are an L (upper arm + forearm blade across the belly), so a convex
@@ -763,7 +777,7 @@ def make_solid_arm_emitter(src, name):
         bpy.ops.object.modifier_apply(modifier="arm_smooth")
     except Exception as e:
         print("smooth apply failed", e, flush=True)
-    inflate_mesh(em, 0.0020)
+    inflate_mesh(em, inflate)
     for p in em.data.polygons:
         p.use_smooth = True
     return em
@@ -869,8 +883,9 @@ def build_assembly(skip_hair=False, preview=False):
         return pred
 
     for side in ("L", "R"):
-        src = objs[f"arm_{side}"]
-        em = make_solid_arm_emitter(src, f"fur_arm_{side}")
+        # Thick Mirumi-style arm: emit from the stuffed soft-sleeve proxy (Ø16–21 mm tube, shoulder cap, mitten paw)
+        src = objs[f"sleeve_proxy_{side}"]
+        em = make_solid_arm_emitter(src, f"fur_arm_{side}", inflate=0.0003)
         assign(em, mats["fur_clay"])
         vg = density_group(em, "fur_density", arm_fur_ok_side(side))
         objs[f"fur_arm_{side}"] = em
@@ -903,14 +918,16 @@ def build_assembly(skip_hair=False, preview=False):
         for side in ("L", "R"):
             em = objs[f"fur_arm_{side}"]
             vg = em.vertex_groups["fur_density"]
-            add_hair(em, f"arm_{side}_under", length_m=0.0075, count=int(9000 * mul_c),
+            # groom: lay the pile along the arm toward the mitten paw (plus a little droop)
+            al = ARM_FLOW[side]
+            add_hair(em, f"arm_{side}_under", length_m=0.0060, count=int(12000 * mul_c),
                      children=int(8 * mul_k) or 5, material=mats["fur_under"],
-                     clump=0.35, rough=0.16, kink_amp=0.08, kink_freq=4,
-                     density_vg=vg, root_m=0.00013, tip_m=0.00004)
-            add_hair(em, f"arm_{side}_guard", length_m=0.0145, count=int(5500 * mul_c),
+                     clump=0.35, rough=0.14, kink_amp=0.06, kink_freq=4,
+                     density_vg=vg, root_m=0.00013, tip_m=0.00004, align=al)
+            add_hair(em, f"arm_{side}_guard", length_m=0.0100, count=int(7000 * mul_c),
                      children=int(8 * mul_k) or 4, material=mats["fur_guard"],
-                     clump=0.62, rough=0.30, kink_amp=0.22, kink_freq=2.5,
-                     density_vg=vg, root_m=0.00010, tip_m=0.00002)
+                     clump=0.6, rough=0.26, kink_amp=0.18, kink_freq=2.5,
+                     density_vg=vg, root_m=0.00010, tip_m=0.00002, align=al)
         for side in ("L", "R"):
             ft = objs[f"fur_foot_{side}"]
             add_hair(ft, f"foot_{side}", length_m=0.0080, count=int(2500 * mul_c),
@@ -1239,48 +1256,42 @@ def render_shot(path):
     print(f"WROTE {path} exists={Path(path).exists()} size={Path(path).stat().st_size if Path(path).exists() else 0}", flush=True)
 
 
-BAG_TOP = 96.0     # mm: top of the tote; Tomo sits on it (Mirumi pose) and hugs the handle leg
-LEAN = 6.0         # deg: leans in toward the handle (about its own y axis, top toward -x)
+BAG_TOP = 96.0     # mm: top of the tote; Tomo sits on it (Mirumi pose) and hugs the handle's upright leg
+LEAN = math.degrees(math.atan2(-G_U.y, G_U.z))   # ≈5.9 deg: tips back so the groove line (and the handle leg) is vertical
 
 
 def seat_matrix():
-    """Whole-robot pose: sitting on the bag top, leaning a little into the handle like Mirumi."""
-    return Matrix.Translation(mm(0, 0, BAG_TOP)) @ Matrix.Rotation(math.radians(-LEAN), 4, "Y")
+    """Whole-robot pose: sitting on the bag top, tipped back ≈6° so the handle upright in its belly groove is vertical."""
+    return Matrix.Translation(mm(0, 0, BAG_TOP)) @ Matrix.Rotation(math.radians(-LEAN), 4, "X")
 
 
 def handle_points():
-    """Robot-frame centre line of a curved Ø12.5 handle: it rises out of the bag at the robot's lower left (+x),
-    lies on the diagonal groove floor through both arm crossings, bows off the body above the groove, and arches
-    over to the robot's right (-x) back down into the bag."""
+    """Robot-frame centre line of a Ø12.5 bag handle: its upright leg rises out of the bag top straight up the centre
+    belly groove between the two paws, then (above the paws) bends away over the robot's right shoulder (-x), bowing
+    forward to clear the face, arches over and drops back into the bag on the far side, like Mirumi on a tote."""
     pts = []
     r = HANDLE_D / 2.0 + 0.15
-    for k in range(0, 61):
-        t = -40.0 + 110.0 * k / 60.0
-        lift = 0.0
-        if t < -6:
-            lift = 0.010 * (t + 6) ** 2
-        elif t > 44:
-            lift = 0.012 * (t - 44) ** 2
-        pts.append(G_FR + G_U * t + G_N * (r + lift))
-    # arch: continue from the last point over to -x and down to the bag top
-    p_end = pts[-1]
-    tan = (pts[-1] - pts[-2]).normalized()
-    side = Vector((-1.0, 0.0, 0.0))
-    for k in range(1, 31):
-        a = math.pi * k / 30.0
-        # a half-loop in the plane of tan and -x, radius 46
-        c = p_end + side * 46.0
-        q = c + (-side) * 46.0 * math.cos(a) + tan * 46.0 * math.sin(a) * 0.9
-        q.y = p_end.y + (-12.0 - p_end.y) * (k / 30.0)      # the far leg goes back to the bag top
+    T1 = 26.0                                           # leave the groove line here (z ≈ 59, above the paws)
+    for k in range(0, 41):
+        t = -40.0 + (T1 + 40.0) * k / 40.0
+        pts.append(G_FR + G_U * t + G_N * r)
+    p0 = pts[-1]
+    RB = 62.0
+    for k in range(1, 61):
+        ph = math.pi * k / 60.0
+        bow = 20.0 * math.sin(min(ph, math.pi / 2))     # forward bow off the face, held on the far side
+        q = Vector((-RB + RB * math.cos(ph), p0.y - bow, p0.z + RB * math.sin(ph)))
+        if ph > math.pi / 2:
+            q.y = (p0.y - 20.0) + ((-12.0) - (p0.y - 20.0)) * ((ph - math.pi / 2) / (math.pi / 2))
         pts.append(q)
     last = pts[-1]
-    for k in range(1, 9):
-        pts.append(Vector((last.x - 1.5 * k, last.y, last.z - (last.z + 8.0) * k / 8.0)))
+    for k in range(1, 13):
+        pts.append(Vector((last.x, last.y, last.z - (last.z + 8.0) * k / 12.0)))
     return pts
 
 
 def make_handle_and_bag():
-    """A curved leather handle (Ø12.5) and a tote; Tomo sits on the tote and hugs the handle leg diagonally."""
+    """A curved leather handle (Ø12.5) and a tote; Tomo sits on the tote and hugs the handle's upright leg."""
     M = seat_matrix()
     cd = bpy.data.curves.new("bag_handle_curve", "CURVE")
     cd.dimensions = "3D"
@@ -1300,11 +1311,11 @@ def make_handle_and_bag():
     leather = mat_plastic("HandleLeather", srgb_lin((24, 22, 22)), rough=0.32, spec=0.5)
     handle.data.materials.append(leather)
     xs = [p.x / S for p in pts]
-    x0, x1 = min(xs) - 40.0, max(xs) + 40.0
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=mm((x0 + x1) / 2, 2.0, BAG_TOP / 2))
+    x0, x1 = min(xs) - 40.0, max(xs) + 70.0
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=mm((x0 + x1) / 2, -4.0, BAG_TOP / 2))
     bag = bpy.context.active_object
     bag.name = "tote_bag"
-    bag.scale = mm(x1 - x0, 86.0, BAG_TOP)
+    bag.scale = mm(x1 - x0, 100.0, BAG_TOP)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     bv = bag.modifiers.new("bag_bevel", "BEVEL")
     bv.width = 0.008
@@ -1406,7 +1417,7 @@ def main():
         GLOBAL[0] = None
         set_camera(*CAM0)
         if shot in ("hero_hug", "mirumi_angle"):
-            # sitting on the tote, both arms closed round the Ø12.5 handle leg that runs diagonally across the chest
+            # sitting on the tote, both arms closed round the upright Ø12.5 handle leg in the centre belly groove
             GLOBAL[0] = seat_matrix()
             apply_pose_v2(objs, yaw=-14 if shot == "hero_hug" else -8, arm_l=HUG_OPEN_L, arm_r=HUG_OPEN_R,
                           tilt=4 if shot == "hero_hug" else 2)
@@ -1425,7 +1436,7 @@ def main():
             shift_lights(-BAG_TOP)
             continue
         elif shot == "arms_open":
-            # arms pulled open to the 30° stop by hand, head panned (tilt 0: looking up opens the fur seam)
+            # arms pulled open to the 60° stop by hand, head panned (tilt 0: looking up opens the fur seam)
             apply_pose_v2(objs, yaw=20, arm_l=ARM_OPEN, arm_r=ARM_OPEN, tilt=0)
             set_cutters(objs, False)
             set_mode_hero(objs)

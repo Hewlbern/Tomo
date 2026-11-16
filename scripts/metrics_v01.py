@@ -37,6 +37,16 @@ comp=[("FS90 pan + horn",10.0,cen("dummy_servo_yaw")),("FS90 tilt + horn",10.0,c
       ("mic",1.0,cen("dummy_mic")),("INA219 + U3V16F5 boost",2.4,np.array([0,10.0,40.0])),("wiring",5.0,np.array([0,0,60.0])),
       ("fasteners",5.5,np.array([0,-5.0,60.0])),("springs",2.0,np.array([0,-31.2,78.0])),("safety eyes",0.8,np.array([0,-44.0,114.0])),
       ("fur skin (long pile) + feet",21.0,np.array([0,-2.0,68.0]))]
+# thick Mirumi-style soft arm sleeves (soft goods): polyester fibrefill inside (ASSUMED 15 kg/m³ loosely packed) +
+# the extra fur over the larger tube (ASSUMED 380 g/m², same as the body pile) vs the old 2 mm sleeve (7,953 mm² for both arms)
+RHO_FILL=0.015e-3; FUR_GM2=380.0; OLD_SLEEVE_AREA=7953.0
+slv={}
+for sd in ("L","R"):
+    sm=L(f"sleeve_proxy_{sd}"); am=L(f"arm_{sd}")
+    slv[sd]=dict(volume_mm3=round(sm.volume,0),area_mm2=round(sm.area,0),stuffing_g=round(max(0.0,sm.volume-am.volume)*RHO_FILL,2),centre=sm.center_mass)
+stuff=sum(v["stuffing_g"] for v in slv.values()); xfur=max(0.0,(sum(v["area_mm2"] for v in slv.values())-OLD_SLEEVE_AREA)*1e-6*FUR_GM2)
+comp.append(("arm sleeves: fibrefill",stuff,(slv["L"]["centre"]+slv["R"]["centre"])/2))
+comp.append(("arm sleeves: extra fur over the thicker tubes",xfur,(slv["L"]["centre"]+slv["R"]["centre"])/2))
 for c in comp: items.append((c[0],c[1],c[2],c[1]))
 def summ(items,solid=False):
     m=np.array([it[3] if solid else it[1] for it in items]); p=np.array([it[2] for it in items]); return float(m.sum()), (m[:,None]*p).sum(0)/m.sum()
@@ -46,24 +56,27 @@ mtb,cmb=summ(items+[bat])
 # before (v0.1 Mirumi proportions, commit 6ad85c3)
 BEFORE={"shells (torso + head, 4 parts)":106.3,"arms":22.3,"TPU pads":4.0,"tray":11.5,"yaw collar":15.3,"turret + hub + yaw small parts":10.4,
         "eye bezels + shutter":6.0,"servos 2 × FS90MG + horns":28.8,"speaker (Adafruit 3351)":25.0,"brain + camera":8.0,"amp + mic":3.0,
-        "INA219 + XL6009 boost":7.0,"wiring":8.0,"fasteners":8.0,"springs":2.0,"eyes (in bezels)":0.0,"fur skin":30.0,"battery (2000 mAh)":38.0}
+        "INA219 + XL6009 boost":7.0,"wiring":8.0,"fasteners":8.0,"springs":2.0,"eyes (in bezels)":0.0,"fur skin":30.0,"thick arm sleeves (fibrefill + extra fur)":0.0,"battery (2000 mAh)":38.0}
 bd={it[0]:it[1] for it in items}
 AFTER={"shells (torso + head, 4 parts)":sum(bd[k] for k in ("torso_front","torso_back","head_front","head_back")),
        "arms":bd["arm_L"]+bd["arm_R"],"TPU pads":bd["paw_pad_L"]+bd["paw_pad_R"],"tray":bd["tray"],"yaw collar":bd["yaw_collar"],
        "turret + hub + yaw small parts":sum(bd[k] for k in ("neck_turret","tilt_hub","yaw_retainer_A","yaw_retainer_B","yaw_coupler","yaw_thrust_washer")),
        "eye bezels + shutter":0.0,"servos 2 × FS90MG + horns":20.0,"speaker (Adafruit 3351)":3.0,"brain + camera":7.5,"amp + mic":3.0,
-       "INA219 + XL6009 boost":2.4,"wiring":5.0,"fasteners":5.5,"springs":2.0,"eyes (in bezels)":0.8,"fur skin":21.0,"battery (2000 mAh)":11.0}
+       "INA219 + XL6009 boost":2.4,"wiring":5.0,"fasteners":5.5,"springs":2.0,"eyes (in bezels)":0.8,"fur skin":21.0,"thick arm sleeves (fibrefill + extra fur)":stuff+xfur,"battery (2000 mAh)":11.0}
 RENAME={"servos 2 × FS90MG + horns":"servos (2 × FS90MG → 2 × FS90, + horns)","speaker (Adafruit 3351)":"speaker (Adafruit 3351 → 3923)",
         "INA219 + XL6009 boost":"INA219 + boost (XL6009 → Pololu U3V16F5)","eyes (in bezels)":"8 mm safety eyes","fur skin":"fur skin (→ long pile + feet)",
         "battery (2000 mAh)":"battery (1S 2000 mAh → 400 mAh)","fasteners":"fasteners (→ nylon M2.5 shell screws)","eye bezels + shutter":"eye bezels + shutter (removed)"}
 budget=[dict(item=RENAME.get(k,k),before_g=round(BEFORE[k],1),after_g=round(AFTER[k],1)) for k in BEFORE]
-o["mass"]=dict(estimate_g=round(mt,0),solid_print_upper_bound_g=round(ms,0),with_battery_g=round(mtb,0),
+o["mass"]=dict(arm_sleeves=dict(L={k:v for k,v in slv["L"].items() if k!="centre"},R={k:v for k,v in slv["R"].items() if k!="centre"},
+                stuffing_g=round(stuff,2),extra_fur_g=round(xfur,2),previous_total_with_battery_g_b458259=191.0,
+                note="Soft goods: a stuffed fur tube (Ø16–18 mm before pile, Ø≈26–28 mm with it) round each printed spine, a shoulder cap over the knuckle and a mitten paw. Stuffing 15 kg/m³ and fur 380 g/m² are ASSUMED."),
+   estimate_g=round(mt,0),solid_print_upper_bound_g=round(ms,0),with_battery_g=round(mtb,0),
    battery="Core Electronics CE04375 1S 400 mAh, 11 g",
    centre_of_mass_mm=np.round(cm,1).tolist(),centre_of_mass_with_battery_mm=np.round(cmb,1).tolist(),
    breakdown_g={it[0]:round(it[1],1) for it in items},
    budget_before_after=budget,before_total_with_battery_g=round(sum(BEFORE.values()),0),after_total_with_battery_g=round(sum(AFTER.values()),0),
    note="Mirumi is about 135–155 g and about 100 x 118 x 143 mm. Target 160–180 g with battery, ceiling 200 g. Printed masses use the ASSUMED print profiles; weigh the first prints.")
-# ---- clinging to a bag handle that runs diagonally across the chest (Mirumi pose) and hanging free from it
+# ---- clinging to the upright of a bag handle running up the belly (Mirumi pose) and hanging free from it
 sys.path.insert(0,"scripts"); import groove_geo as gg
 H=SW["hug"]; g125=next(g for g in H["grip"] if g["d_mm"]==12.5)
 def cling(mass,com,g=g125,mu=0.5):
@@ -85,18 +98,18 @@ def cling(mass,com,g=g125,mu=0.5):
             note="Mirumi pose: bottom resting on the bag top, both arms round the handle. The bag carries the weight; the springs hold it upright against the handle."),
         free_hang=dict(friction_capacity_along_handle_N_mu0p5=round(cap,2),slip_safety_factor_vertical_handle=round(cap/W,2),
             roll_to_hang_com_under_handle=True,
-            note="Hanging free from the handle (nothing under it): the body rolls about the handle until the COM is under it, so with a vertical handle it hangs tipped about 35 deg sideways; slip along the handle is resisted only by friction."))
+            note="Hanging free from a vertical handle upright (nothing under it): slip down the handle is resisted only by friction on the pads and the groove; the COM offset from the handle is carried as a moment by the pad / groove couple."))
 o["clinging"]=dict(no_battery=cling(mt,cm),with_battery=cling(mtb,cmb),
    per_handle={f'{g["d_mm"]}':dict(pad_force_total_N=g["total_pad_force_N"],into_groove_N=g["total_into_groove_N"],
         free_hang_slip_SF_no_battery=round(0.5*2*g["total_pad_force_N"]/(mt/1000*G),2)) for g in H["grip"]},
-   assumption="Handle Ø12.5 lying on the diagonal groove floor line (35° from the body vertical). μ = 0.5 TPU/fur on a fabric or leather handle (ASSUMED). Pad forces from scripts/sim_v01.py. Not tested.")
+   assumption="Handle Ø12.5 upright on the centre groove floor line (≈6° from the body vertical). μ = 0.5 TPU/fur on a fabric or leather handle (ASSUMED). Pad forces from scripts/sim_v01.py. Not tested.")
 L_lev={sd:float(np.linalg.norm((L(f"paw_pad_{sd}").center_mass-np.array([(1 if sd=="L" else -1)*(gg.eggr(78)+8.5)*math.cos(math.radians(-35)),(gg.eggr(78)+8.5)*math.sin(math.radians(-35)),0]))[:2])) for sd in ("L","R")}
 Mopen=H["spring"]["torque_at_open_stop_Nmm"]; sig=32*Mopen*1.1/(math.pi*1.22**3)
 o["hug_springs"]=dict(rate_Nmm_per_deg=H["spring"]["rate_Nmm_per_deg"],preload_deg=H["spring"]["preload_deg"],
    torque_rest_Nmm=H["spring"]["torque_at_rest_Nmm"],torque_open_stop_Nmm=Mopen,
    finger_force_to_hold_open_at_pad_N={sd:round(Mopen/L_lev[sd],2) for sd in L_lev},pad_lever_mm={sd:round(L_lev[sd],1) for sd in L_lev},
    grip={f'{g["d_mm"]}':dict(open_deg_L=g["L"].get("open_deg"),open_deg_R=g["R"].get("open_deg"),force_L_N=g["L"].get("pad_normal_force_N"),force_R_N=g["R"].get("pad_normal_force_N"),total_N=g["total_pad_force_N"]) for g in H["grip"]},
-   spring_stress_check=f"σ ≈ 32·M·Ki/(π·d³) with M = {Mopen:.0f} N·mm at the open stop (80° wind-up), d = 1.22 mm, Ki ≈ 1.1: ≈{sig/1000:.2f} GPa, under the ≈1.86 GPa at the catalogue 90° rating (302.7 N·mm).")
+   spring_stress_check=f"σ ≈ 32·M·Ki/(π·d³) with M = {Mopen:.0f} N·mm at the open stop (90° wind-up), d = 1.22 mm, Ki ≈ 1.1: ≈{sig/1000:.2f} GPa, vs ≈1.86 GPa at the catalogue 90° rating (302.7 N·mm): the open stop sits exactly at the rating, no margin; do not hold the arms open past the stop.")
 # ---- head pan / tilt loads
 head=[L(n) for n in ("head_front","head_back","tilt_hub")]; h_cam=1.0
 hm=sum(h.volume for h in head)*RHO_PLA*FILL['head_front']+0.9*h_cam+0.8+4.0    # + camera module/FPC, safety eyes, head fur share (ASSUMED 4 g)

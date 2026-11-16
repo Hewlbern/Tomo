@@ -5,7 +5,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__))+"/..")
 SW=json.load(open("results/summary_sweep.json")); FA=json.load(open("results/fit_audit.json")); ME=json.load(open("results/metrics_v01.json"))
 st=SW["stop_engagement"]; H=SW["hug"]
 out=dict(
-  version="V.01 passive spring hug, Mirumi proportions (one egg body, shoulder arms, diagonal groove)",
+  version="V.01 passive spring hug, Mirumi proportions (one egg body, two short symmetric shoulder arms, centre groove)",
   project="Tomo by DreamMachina (formerly evoKin V.01)",
   repository="https://github.com/Hewlbern/Tomo",
   cad_only=True, physically_tested=False, child_ready=False, power="bench rail only",
@@ -16,9 +16,9 @@ out=dict(
     head_tilt=f"Feetech FS90 on neck_turret, axis along x through y=6, z=119; software ±10°, first contact +{st['tilt_down']['tilt']}° (nod down) / {st['tilt_up']['tilt']}° (look up)",
     arms="none — passive"),
   hug=dict(
-    mechanism="Mirumi-style passive hug: each arm turns on a vertical M3 shoulder pin just under the face (knuckle z 70–86); a music-wire torsion spring in the knuckle closes it onto a printed rest stop (50° preload); opened by hand to a 30° printed stop; zero power to hold. Asymmetric arms: left over the chest, right under the belly",
+    mechanism="Mirumi-style passive hug: each arm turns on a vertical M3 shoulder pin just under the face (knuckle z 70–86); a music-wire torsion spring in the knuckle closes it onto a printed rest stop (30° preload); opened by hand to a 60° printed stop; zero power to hold. Two short symmetric arms whose paws nearly meet in front of the handle",
     spring=H["spring"], arm_angle_convention="0 = closed on the rest stop, + = open; rotation about z through each shoulder (x=±44.6, y=−31.2)",
-    groove="R8 channel, off-centre and diagonal (35° from vertical, lower +x to upper −x), floor 7 mm below the skin at both arm crossings, 2.4 mm liner",
+    groove="R8 channel down the front centre, 5.9° from vertical (for a handle upright), floor 2.5 mm (z 33) to 4 mm (z 64) below the skin, 2.4 mm liner",
     grip=H["grip"], open=H["open"], assumption=H["assumption"],
     stops=dict(closed=st["armL_closed_stop"]["armL"], open=st["armL_open_stop"]["armL"])),
   sweep=dict(poses=SW["sweep"]["poses"], pair_tests=SW["sweep"]["pair_tests"], booleans=SW["sweep"]["aabb_passed_to_boolean"],

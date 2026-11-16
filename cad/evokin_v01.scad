@@ -91,7 +91,8 @@ function eggdr(z)=(eggr(z+0.2)-eggr(z-0.2))/0.4;
 function on_egg(psi,z,off=0)=[(eggr(z)+off)*cos(psi),(eggr(z)+off)*sin(psi),z];
 /* ---- SHOULDER hinges: vertical axes just under the face (was the hip, z 22..38).
    Left arm (critter's own left, +x) hinge at azimuth PSI_H, right arm mirrored (azimuth 180-PSI_H). ---- */
-ARM_RS=3.5; ARM_HW=5;                                  // band = pairs of r3.5 spheres ±5 across the path (≈7 x 17 section)
+ARM_RS=3.0; ARM_HW=4;                                  // lighter Tomo: band = pairs of r3 spheres ±4 across the path (≈6 x 14 section, was 7 x 17)
+ARM_THIN=3.5-ARM_RS;                                   // path offsets are reduced by this so the band's INNER face stays where the r3.5 band had it
 KN_R=8; KN_Z0=70; KN_Z1=86;                           // knuckle Ø16, z 70..86 (shoulder, just under the face seam; ear top 92.4 clears the nodding cap rim)
 PSI_H=-35; O_ARM=8.5;
 R_AX=eggr((KN_Z0+KN_Z1)/2)+O_ARM;                     // 54.4
@@ -131,10 +132,13 @@ function gline(t)=G_FR+t*G_U;
 TILT_Y=6; TILT_Z=119; TS_X=22;
 TILT_SOFT=[-10,10];                                    // firmware clamp (deg), see results/summary_sweep.json for the first contact
 pi=[65,8.5,30]; pi_holes=[58,23]; pi_z=43;           // 8.5 mm y-envelope allows a header
-cam=[25,11.5,24]; cam_holes=[21,12.5]; eye_z=120; eye_x=13; cam_y=-24;   // Mirumi proportions: 4 mm forward so the lens sits ~16 mm behind the eye hole
+// Lighter Tomo / Mirumi look: small 8 mm safety eyes set lower and closer; the camera (XIAO ESP32S3 Sense OV3660/OV5640 module on a
+// long 24-pin FPC, ASSUMED 8.5 x 8.5 x 6 envelope incl. lens) looks out through a Ø3.5 'nose' window between and below the eyes.
+eye_z=114; eye_x=10.5; EYE_HOLE=5.0; nose_z=110; NOSE_HOLE=3.5;   // v0.1 light: nose 110 (107 put the camera pod into the collar at +9.5° nod)
+cam=[8.5,6.0,8.5]; cam_y=-(eggr(nose_z)-2.4)+0.5+cam[1]/2;   // lens face 0.5 mm behind the inner skin
 // Adafruit 3351 Mono Enclosed Speaker 3 W 4 Ω (Core A$8.95): 70 x 30 x 17, holes 3.4 on 63 x 24.
 // Matches MAX98357A (3.2 W into 4 Ω at 5 V). The Ø28 placeholder and the 0.5 W 8 Ω mini are retired.
-SPK=[70,17,30]; SPK_HOLES=[63,24];
+SPK=[30,5,20]; SPK_C=[0,38,64];     // Adafruit 3923 Mini Oval 8 Ω 1 W, 30 x 20 x 5 mm, 3 g (was the 25 g Adafruit 3351); on the BACK wall, facing out
 // Adafruit 3006 MAX98357A published 19.4 x 17.8 x 3.0, plus ~8 mm for the post-2024 terminal block.
 AMP=[19.4,17.8,3.0]; AMP_HEAD=8.0;
 // Adafruit 3421 SPH0645LM4H breakout 16.7 x 12.7 x 1.8, bottom-ported, aligned to the mic hole.
@@ -197,18 +201,18 @@ module torso_add(){ intersection(){ tegg(0.1); union(){
   for(p=tboss) translate([p[0],0,p[1]]) rotate([90,0,0]) hull(){ cylinder(d=7,h=16,center=true); translate([sign(p[0])*12,0,0]) cylinder(d=7,h=16,center=true);}
   for(p=cboss) translate([p[0],p[1],tcut-10]) hull(){ cylinder(d=7,h=10); translate([0,sign(p[1])*24,0]) cylinder(d=7,h=10);}
   for(sx=[-1,1]) translate([sx*TAB_X,1.5,TAB_Z]) cube([14,10,12],center=true);
-  // speaker mounting bosses (63 x 24 hole rectangle), inside the front
-  for(sx=[-1,1],sz=[-1,1]) translate([sx*SPK_HOLES[0]/2,-28,68+sz*SPK_HOLES[1]/2]) rotate([90,0,0]) cylinder(d=6,h=8,center=true);
+  // mini-speaker frame on the inside of the back wall (speaker glued / foam-taped into the pocket)
+  translate([SPK_C[0],SPK_C[1]+2.5,SPK_C[2]]) cube([SPK[0]+4,SPK[1]+6,SPK[2]+4],center=true);
   // mic pocket boss
   translate([18,-28,80]) rotate([90,0,0]) cylinder(d=8,h=8,center=true);
 }}}
 module torso_cuts_shared(){
   for(sx=[-1,1]) translate([sx*TAB_X,1.5,TAB_Z]) cube([10.6,3.6,10.6],center=true);   // 0.3 mm per side around 10x3x10 tab
   for(sx=[-1,1]) translate([sx*25.4,1.5,TAB_Z]) cube([7.8,3.8,12.4],center=true);  // spine relief through the rib
-  // Adafruit 3351 grille: 66 x 26 window + slots
-  translate([0,-TD/2,68]) cube([66,30,26],center=true);
-  for(sx=[-1,1],sz=[-1,1]) translate([sx*SPK_HOLES[0]/2,-28,68+sz*SPK_HOLES[1]/2]) rotate([90,0,0]) cylinder(d=3.4,h=16,center=true);
-  translate([0,-26,68]) cube([SPK[0]+0.6,SPK[1]+0.6,SPK[2]+0.6],center=true);
+  // mini speaker pocket (0.3 mm per side) on the back wall, open towards the inside, and a 5 x 3 grille of Ø2.2 holes
+  translate(SPK_C) cube([SPK[0]+0.6,SPK[1]+0.6,SPK[2]+0.6],center=true);
+  translate([SPK_C[0],SPK_C[1]-5,SPK_C[2]]) cube([SPK[0]-4,8,SPK[2]-4],center=true);
+  for(i=[-2:2],k=[-1:1]) translate([SPK_C[0]+i*5,SPK_C[1],SPK_C[2]+k*5]) rotate([-90,0,0]) cylinder(d=2.2,h=20);
   translate([18,-TD/2,80]) rotate([90,0,0]) cylinder(d=2.4,h=30,center=true);
   translate([18,-30.5,80]) cube([MIC[0]+0.6,2.6,MIC[1]+0.6],center=true);
   // webbing slots (optional strap mount on the back)
@@ -433,11 +437,13 @@ module head_back() head_pose() difference(){
 }
 module head_front() head_pose() difference(){
   union(){ intersection(){ head_shell(); F(); } intersection(){ head_bosses(); F(); }
-    intersection(){ hegg(0.1); F(); hull(){ translate([-eye_x,cam_y-1.5,eye_z]) cube([30,3,24],center=true); translate([-eye_x,cam_y-8,eye_z]) cube([30,3,24],center=true);} } }
+    intersection(){ hegg(0.1); F(); cap_region(); translate([0,cam_y-1.5,nose_z]) cube([cam[0]+4.5,cam[1]+4,cam[2]+4.5],center=true); } }
   for(p=hboss) translate([p[0],0,p[1]]) rotate([90,0,0]) cylinder(d=M25_CLR,h=40,center=true);
-  translate([-eye_x,cam_y,eye_z]) cube([cam[0]-6,10,cam[2]-6],center=true);
-  for(sx=[-1,1],sz=[-1,1]) translate([-eye_x+sx*cam_holes[0]/2,cam_y,eye_z+sz*cam_holes[1]/2]) rotate([90,0,0]) cylinder(d=M25_CLR,h=12,center=true);
-  for(sx=[-1,1]) translate([sx*eye_x,-HD/2-5,eye_z]) rotate([-90,0,0]) cylinder(d=21.6,h=14);
+  translate([0,cam_y+3,nose_z]) cube([cam[0]+0.4,cam[1]+6,cam[2]+0.4],center=true);                // camera pocket, open to the inside
+  translate([0,0,nose_z]) rotate([90,0,0]) cylinder(d=NOSE_HOLE,h=60);                             // 'nose' window for the lens
+  translate([0,cam_y,nose_z+cam[2]/2]) cube([6,2,6],center=true);                                  // FPC exit on top of the pocket
+  translate([0,cam_y-1,nose_z-(cam[2]+4.5)/2]) rotate([45,0,0]) translate([-(cam[0]+6)/2,0,-20]) cube([cam[0]+6,20,20]);  // 45° chamfer on the pod's inner lower edge: clears the collar when nodding
+  for(sx=[-1,1]) translate([sx*eye_x,0,eye_z]) rotate([90,0,0]) cylinder(d=EYE_HOLE,h=60);          // 8 mm safety-eye shanks
   ribbon_loop_bay();
   translate([14,-8,120]) cube([17,2.5,20],center=true);      // ribbon run camera -> loop
   seam_fem_head();
@@ -449,11 +455,11 @@ module head_front() head_pose() difference(){
 // path, in the skin tangent plane (binormal = egg normal x path tangent).
 function apath(side)=side=="L"?ARM_PATH_L:ARM_PATH_R;
 function npath(side)=len(apath(side));
-function ac(side,i)=let(p=apath(side)[i]) on_egg(p[0],p[1],p[2]);
+function ac(side,i)=let(p=apath(side)[i]) on_egg(p[0],p[1],p[2]-ARM_THIN);
 function an(side,i)=let(p=apath(side)[i], n=[cos(p[0]),sin(p[0]),-eggdr(p[1])]) n/norm(n);
 function at(side,i)=let(n=npath(side), a=ac(side,max(0,i-1)), b=ac(side,min(n-1,i+1))) (b-a)/norm(b-a);
 function aw(side,i)=let(w=cross(an(side,i),at(side,i))) w/norm(w);
-function ahw(side,i)= i==0 ? 4 : (i==npath(side)-1 ? 3.5 : ARM_HW);   // narrower root (clears the ear) and paw tip
+function ahw(side,i)= i==0 ? 3.5 : (i==npath(side)-1 ? 3.0 : ARM_HW);   // narrower root (clears the ear) and paw tip
 module sec(side,i,r) for(s=[-1,1]) translate(ac(side,i)+s*ahw(side,i)*aw(side,i)) sphere(r=r,$fn=20);
 module arm_band(side,o=0,i0=0,i1=-1) { e=(i1<0?npath(side)-1:i1); for(i=[i0:e-1]) hull(){ sec(side,i,ARM_RS+o); sec(side,i+1,ARM_RS+o); } }
 module knuckle_local() difference(){
@@ -499,8 +505,8 @@ module dummy_horn_yaw() translate([0,0,yaw_top+s_boss[1]]) horn_env();
 module dummy_servo_tilt() rotate(yaw) tiltservo_frame() servo_env(0);
 module dummy_horn_tilt() head_pose() tiltservo_frame() translate([0,0,s_boss[1]]) horn_env();   // horn rides with the head
 module dummy_pi() translate([0,-4-pi[1]/2,pi_z]) cube(pi,center=true);
-module dummy_cam() head_pose() translate([-eye_x,cam_y+0.5+cam[1]/2,eye_z]) cube(cam,center=true);
-module dummy_speaker() translate([0,-26,68]) cube(SPK,center=true);           // Adafruit 3351 70x17x30, 70 along x
+module dummy_cam() head_pose() translate([0,cam_y,nose_z]) cube(cam,center=true);
+module dummy_speaker() translate(SPK_C) cube(SPK,center=true);                 // Adafruit 3923 30x5x20, 30 along x
 module dummy_amp() translate([0,6.5,42]) cube([AMP[0],3.0,AMP[1]],center=true);
 module dummy_mic() translate([18,-30.5,80]) cube([MIC[0],MIC[2],MIC[1]],center=true);
 module dummies(){ dummy_servo_yaw(); dummy_horn_yaw(); dummy_servo_tilt(); dummy_horn_tilt();
@@ -536,7 +542,7 @@ module coupon() {
 }
 
 PRINTED_PARTS=["torso_front","torso_back","tray","yaw_collar","yaw_retainer_A","yaw_retainer_B","yaw_coupler","yaw_thrust_washer",
-  "neck_turret","tilt_hub","head_back","head_front","arm_L","arm_R","paw_pad_L","paw_pad_R","bezel","shutter","coupon"];
+  "neck_turret","tilt_hub","head_back","head_front","arm_L","arm_R","paw_pad_L","paw_pad_R","coupon"];   // bezel + shutter removed (bought 8 mm safety eyes)
 if(part=="torso_front") torso_front(); else if(part=="torso_back") torso_back();
 else if(part=="tray") tray(); else if(part=="yaw_collar") yaw_collar();
 else if(part=="yaw_retainer_A") yaw_retainer_half(1); else if(part=="yaw_retainer_B") yaw_retainer_half(-1);

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 #!/usr/bin/env python3
-"""Photoreal Cycles renders of Tomo by DreamMachina (formerly evoKin V.01): orange furry teddy,
+"""Photoreal Cycles renders of Tomo by DreamMachina (formerly evoKin V.01): long-pile ivory / pink plush,
 Mirumi-style passive spring hug arms, head pan + tilt.
 
 STLs are in millimetres, Z-up, -Y face, exported at yaw=0, tilt=0, arms closed (0 = hugging, + = open).
@@ -56,9 +56,11 @@ def eggr(z, o=0.0):
 
 SEAM_C, SEAM_Z = 119.0, 101.0
 SEAM_R = math.hypot(eggr(SEAM_Z), SEAM_C - SEAM_Z)   # face-cap seam sphere, centre (0, 0, 119)
-EYE_X, EYE_Z = 13.0, 120.0
-EYE_SKIN_Y = -math.sqrt(eggr(EYE_Z) ** 2 - EYE_X ** 2)   # ≈ -39.7
-BEZEL_Y = EYE_SKIN_Y - 1.1
+EYE_X, EYE_Z = 10.5, 114.0      # lighter Tomo: 8 mm safety eyes, set lower and closer (cad eye_x / eye_z)
+EYE_SKIN_Y = -math.sqrt(eggr(EYE_Z) ** 2 - EYE_X ** 2)   # ≈ -41.8
+NOSE_Z = 110.0                   # camera 'nose' window (cad nose_z)
+NOSE_SKIN_Y = -eggr(NOSE_Z)
+FUR_BASE = 2.0                   # fur backing sits this far outside the printed shell (mm)
 _RAX = eggr(78.0) + 8.5
 HL = (_RAX * math.cos(math.radians(-35)), _RAX * math.sin(math.radians(-35)), 0.0)   # left SHOULDER hinge (vertical)
 HR = (-HL[0], HL[1], 0.0)
@@ -81,7 +83,7 @@ except Exception:
 
 HEAD_PARTS = {
     "head_back", "head_front", "tilt_hub", "dummy_cam", "dummy_horn_tilt",
-    "bezel_L", "bezel_R", "eye_L", "eye_R", "eye_rim_L", "eye_rim_R", "fur_head",
+    "eye_L", "eye_R", "nose", "fur_head",
 }
 TURRET_PARTS = {"neck_turret", "yaw_coupler", "yaw_retainer_A", "yaw_retainer_B",
                 "dummy_servo_tilt", "dummy_horn_yaw"}
@@ -90,11 +92,17 @@ ARM_L_PARTS = {"arm_L", "paw_pad_L", "sleeve_proxy_L", "fur_arm_L"}
 ARM_R_PARTS = {"arm_R", "paw_pad_R", "sleeve_proxy_R", "fur_arm_R"}
 GLOBAL = [None]             # optional whole-robot matrix (hanging pose)
 
-# Deep saturated marmalade. AgX + studio lights wash mid oranges to peach,
+# Mirumi-like colourways (sRGB albedo; AgX lifts pale tones, so keep them a touch darker than the target)
+PALETTES = {
+    "ivory": dict(fur=(222, 206, 180), tip=(240, 232, 214), root=(172, 150, 120), pad=(176, 156, 128)),
+    "pink":  dict(fur=(236, 172, 186), tip=(248, 208, 218), root=(196, 124, 140), pad=(196, 124, 140)),
+}
+
+# (legacy note) AgX + studio lights wash mid tones out,
 # so the albedo is deliberately darker and redder than the target grade.
-FUR_SRGB = (186, 58, 0)
-FUR_TIP_SRGB = (220, 88, 6)
-FUR_ROOT_SRGB = (108, 28, 0)
+FUR_SRGB = PALETTES["ivory"]["fur"]
+FUR_TIP_SRGB = PALETTES["ivory"]["tip"]
+FUR_ROOT_SRGB = PALETTES["ivory"]["root"]
 
 
 def argv_after_dd():
@@ -422,10 +430,7 @@ def torso_fur_ok(pt):
     t, tc, dn, dw, c = _groove_local(pt)
     if (Vector(pt) - c).length < GR + 2.0 and y < -10:
         return False
-    # shoulder hinges: no hair on the knuckles
-    for hx in (HL[0], HR[0]):
-        if ((x - hx) ** 2 + (y - HL[1]) ** 2) ** 0.5 < 11.0 and 64 < z < 94:
-            return False
+    # shoulder knuckles stay under the coat (Mirumi: no visible hardware)
     return True
 
 
@@ -463,7 +468,9 @@ def make_egg_fur(name, o, part, segments=128, rings=96):
 
     def seam_dist(z):
         return math.hypot(eggr(z, o), SEAM_C - z)
-    lim = SEAM_R + 1.5 if part == "body" else SEAM_R - 1.5
+    # body coat stops 1.5 mm outside the seam sphere; the cap coat is a soft lip that runs 3 mm PAST the seam,
+    # a hair outside the body coat, so the 3 mm running gap is always covered (it slides over the body pile)
+    lim = SEAM_R + 1.5 if part == "body" else SEAM_R + 3.0
     # find the seam height on this offset egg
     lo, hi = 60.0, H_EGG - o - 0.01
     for _ in range(60):
@@ -509,23 +516,25 @@ def make_egg_fur(name, o, part, segments=128, rings=96):
 
 
 def head_fur_ok(pt):
-    """Weight 1 everywhere on the head except a soft well around each eye."""
+    """Weight 1 everywhere on the head except small trimmed wells round the eyes and the nose (Mirumi trims its face)."""
     x, y, z = pt
     w = 1.0
     if y < 5.0:
-        for sx in (1, -1):
-            r = ((x - sx * EYE_X) ** 2 + (z - EYE_Z) ** 2) ** 0.5
-            # no hair over the visible eyeball; full coat by ~11 mm
-            if r < 6.4:
+        for (cx, cz, r0, r1) in ((EYE_X, EYE_Z, 4.6, 8.0), (-EYE_X, EYE_Z, 4.6, 8.0), (0.0, NOSE_Z, 2.6, 5.5)):
+            r = ((x - cx) ** 2 + (z - cz) ** 2) ** 0.5
+            if r < r0:
                 return 0.0
-            if r < 11.0:
-                w = min(w, (r - 6.4) / (11.0 - 6.4))
+            if r < r1:
+                w = min(w, 0.15 + 0.85 * (r - r0) / (r1 - r0))
     return w
 
 
 # -----------------------------------------------------------------------------
 # Hair
 # -----------------------------------------------------------------------------
+DROOP = [0.55]
+
+
 def add_hair(obj, name, length_m, count, children, material,
              clump=0.55, rough=0.10, kink_amp=0.04, kink_freq=4.0,
              length_rand=0.18, density_vg=None, root_m=0.00040, tip_m=0.00010):
@@ -546,7 +555,11 @@ def add_hair(obj, name, length_m, count, children, material,
     ps.emit_from = "FACE"
     ps.use_emit_random = True
     ps.count = int(count)
-    ps.hair_length = length_m
+    # comb the pile downwards so it drapes like plush (and the cap coat falls over the face seam).
+    # hair_length only rescales normal_factor, so set it first and give the downward comb in the same units
+    # (strand length grows by ~sqrt(1 + DROOP^2); the lengths below already allow for it).
+    ps.hair_length = length_m / (1.0 + DROOP[0] ** 2) ** 0.5
+    ps.object_align_factor = (0.0, 0.0, -DROOP[0] * ps.normal_factor)
     ps.length_random = length_rand
     ps.hair_step = 5
     ps.display_step = 3
@@ -676,47 +689,29 @@ CUT_COLORS = {
 }
 
 
-def place_bezel(name, sx):
-    obj = import_stl(resolve_stl("bezel.stl"), name)
-    obj.location = mm(sx * EYE_X, BEZEL_Y, EYE_Z)
-    obj.rotation_euler = (math.radians(-90), 0, 0)
-    bpy.context.view_layer.update()
-    return obj
-
-
 def place_eye(name, sx):
-    # Dark glossy safety-eye. 7 mm sphere, front ~3 mm proud of the bezel
-    # flange so it reads as an eye from the front, not just a chrome ring.
-    r = 0.0070
-    bpy.ops.mesh.primitive_uv_sphere_add(
-        segments=40, ring_count=20, radius=r,
-        location=mm(sx * EYE_X, BEZEL_Y + 2.0, EYE_Z),
-    )
-    obj = bpy.context.active_object
-    obj.name = name
-    for p in obj.data.polygons:
-        p.use_smooth = True
-    return obj
-
-
-def place_eye_rim(name, sx):
-    """Thin dark washer sitting on the fur surface, like a safety-eye flange.
-    The CAD bezel is a 27 mm mounting ring that nearly meets in the middle
-    and reads as a raccoon mask if left visible on the hero."""
+    """8 mm glossy black safety eye: a 4 mm-radius dome sitting on the trimmed fur backing."""
     _deselect()
-    bpy.ops.mesh.primitive_torus_add(
-        major_radius=0.0076,
-        minor_radius=0.0011,
-        major_segments=36,
-        minor_segments=10,
-        location=mm(sx * EYE_X, EYE_SKIN_Y - 3.9, EYE_Z),
-        rotation=(math.radians(90), 0, 0),
+    bpy.ops.mesh.primitive_uv_sphere_add(
+        segments=40, ring_count=20, radius=0.0036,
+        location=mm(sx * EYE_X, EYE_SKIN_Y - FUR_BASE - 1.0, EYE_Z),
     )
     obj = bpy.context.active_object
     obj.name = name
     for p in obj.data.polygons:
         p.use_smooth = True
     return obj
+
+
+def place_nose(name):
+    """Tiny dark nose over the Ø3.5 camera window."""
+    obj = make_uv_sphere(name, mm(0.0, NOSE_SKIN_Y - FUR_BASE - 0.6, NOSE_Z), (0.0024, 0.0013, 0.0017), 32, 16)
+    return obj
+
+
+def place_foot(name, sx):
+    """Stubby plush foot sewn to the skin at the bottom front (soft goods, no hardware)."""
+    return make_uv_sphere(name, mm(sx * 15.0, -30.0, 6.5), (0.0095, 0.0125, 0.0065), 40, 20)
 
 
 def inflate_mesh(obj, offset_m):
@@ -779,12 +774,11 @@ def build_assembly(skip_hair=False, preview=False):
     for name, fn in PART_FILES.items():
         objs[name] = import_stl(resolve_stl(fn), name)
 
-    objs["bezel_L"] = place_bezel("bezel_L", +1)
-    objs["bezel_R"] = place_bezel("bezel_R", -1)
     objs["eye_L"] = place_eye("eye_L", +1)
     objs["eye_R"] = place_eye("eye_R", -1)
-    objs["eye_rim_L"] = place_eye_rim("eye_rim_L", +1)
-    objs["eye_rim_R"] = place_eye_rim("eye_rim_R", -1)
+    objs["nose"] = place_nose("nose")
+    objs["fur_foot_L"] = place_foot("fur_foot_L", +1)
+    objs["fur_foot_R"] = place_foot("fur_foot_R", -1)
 
     # ---- materials (hero defaults; cutaway swaps later)
     mats = {}
@@ -792,7 +786,7 @@ def build_assembly(skip_hair=False, preview=False):
     mats["print_head"] = mat_plastic("PrintHead", srgb_lin((232, 180, 80)), rough=0.45)
     mats["print_dark"] = mat_plastic("PrintDark", srgb_lin((50, 44, 40)), rough=0.4)
     mats["print_bracket"] = mat_plastic("PrintBracket", srgb_lin((42, 46, 50)), rough=0.38)
-    mats["bezel"] = mat_plastic("Bezel", srgb_lin((12, 10, 10)), rough=0.35, metallic=0.08, spec=0.35)
+    mats["nose"] = mat_plastic("Nose", srgb_lin((34, 22, 20)), rough=0.3, spec=0.5)
     mats["eye"] = mat_eye_glass()
     mats["pad"] = mat_pad()
     mats["fur_under"] = mat_fur_undercoat()
@@ -823,10 +817,9 @@ def build_assembly(skip_hair=False, preview=False):
     assign(objs["sleeve_proxy_R"], mats["print_dark"])
     assign(objs["paw_pad_L"], mats["pad"])
     assign(objs["paw_pad_R"], mats["pad"])
-    assign(objs["bezel_L"], mats["bezel"])
-    assign(objs["bezel_R"], mats["bezel"])
-    assign(objs["eye_rim_L"], mats["bezel"])
-    assign(objs["eye_rim_R"], mats["bezel"])
+    assign(objs["nose"], mats["nose"])
+    assign(objs["fur_foot_L"], mats["fur_clay"])
+    assign(objs["fur_foot_R"], mats["fur_clay"])
     assign(objs["eye_L"], mats["eye"])
     assign(objs["eye_R"], mats["eye"])
     for k in ("tray", "yaw_collar", "yaw_coupler", "yaw_retainer_A", "yaw_retainer_B",
@@ -838,13 +831,13 @@ def build_assembly(skip_hair=False, preview=False):
             pass
 
     # ---- fur emitters: the one egg (begg(-4)) split at the face-cap seam sphere. The cap coat rides with the head.
-    fur_t = make_egg_fur("fur_torso", -4.0, "body", segments=160 if not preview else 112, rings=110 if not preview else 70)
+    fur_t = make_egg_fur("fur_torso", -FUR_BASE, "body", segments=160 if not preview else 112, rings=110 if not preview else 70)
     groove_fur_emitter(fur_t)
     assign(fur_t, mats["fur_clay"])
     vg_t = density_group(fur_t, "fur_density", torso_fur_ok)
     objs["fur_torso"] = fur_t
 
-    fur_h = make_egg_fur("fur_head", -3.5, "cap", segments=128 if not preview else 96, rings=48 if not preview else 32)
+    fur_h = make_egg_fur("fur_head", -FUR_BASE - 0.8, "cap", segments=128 if not preview else 96, rings=48 if not preview else 32)
     assign(fur_h, mats["fur_clay"])
     # Do not punch holes in the head mesh: hair is kept off the eyeballs with a soft density well instead;
     # the glossy spheres sit proud of the coat like safety eyes.
@@ -866,13 +859,12 @@ def build_assembly(skip_hair=False, preview=False):
 
         def pred(pt):
             x, y, z = pt
-            # No hair on the shoulder knuckle; keep the TPU pads at the handle crossings bare.
-            hx = HL[0] if side == "L" else HR[0]
-            if ((x - hx) ** 2 + (y - HL[1]) ** 2) ** 0.5 < 11.0:
-                return 0.0
+            # Knuckle furred over (no visible hardware); only the TPU pads at the handle crossings stay short.
             _, _, dist = kd.find(Vector(pt))
-            if dist < 3.2:
+            if dist < 2.0:
                 return 0.0
+            if dist < 6.0:
+                return 0.5
             return 1.0
         return pred
 
@@ -889,37 +881,41 @@ def build_assembly(skip_hair=False, preview=False):
 
     # Hair counts: preview uses fewer parents / children
     if not skip_hair:
-        mul_c = 0.55 if preview else 1.0
+        mul_c = 0.55 if preview else 1.35
         mul_k = 1.0
-        # torso
-        add_hair(fur_t, "torso_under", length_m=0.0055, count=int(12000 * mul_c),
+        # Long, soft, dense pile (Mirumi-like): a 7 mm undercoat and 11–12 mm guard hairs combed down; feet too.
+        add_hair(fur_t, "torso_under", length_m=0.0085, count=int(16000 * mul_c),
                  children=int(10 * mul_k) or 6, material=mats["fur_under"],
-                 clump=0.45, rough=0.12, kink_amp=0.05, kink_freq=7,
-                 density_vg=vg_t, root_m=0.00016, tip_m=0.00005)
-        add_hair(fur_t, "torso_guard", length_m=0.0070, count=int(7000 * mul_c),
-                 children=int(8 * mul_k) or 5, material=mats["fur_guard"],
-                 clump=0.32, rough=0.22, kink_amp=0.12, kink_freq=5,
-                 density_vg=vg_t, root_m=0.00012, tip_m=0.00003)
-        # head: a little shorter, tidier around the face
-        add_hair(fur_h, "head_under", length_m=0.0050, count=int(9000 * mul_c),
+                 clump=0.35, rough=0.18, kink_amp=0.08, kink_freq=4,
+                 density_vg=vg_t, root_m=0.00015, tip_m=0.00004)
+        add_hair(fur_t, "torso_guard", length_m=0.0175, count=int(9000 * mul_c),
+                 children=int(9 * mul_k) or 5, material=mats["fur_guard"],
+                 clump=0.65, rough=0.32, kink_amp=0.25, kink_freq=2.5,
+                 density_vg=vg_t, root_m=0.00011, tip_m=0.00002)
+        add_hair(fur_h, "head_under", length_m=0.0080, count=int(10000 * mul_c),
                  children=int(10 * mul_k) or 6, material=mats["fur_under"],
-                 clump=0.4, rough=0.1, kink_amp=0.04, kink_freq=7,
+                 clump=0.35, rough=0.16, kink_amp=0.08, kink_freq=4,
                  density_vg=vg_h, root_m=0.00014, tip_m=0.00004)
-        add_hair(fur_h, "head_guard", length_m=0.0065, count=int(5000 * mul_c),
-                 children=int(8 * mul_k) or 5, material=mats["fur_guard"],
-                 clump=0.3, rough=0.2, kink_amp=0.1, kink_freq=5.5,
-                 density_vg=vg_h, root_m=0.00011, tip_m=0.000028)
+        add_hair(fur_h, "head_guard", length_m=0.0170, count=int(6500 * mul_c),
+                 children=int(9 * mul_k) or 5, material=mats["fur_guard"],
+                 clump=0.62, rough=0.30, kink_amp=0.22, kink_freq=2.5,
+                 density_vg=vg_h, root_m=0.00010, tip_m=0.00002)
         for side in ("L", "R"):
             em = objs[f"fur_arm_{side}"]
             vg = em.vertex_groups["fur_density"]
-            add_hair(em, f"arm_{side}_under", length_m=0.0050, count=int(8000 * mul_c),
+            add_hair(em, f"arm_{side}_under", length_m=0.0075, count=int(9000 * mul_c),
                      children=int(8 * mul_k) or 5, material=mats["fur_under"],
-                     clump=0.4, rough=0.12, kink_amp=0.05, kink_freq=6,
-                     density_vg=vg, root_m=0.00014, tip_m=0.00004)
-            add_hair(em, f"arm_{side}_guard", length_m=0.0060, count=int(4500 * mul_c),
-                     children=int(7 * mul_k) or 4, material=mats["fur_guard"],
-                     clump=0.28, rough=0.2, kink_amp=0.1, kink_freq=5,
-                     density_vg=vg, root_m=0.00011, tip_m=0.00003)
+                     clump=0.35, rough=0.16, kink_amp=0.08, kink_freq=4,
+                     density_vg=vg, root_m=0.00013, tip_m=0.00004)
+            add_hair(em, f"arm_{side}_guard", length_m=0.0145, count=int(5500 * mul_c),
+                     children=int(8 * mul_k) or 4, material=mats["fur_guard"],
+                     clump=0.62, rough=0.30, kink_amp=0.22, kink_freq=2.5,
+                     density_vg=vg, root_m=0.00010, tip_m=0.00002)
+        for side in ("L", "R"):
+            ft = objs[f"fur_foot_{side}"]
+            add_hair(ft, f"foot_{side}", length_m=0.0080, count=int(2500 * mul_c),
+                     children=8, material=mats["fur_guard"], clump=0.4, rough=0.25, kink_amp=0.15, kink_freq=3,
+                     root_m=0.00011, tip_m=0.00003)
 
     return objs, mats
 
@@ -1089,7 +1085,7 @@ def build_camera():
 # -----------------------------------------------------------------------------
 HERO_SHOW = {
     "fur_torso", "fur_head", "fur_arm_L", "fur_arm_R",
-    "eye_rim_L", "eye_rim_R", "eye_L", "eye_R",
+    "eye_L", "eye_R", "nose", "fur_foot_L", "fur_foot_R",
     "studio_ground", "studio_back",
 }
 # hide raw printed shells and internals on the finished look
@@ -1099,7 +1095,7 @@ HERO_HIDE = {
     "yaw_thrust_washer",
     "neck_turret", "tilt_hub",
     "arm_L", "arm_R", "sleeve_proxy_L", "sleeve_proxy_R",
-    "fur_proxy_torso", "bezel_L", "bezel_R",
+    "fur_proxy_torso",
     "dummy_servo_yaw", "dummy_servo_tilt", "dummy_horn_yaw", "dummy_horn_tilt",
     "dummy_pi", "dummy_cam", "dummy_speaker", "dummy_amp", "dummy_mic",
 }
@@ -1141,13 +1137,10 @@ def set_mode_hero(objs, show_emitters=False):
                 obj.hide_render = False
             else:
                 set_emitter_visible(obj, True)
-    for n in ("eye_L", "eye_R", "eye_rim_L", "eye_rim_R"):
+    for n in ("eye_L", "eye_R", "nose"):
         if n in objs:
             set_hide(objs[n], False)
             set_emitter_visible(objs[n], True)
-    for n in ("bezel_L", "bezel_R"):
-        if n in objs:
-            set_hide(objs[n], True)
 
 
 def set_mode_cutaway(objs, mats):
@@ -1156,12 +1149,12 @@ def set_mode_cutaway(objs, mats):
             continue
         # no hair in the cutaway — it obscures the internals
         enable_hair(obj, False)
-        if name in CUT_HIDE or name.startswith("fur_arm") or name in ("fur_torso", "fur_head"):
+        if name in CUT_HIDE or name.startswith("fur_arm") or name.startswith("fur_foot") or name in ("fur_torso", "fur_head"):
             # show the designed fur_proxy as the transparent coat; hide GN ellipsoids
             if name in ("fur_torso", "fur_head"):
                 set_hide(obj, True)
                 continue
-            if name.startswith("fur_arm"):
+            if name.startswith("fur_arm") or name.startswith("fur_foot"):
                 set_hide(obj, True)
                 continue
         if name in CUT_HIDE:
@@ -1185,12 +1178,9 @@ def set_mode_cutaway(objs, mats):
         if k in objs:
             assign(objs[k], mat)
             set_hide(objs[k], False)
-    # keep eyes/bezels/pads readable
-    for n in ("bezel_L", "bezel_R", "eye_L", "eye_R"):
+    # keep eyes/nose/pads readable
+    for n in ("eye_L", "eye_R", "nose"):
         set_hide(objs[n], False)
-    for n in ("eye_rim_L", "eye_rim_R"):
-        if n in objs:
-            set_hide(objs[n], True)
 
 
 # -----------------------------------------------------------------------------
@@ -1362,7 +1352,7 @@ def main():
     objs, mats = build_assembly(skip_hair=args.skip_hair, preview=preview)
     stash_rest(objs)
     print("=== rest bounds (m) ===", flush=True)
-    for name in ("torso_front", "head_front", "arm_L", "fur_torso", "fur_head", "bezel_L", "eye_L"):
+    for name in ("torso_front", "head_front", "arm_L", "fur_torso", "fur_head", "nose", "eye_L"):
         o = objs.get(name)
         if not o:
             print(" missing", name); continue
@@ -1391,7 +1381,27 @@ def main():
             o.hide_viewport = not on
 
     HERO = ((-6, -20, BAG_TOP + 70), (210, -500, 70), 62)
+    def set_palette(name):
+        P = PALETTES[name]
+        for key, col in (("fur_under", P["root"]), ("fur_guard", P["fur"])):
+            n = mats[key].node_tree.nodes.get("Principled Hair BSDF")
+            if n is None:
+                n = next(x for x in mats[key].node_tree.nodes if x.type == "BSDF_HAIR_PRINCIPLED")
+            n.inputs["Color"].default_value = srgb_lin(col)
+        b = mats["fur_clay"].node_tree.nodes.get("Principled BSDF")
+        if b:
+            b.inputs["Base Color"].default_value = srgb_lin(P["root"])
+            try:
+                b.inputs["Sheen Tint"].default_value = srgb_lin(P["tip"])
+            except Exception:
+                pass
+        pb = mats["pad"].node_tree.nodes.get("Principled BSDF")
+        if pb:
+            pb.inputs["Base Color"].default_value = srgb_lin(P["pad"])
+
+    SHOT_PALETTE = {"hero_hug": "ivory", "arms_open": "ivory", "mirumi_angle": "pink", "cutaway": "ivory"}
     for shot in shots:
+        set_palette(SHOT_PALETTE[shot])
         show_props(False)
         GLOBAL[0] = None
         set_camera(*CAM0)
@@ -1430,6 +1440,7 @@ def main():
         render_shot(path)
 
     # save the blend in the seated hero pose
+    set_palette("ivory")
     GLOBAL[0] = seat_matrix()
     show_props(True)
     apply_pose_v2(objs, yaw=-14, arm_l=HUG_OPEN_L, arm_r=HUG_OPEN_R, tilt=4)

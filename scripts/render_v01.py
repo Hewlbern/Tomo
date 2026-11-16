@@ -85,7 +85,7 @@ def opened():
     ax.set_title(f"Arms on the 30° open stop (pads ↔ belly L {o['pad_L_to_belly_mm']} / R {o['pad_R_to_belly_mm']} mm)\nhead pan +30°, looking up 10°",fontsize=11)
     ax=fig.add_subplot(122,projection="3d"); draw(ax,SHELL,dict(yaw=0,tilt=10,aL=0,aR=0),view=(2,0),lim=(-80,80,-90,70,-5,155))
     ax.set_title("Side — face cap nodding 10° inside the egg (tilt axis y=6, z=119)\narms closed on their rest stops",fontsize=11)
-    fig.suptitle(f"{NAME} — hand-opened arms (0–30°) and head pan ±42° / tilt ±10° (2 × FS90MG)",fontsize=14)
+    fig.suptitle(f"{NAME} — hand-opened arms (0–30°) and head pan ±42° / tilt ±10° (2 × Feetech FS90)",fontsize=14)
     fig.text(0.5,0.02,FOOT,ha="center",fontsize=8.5); plt.subplots_adjust(0.0,0.05,1.0,0.9,0.0)
     fig.savefig("renders/cad/v01_arms_open_tilt.png",facecolor="white"); plt.close(fig); print("wrote renders/cad/v01_arms_open_tilt.png")
 def exploded():
@@ -100,7 +100,7 @@ def exploded():
     ex={"head_back":[0,22,30],"head_front":[0,-40,30],"tilt_hub":[-14,0,0],"dummy_cam":[0,-40,30]}
     parts=["yaw_collar","neck_turret","dummy_servo_tilt","dummy_horn_tilt","tilt_hub","head_back","head_front","dummy_cam","dummy_servo_yaw"]
     draw(ax,parts,dict(),explode=ex,alpha={"head_back":0.5,"head_front":0.35},lim=(-60,60,-90,60,60,180),view=(14,-60))
-    ax.set_title("Neck, exploded: pan FS90MG in the collar → neck_turret (yaw) carries the tilt FS90MG;\n"
+    ax.set_title("Neck, exploded: pan FS90 in the collar → neck_turret (yaw) carries the tilt FS90;\n"
                  "tilt_hub (red) keys into head_back, M3 idler pivot on the other side",fontsize=10)
     fig.suptitle(f"{NAME} — shoulder hinge and pan/tilt neck",fontsize=14)
     fig.text(0.5,0.02,FOOT+"  Yellow = assumed horn envelope (measure on arrival).",ha="center",fontsize=8.5); plt.subplots_adjust(0.0,0.05,1.0,0.88,0.0)

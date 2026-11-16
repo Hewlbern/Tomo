@@ -1,126 +1,236 @@
 {
  "assumptions": {
-  "material": "PLA 1.24 g/cm\u00b3 \u00d7 0.75 effective fill (solid upper bound also given); TPU pads 1.21 g/cm\u00b3 solid",
-  "components": "FS90MG 13.4 g each (Feetech listing), horn 1 g, Adafruit 3351 speaker 25 g (ASSUMED), XIAO ESP32S3 Sense + camera 8 g, amp 2 g, mic 1 g, INA219 2 g, boost 5 g, wiring 8 g, fasteners 8 g, springs 2 \u00d7 1 g, fur skin 30 g (ASSUMED). Battery listed separately (portable power unresolved).",
+  "material": "PLA 1.24 g/cm\u00b3 \u00d7 per-part effective fill (see print_profiles); TPU pads 1.21 g/cm\u00b3 solid",
+  "print_profiles": {
+   "torso_front": 0.48,
+   "torso_back": 0.48,
+   "head_front": 0.48,
+   "head_back": 0.48,
+   "arm_L": 0.62,
+   "arm_R": 0.62,
+   "yaw_collar": 0.6,
+   "neck_turret": 0.6,
+   "tray": 0.5,
+   "yaw_retainer_A": 0.75,
+   "yaw_retainer_B": 0.75,
+   "yaw_coupler": 0.75,
+   "yaw_thrust_washer": 0.75,
+   "tilt_hub": 0.75
+  },
+  "components": "Feetech FS90 9 g each (Feetech spec sheet / Core Electronics CE09376) + horn 1 g; Adafruit 3923 mini oval speaker 3 g (Adafruit listing); XIAO ESP32S3 Sense with camera 6.6 g (distributor spec) + long-FPC camera allowance 0.9 g; MAX98357A amp 2 g; mic 1 g; INA219 2 g; Pololu U3V16F5 boost 0.4 g (Pololu listing); wiring 5 g (ASSUMED, trimmed 30 AWG); fasteners 5.5 g (steel M3 pins and servo/horn screws; nylon M2.5 shell/collar screws); springs 2 \u00d7 1 g; 8 mm safety eyes 2 \u00d7 0.4 g (ASSUMED); long-pile fur skin 19 g (ASSUMED light knit-backed faux fur \u2248380 g/m\u00b2 over \u22480.050 m\u00b2) + feet fibrefill 2 g; battery Core Electronics CE04375 1S 400 mAh 11 g (listing).",
   "cad_only": true,
   "physically_tested": false
  },
  "mass": {
-  "estimate_g": 297.0,
-  "solid_print_upper_bound_g": 354.0,
-  "with_2000mAh_battery_g": 335.0,
+  "estimate_g": 180.0,
+  "solid_print_upper_bound_g": 278.0,
+  "with_battery_g": 191.0,
+  "battery": "Core Electronics CE04375 1S 400 mAh, 11 g",
   "centre_of_mass_mm": [
-   -1.1,
-   -6.6,
-   74.3
+   -1.0,
+   -4.4,
+   73.4
   ],
   "centre_of_mass_with_battery_mm": [
    -1.0,
-   -4.4,
-   67.5
+   -3.5,
+   70.9
   ],
   "breakdown_g": {
-   "torso_front": 34.2,
-   "torso_back": 33.7,
-   "tray": 11.5,
-   "yaw_collar": 15.3,
+   "torso_front": 23.5,
+   "torso_back": 20.2,
+   "head_front": 9.2,
+   "head_back": 9.7,
+   "arm_L": 6.1,
+   "arm_R": 7.8,
+   "yaw_collar": 12.2,
+   "neck_turret": 6.3,
+   "tray": 7.7,
    "yaw_retainer_A": 0.8,
    "yaw_retainer_B": 0.8,
    "yaw_coupler": 0.5,
    "yaw_thrust_washer": 0.4,
-   "neck_turret": 7.9,
    "tilt_hub": 1.0,
-   "head_back": 18.9,
-   "head_front": 19.5,
-   "arm_L": 9.7,
-   "arm_R": 12.6,
-   "bezel": 5.8,
-   "shutter": 0.2,
-   "paw_pad_L": 2.0,
-   "paw_pad_R": 2.0,
-   "FS90MG pan + horn": 14.4,
-   "FS90MG tilt + horn": 14.4,
-   "speaker (Adafruit 3351)": 25.0,
-   "brain + camera": 8.0,
+   "paw_pad_L": 1.7,
+   "paw_pad_R": 1.6,
+   "FS90 pan + horn": 10.0,
+   "FS90 tilt + horn": 10.0,
+   "speaker (Adafruit 3923)": 3.0,
+   "brain + camera (XIAO ESP32S3 Sense)": 7.5,
    "amp": 2.0,
    "mic": 1.0,
-   "INA219 + boost": 7.0,
-   "wiring": 8.0,
-   "fasteners": 8.0,
+   "INA219 + U3V16F5 boost": 2.4,
+   "wiring": 5.0,
+   "fasteners": 5.5,
    "springs": 2.0,
-   "fur skin": 30.0
+   "safety eyes": 0.8,
+   "fur skin (long pile) + feet": 21.0
   },
-  "note": "Mirumi is 155 g and about 100 x 118 x 143 mm. Tomo is one \u00d892 x 148 mm egg (about 102 x 108 x 152 mm with 4-5 mm fur and the arms) and carries a speaker and a camera brain, so it is heavier."
+  "budget_before_after": [
+   {
+    "item": "shells (torso + head, 4 parts)",
+    "before_g": 106.3,
+    "after_g": 62.7
+   },
+   {
+    "item": "arms",
+    "before_g": 22.3,
+    "after_g": 13.9
+   },
+   {
+    "item": "TPU pads",
+    "before_g": 4.0,
+    "after_g": 3.3
+   },
+   {
+    "item": "tray",
+    "before_g": 11.5,
+    "after_g": 7.7
+   },
+   {
+    "item": "yaw collar",
+    "before_g": 15.3,
+    "after_g": 12.2
+   },
+   {
+    "item": "turret + hub + yaw small parts",
+    "before_g": 10.4,
+    "after_g": 9.9
+   },
+   {
+    "item": "eye bezels + shutter (removed)",
+    "before_g": 6.0,
+    "after_g": 0.0
+   },
+   {
+    "item": "servos (2 \u00d7 FS90MG \u2192 2 \u00d7 FS90, + horns)",
+    "before_g": 28.8,
+    "after_g": 20.0
+   },
+   {
+    "item": "speaker (Adafruit 3351 \u2192 3923)",
+    "before_g": 25.0,
+    "after_g": 3.0
+   },
+   {
+    "item": "brain + camera",
+    "before_g": 8.0,
+    "after_g": 7.5
+   },
+   {
+    "item": "amp + mic",
+    "before_g": 3.0,
+    "after_g": 3.0
+   },
+   {
+    "item": "INA219 + boost (XL6009 \u2192 Pololu U3V16F5)",
+    "before_g": 7.0,
+    "after_g": 2.4
+   },
+   {
+    "item": "wiring",
+    "before_g": 8.0,
+    "after_g": 5.0
+   },
+   {
+    "item": "fasteners (\u2192 nylon M2.5 shell screws)",
+    "before_g": 8.0,
+    "after_g": 5.5
+   },
+   {
+    "item": "springs",
+    "before_g": 2.0,
+    "after_g": 2.0
+   },
+   {
+    "item": "8 mm safety eyes",
+    "before_g": 0.0,
+    "after_g": 0.8
+   },
+   {
+    "item": "fur skin (\u2192 long pile + feet)",
+    "before_g": 30.0,
+    "after_g": 21.0
+   },
+   {
+    "item": "battery (1S 2000 mAh \u2192 400 mAh)",
+    "before_g": 38.0,
+    "after_g": 11.0
+   }
+  ],
+  "before_total_with_battery_g": 334.0,
+  "after_total_with_battery_g": 191.0,
+  "note": "Mirumi is about 135\u2013155 g and about 100 x 118 x 143 mm. Target 160\u2013180 g with battery, ceiling 200 g. Printed masses use the ASSUMED print profiles; weigh the first prints."
  },
  "clinging": {
   "no_battery": {
-   "weight_N": 2.91,
+   "weight_N": 1.76,
    "com_mm": [
-    -1.1,
-    -6.6,
-    74.3
+    -1.0,
+    -4.4,
+    73.4
    ],
-   "handle_axis_to_com_mm": 42.3,
+   "handle_axis_to_com_mm": 43.9,
    "handle_angle_from_body_vertical_deg": 35.1,
-   "pad_force_total_N": 6.99,
-   "pad_force_into_groove_N": 6.88,
-   "mean_clamp_height_mm": 42.6,
+   "pad_force_total_N": 7.03,
+   "pad_force_into_groove_N": 6.97,
+   "mean_clamp_height_mm": 42.4,
    "seated_on_bag": {
     "max_backward_tilt_held_deg": 90.0,
-    "hug_moment_over_toppling_moment_at_90deg": 1.38,
+    "hug_moment_over_toppling_moment_at_90deg": 2.3,
     "note": "Mirumi pose: bottom resting on the bag top, both arms round the handle. The bag carries the weight; the springs hold it upright against the handle."
    },
    "free_hang": {
-    "friction_capacity_along_handle_N_mu0p5": 6.99,
-    "slip_safety_factor_vertical_handle": 2.4,
+    "friction_capacity_along_handle_N_mu0p5": 7.03,
+    "slip_safety_factor_vertical_handle": 3.98,
     "roll_to_hang_com_under_handle": true,
     "note": "Hanging free from the handle (nothing under it): the body rolls about the handle until the COM is under it, so with a vertical handle it hangs tipped about 35 deg sideways; slip along the handle is resisted only by friction."
    }
   },
   "with_battery": {
-   "weight_N": 3.28,
+   "weight_N": 1.87,
    "com_mm": [
     -1.0,
-    -4.4,
-    67.5
+    -3.5,
+    70.9
    ],
-   "handle_axis_to_com_mm": 41.9,
+   "handle_axis_to_com_mm": 44.0,
    "handle_angle_from_body_vertical_deg": 35.1,
-   "pad_force_total_N": 6.99,
-   "pad_force_into_groove_N": 6.88,
-   "mean_clamp_height_mm": 42.6,
+   "pad_force_total_N": 7.03,
+   "pad_force_into_groove_N": 6.97,
+   "mean_clamp_height_mm": 42.4,
    "seated_on_bag": {
     "max_backward_tilt_held_deg": 90.0,
-    "hug_moment_over_toppling_moment_at_90deg": 1.34,
+    "hug_moment_over_toppling_moment_at_90deg": 2.24,
     "note": "Mirumi pose: bottom resting on the bag top, both arms round the handle. The bag carries the weight; the springs hold it upright against the handle."
    },
    "free_hang": {
-    "friction_capacity_along_handle_N_mu0p5": 6.99,
-    "slip_safety_factor_vertical_handle": 2.13,
+    "friction_capacity_along_handle_N_mu0p5": 7.03,
+    "slip_safety_factor_vertical_handle": 3.75,
     "roll_to_hang_com_under_handle": true,
     "note": "Hanging free from the handle (nothing under it): the body rolls about the handle until the COM is under it, so with a vertical handle it hangs tipped about 35 deg sideways; slip along the handle is resisted only by friction."
    }
   },
   "per_handle": {
    "10.0": {
-    "pad_force_total_N": 6.6,
-    "into_groove_N": 6.52,
-    "free_hang_slip_SF_no_battery": 2.27
+    "pad_force_total_N": 6.76,
+    "into_groove_N": 6.62,
+    "free_hang_slip_SF_no_battery": 3.83
    },
    "12.5": {
-    "pad_force_total_N": 6.99,
-    "into_groove_N": 6.88,
-    "free_hang_slip_SF_no_battery": 2.4
+    "pad_force_total_N": 7.03,
+    "into_groove_N": 6.97,
+    "free_hang_slip_SF_no_battery": 3.98
    },
    "15.0": {
-    "pad_force_total_N": 7.29,
+    "pad_force_total_N": 7.26,
     "into_groove_N": 7.24,
-    "free_hang_slip_SF_no_battery": 2.5
+    "free_hang_slip_SF_no_battery": 4.11
    },
    "25": {
-    "pad_force_total_N": 6.05,
-    "into_groove_N": 6.05,
-    "free_hang_slip_SF_no_battery": 2.08
+    "pad_force_total_N": 6.07,
+    "into_groove_N": 6.07,
+    "free_hang_slip_SF_no_battery": 3.44
    }
   },
   "assumption": "Handle \u00d812.5 lying on the diagonal groove floor line (35\u00b0 from the body vertical). \u03bc = 0.5 TPU/fur on a fabric or leather handle (ASSUMED). Pad forces from scripts/sim_v01.py. Not tested."
@@ -131,72 +241,72 @@
   "torque_rest_Nmm": 168.2,
   "torque_open_stop_Nmm": 269.1,
   "finger_force_to_hold_open_at_pad_N": {
-   "L": 4.63,
-   "R": 4.12
+   "L": 4.66,
+   "R": 4.15
   },
   "pad_lever_mm": {
-   "L": 58.2,
-   "R": 65.3
+   "L": 57.7,
+   "R": 64.9
   },
   "grip": {
    "10.0": {
-    "open_deg_L": 4.14,
-    "open_deg_R": 3.9,
-    "force_L_N": 3.4,
-    "force_R_N": 3.2,
-    "total_N": 6.6
+    "open_deg_L": 3.8,
+    "open_deg_R": 3.54,
+    "force_L_N": 3.52,
+    "force_R_N": 3.25,
+    "total_N": 6.76
    },
    "12.5": {
-    "open_deg_L": 6.85,
-    "open_deg_R": 6.43,
-    "force_L_N": 3.57,
-    "force_R_N": 3.41,
-    "total_N": 6.99
+    "open_deg_L": 6.54,
+    "open_deg_R": 6.08,
+    "force_L_N": 3.66,
+    "force_R_N": 3.37,
+    "total_N": 7.03
    },
    "15.0": {
-    "open_deg_L": 9.53,
-    "open_deg_R": 8.96,
+    "open_deg_L": 9.25,
+    "open_deg_R": 8.63,
     "force_L_N": 3.74,
-    "force_R_N": 3.54,
-    "total_N": 7.29
+    "force_R_N": 3.53,
+    "total_N": 7.26
    },
    "25": {
-    "open_deg_L": 6.17,
-    "open_deg_R": 6.33,
-    "force_L_N": 3.22,
+    "open_deg_L": 5.86,
+    "open_deg_R": 6.19,
+    "force_L_N": 3.23,
     "force_R_N": 2.83,
-    "total_N": 6.05
+    "total_N": 6.07
    }
   },
   "spring_stress_check": "\u03c3 \u2248 32\u00b7M\u00b7Ki/(\u03c0\u00b7d\u00b3) with M = 269 N\u00b7mm at the open stop (80\u00b0 wind-up), d = 1.22 mm, Ki \u2248 1.1: \u22481.66 GPa, under the \u22481.86 GPa at the catalogue 90\u00b0 rating (302.7 N\u00b7mm)."
  },
  "head": {
   "pan": {
-   "servo": "FS90MG in the yaw collar (unchanged)",
+   "servo": "Feetech FS90 (plastic gear, 9 g) in the yaw collar; same 22.5 x 12.1 x 22.4 case as the FS90MG",
    "software_clamp_deg": [
     -42,
     42
    ],
    "hard_stop_deg": 47.0,
-   "moving_inertia_g_mm2": 56629.0,
-   "accel_torque_60deg_in_0p12s_kgcm": 0.1679,
-   "fraction_of_stall_6V": 0.0763,
+   "moving_inertia_g_mm2": 36681.0,
+   "accel_torque_60deg_in_0p12s_kgcm": 0.1088,
+   "fraction_of_stall_4p8V": 0.0837,
    "note": "Pan now also turns the turret and the tilt servo."
   },
   "tilt": {
-   "servo": "FS90MG on the neck turret, spline on the tilt axis (x direction, y=6, z=119)",
+   "servo": "Feetech FS90 on the neck turret, spline on the tilt axis (x direction, y=6, z=119)",
    "software_clamp_deg": [
     -10,
     10
    ],
    "first_contact_deg": {
-    "nod_down": 16.5,
+    "nod_down": 13.5,
     "look_up": -23.5
    },
-   "head_mass_g": 49.5,
-   "head_com_from_axis_mm": 9.3,
-   "gravity_torque_kgcm": 0.046,
-   "fraction_of_stall_6V": 0.021
+   "head_mass_g": 25.3,
+   "head_com_from_axis_mm": 8.8,
+   "gravity_torque_kgcm": 0.022,
+   "fraction_of_stall_4p8V": 0.017
   }
  },
  "servo_power": {
@@ -205,44 +315,49 @@
    "head pan",
    "head tilt"
   ],
-  "stall_each_A_6V": 0.8,
-  "worst_case_all_stalled_A": 1.6,
-  "note": "Arms are passive and draw nothing; hugging costs no power. Budget the 5 V servo rail for \u22651.6 A peak."
+  "stall_each_A_5V": 0.7,
+  "worst_case_all_stalled_A": 1.4,
+  "note": "Arms are passive and draw nothing. FS90 stall 700 mA at 4.8 V (Feetech). U3V16F5 from a 3.7 V cell gives roughly 1 A continuous at 5 V, so the firmware must not stall both servos at once; the INA219 trip covers it.",
+  "runtime": {
+   "battery_mAh": 400,
+   "idle_wifi_mA": 110,
+   "servo_avg_mA": 60,
+   "est_hours": 2.0,
+   "note": "XIAO ESP32S3 Sense Wi-Fi active \u2248110 mA (Seeed), servos moving ~20 % of the time \u224860 mA average (ASSUMED): \u22482 h; \u22483\u20134 h with Wi-Fi light-sleep between interactions."
+  }
  },
  "changed_vs_servo_clasp_bed94ce": {
-  "arm_L.stl": "changed (volume 16927 -> 10442 mm\u00b3)",
-  "arm_R.stl": "changed (volume 16927 -> 13585 mm\u00b3)",
-  "bezel.stl": "geometrically unchanged (bytes differ)",
+  "arm_L.stl": "changed (volume 16927 -> 7957 mm\u00b3)",
+  "arm_R.stl": "changed (volume 16927 -> 10130 mm\u00b3)",
   "coupon.stl": "geometrically unchanged (bytes differ)",
-  "head_back.stl": "changed (volume 25416 -> 20326 mm\u00b3)",
-  "head_front.stl": "changed (volume 17488 -> 21015 mm\u00b3)",
+  "head_back.stl": "changed (volume 25416 -> 16347 mm\u00b3)",
+  "head_front.stl": "changed (volume 17488 -> 15540 mm\u00b3)",
   "neck_turret.stl": "new",
   "paw_pad_L.stl": "new",
   "paw_pad_R.stl": "new",
-  "shutter.stl": "identical",
   "tilt_hub.stl": "new",
-  "torso_back.stl": "changed (volume 39687 -> 36231 mm\u00b3)",
-  "torso_front.stl": "changed (volume 21184 -> 36778 mm\u00b3)",
+  "torso_back.stl": "changed (volume 39687 -> 33944 mm\u00b3)",
+  "torso_front.stl": "changed (volume 21184 -> 39469 mm\u00b3)",
   "tray.stl": "geometrically unchanged (bytes differ)",
   "yaw_collar.stl": "geometrically unchanged (bytes differ)",
   "yaw_coupler.stl": "geometrically unchanged (bytes differ)",
-  "yaw_retainer_A.stl": "geometrically unchanged (bytes differ)",
-  "yaw_retainer_B.stl": "identical",
+  "yaw_retainer_A.stl": "identical",
+  "yaw_retainer_B.stl": "geometrically unchanged (bytes differ)",
   "yaw_thrust_washer.stl": "geometrically unchanged (bytes differ)",
-  "reference/dummies.stl": "changed (volume 83776 -> 75955 mm\u00b3)",
+  "reference/dummies.stl": "changed (volume 83776 -> 37069 mm\u00b3)",
   "reference/dummy_amp.stl": "identical",
-  "reference/dummy_cam.stl": "changed (volume 6900 -> 6900 mm\u00b3)",
+  "reference/dummy_cam.stl": "changed (volume 6900 -> 434 mm\u00b3)",
   "reference/dummy_horn_tilt.stl": "new",
   "reference/dummy_horn_yaw.stl": "geometrically unchanged (bytes differ)",
   "reference/dummy_mic.stl": "identical",
   "reference/dummy_pi.stl": "identical",
   "reference/dummy_servo_tilt.stl": "new",
   "reference/dummy_servo_yaw.stl": "geometrically unchanged (bytes differ)",
-  "reference/dummy_speaker.stl": "identical",
+  "reference/dummy_speaker.stl": "changed (volume 35700 -> 3000 mm\u00b3)",
   "reference/fur_proxy_torso.stl": "changed (volume 89623 -> 116694 mm\u00b3)",
   "reference/grip_rod.stl": "new",
-  "reference/sleeve_proxy_L.stl": "changed (volume 30717 -> 9752 mm\u00b3)",
-  "reference/sleeve_proxy_R.stl": "changed (volume 30717 -> 13713 mm\u00b3)"
+  "reference/sleeve_proxy_L.stl": "changed (volume 30717 -> 7558 mm\u00b3)",
+  "reference/sleeve_proxy_R.stl": "changed (volume 30717 -> 10604 mm\u00b3)"
  },
  "removed_vs_servo_clasp_bed94ce": [
   "stl/shoulder_bracket_L.stl",

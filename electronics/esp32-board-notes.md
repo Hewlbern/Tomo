@@ -14,21 +14,26 @@ A condensed source for the custom-board section is a Gemini (Code and analysis
 | Function | Role |
 |---|---|
 | Brain | ESP32-S3 with enough flash and Octal PSRAM for a camera frame buffer plus audio |
-| Camera | OV2640 or OV3660, on a 24-pin 0.5 mm FPC through the hollow neck journal |
+| Camera | OV3660 or OV5640 (Seeed now ships these on the XIAO Sense; OV2640 is discontinued), on a long 24-pin 0.5 mm FPC through the hollow neck journal to the 'nose' pod behind a Ø3.5 window. Optional: Tomo works without it |
 | Voice in | I2S or PDM MEMS microphone |
-| Voice out | I2S amplifier (MAX98357A) into the Adafruit 3351 3 W 4 Ω enclosed speaker already seated in the torso |
-| Motion | **Two** Feetech FS90MG servos (V.01 passive hug): head pan and head tilt/nod — two PWM channels. The arms are passive (torsion spring per shoulder, opened by hand) and need no electronics |
-| Power | USB-C in, 1S LiPo, a clean 3.3 V rail that holds up as the pack sags, and a **separate 5 V servo rail** with bulk capacitance |
+| Voice out | I2S amplifier (MAX98357A) into an Adafruit 3923 mini oval speaker (8 Ω 1 W, 30 × 20 × 5 mm, 3 g) on the inside of torso_back; keep the amp gain low |
+| Motion | **Two** Feetech FS90 servos, 9 g plastic gear (lighter Tomo; was FS90MG): head pan and head tilt/nod — two PWM channels. The arms are passive (torsion spring per shoulder, opened by hand) and need no electronics |
+| Power | USB-C in, 1S 400 mAh LiPo (Core CE04375, 11 g, PCM, 2C), charged by the XIAO's onboard charger, a clean 3.3 V rail that holds up as the pack sags, and a **separate 5 V servo rail** with bulk capacitance |
 | Fail-safe | Sense current on the 5 V rail and cut servo power so the head goes limp if a child forces it. The arms are no longer motorised, so there is no grip current and no clasp interlock; the only driven parts are the pan and tilt servos (firmware clamps ±42° pan, ±10° tilt). |
 
-Budget about 800 mA stall per FS90MG, conservatively — **1.6 A** if both
+Budget about 700 mA stall per FS90 at 4.8 V (800 mA at 6 V, Feetech) — **≈1.4 A** if both
 stall at once — and keep the first bench bring-up on a current-limited supply.
 Holding a hug costs no power at all.
-Stagger moves in firmware or size the 5 V rail for the peak. Portable power is unresolved.
+The planned portable rail is a **Pololu U3V16F5** 5 V boost (0.4 g, ≈1.6 A typical
+input, so roughly 1 A out at 5 V from 3.7 V) on the **400 mAh** cell (2C = 0.8 A,
+leads rated 1 A). Neither covers two stalled servos, so the firmware moves one joint
+at a time (`ONE_JOINT_AT_A_TIME`) and goes limp between behaviours, and the INA219
+trip must sit below ≈0.6 A on the servo rail. Runtime ≈2 h at ≈170 mA average with
+Wi-Fi on (ASSUMED), longer with light-sleep.
 
 ## Two prototype options (planned, not purchased)
 
-### Option A — about A$88–93 electronics, or about A$112.15–116.65 with the two priced servos and speaker
+### Option A — about A$93–98 electronics, or about A$114.90–119.40 with the two priced servos, speaker and battery
 
 A project buy, not a single-robot kit: one first-article board plus spare
 modules for a later custom PCB.
@@ -40,28 +45,29 @@ modules for a later custom PCB.
 | DigiKey line, free shipping | | 66.50 | |
 | MAX98357A breakout (clone) | 1 | 7.95 | AuscomTech |
 | INA219 breakout (clone) | 1 | 7.00 | AuscomTech |
-| XL6009 boost, set to 5 V | 1 | 6.95 | AuscomTech |
-| **Subtotal** | | **88.40** | |
+| Pololu U3V16F5 5 V boost | 1 | 11.70 | Core Electronics |
+| **Subtotal** | | **93.15** | |
 | Optional MakerStore TP4056 | 1 | 4.50 | optional |
 
 The XIAO Sense is 21 × 17.5 mm and already has 8 MB PSRAM, a detachable
-OV2640, a digital MEMS mic and a small battery charger. Unplug the stock
+OV3660/OV5640 camera, a digital MEMS mic and a small battery charger. Unplug the stock
 camera if you want to try a longer 24-pin FPC through the printed collar.
 
 Cautions: many bare TP4056 boards have no protection IC — only use a pack that
-already has a PCM, or prefer a BQ24074. The XL6009 has no input/output
-protection; put 470–1000 µF on the 5 V servo header, and prefer a protected
-regulator (Pololu S13V20F5, about A$29.55) when you can. Clone INMP441 modules
+already has a PCM, or prefer a BQ24074. The U3V16F5 has thermal shutdown and an
+input current limit but no short-circuit or reverse protection; put 33 µF on its
+input and 470 µF on the 5 V servo header. The Pololu S13V20F5 (about A$29.55) is the
+heavier, protected alternative. Clone INMP441 modules
 are often fake; the Sense already has a mic, so you may not need one yet.
 
-### Option B — about A$51 electronics, or about A$74.93 with the two priced servos and speaker, plus a PCA9685 (not yet sourced)
+### Option B — about A$56 electronics, or about A$77.68 with the two priced servos, speaker and battery, plus a PCA9685 (not yet sourced)
 
 | Item | Qty | AUD | Supplier (Nov 2026) |
 |---|---:|---:|---|
 | DFRobot ESP32-S3 AI Camera DFR1154 (OV3660, PDM mic, MAX98357, 5–12 V VIN, no charger) | 1 | 37.23 | Core Electronics |
 | INA219 breakout (clone) | 1 | 7.00 | AuscomTech |
-| XL6009 boost, set to 5 V | 1 | 6.95 | AuscomTech |
-| **Subtotal** | | **51.18** | |
+| Pololu U3V16F5 5 V boost | 1 | 11.70 | Core Electronics |
+| **Subtotal** | | **55.93** | |
 | PCA9685 16-ch I2C servo driver (needed for the 2 servos + INA219 on one bus) | 1 | not yet sourced | — |
 
 There is no charger on this board. Confirm the board outline against the tray
@@ -113,17 +119,17 @@ check before the board is laid out.
 Suggested block:
 
 ```
-USB-C 5 V ──► BQ24074 power-path & LiPo charger ◄── 1S LiPo (2000–3000 mAh, with PCM)
+USB-C 5 V ──► BQ24074 power-path & LiPo charger ◄── 1S LiPo (400–600 mAh, with PCM)
                  │ V_SYS (about 3.5–4.4 V)
      ┌───────────┼────────────────────────────┐
      ▼           ▼                            ▼
  TPS63020     TPS61088 (not MT3608)        MAX98357A
- 3.3 V MCU    5.0 V servo rail + 470–1000 µF   ► Adafruit 3351
+ 3.3 V MCU    5.0 V servo rail + 470–1000 µF   ► Adafruit 3923
  & camera        │
                  ▼
-           INA219 + TPS259241 eFuse  ► 2× FS90MG
+           INA219 + TPS259241 eFuse  ► 2× FS90
      ESP32-S3-WROOM-1-N16R8 ── I2S mic (INMP441 / ICS-43434)
-                             ── OV2640 / OV3660 on 24-pin FPC
+                             ── OV3660 / OV5640 on 24-pin FPC
                              ── native USB D+/D− to USB-C
 ```
 
@@ -134,9 +140,9 @@ Notes worth keeping:
 - On N16R8 modules, **do not use GPIO 33–37** — they are taken by Octal PSRAM.
 - Trip the eFuse when INA219 sees current above a threshold for about 200 ms,
   and also when the head is parked. The “about 450 mA” figure in the design
-  discussion is a starting guess only: **measure the real FS90MG moving and
+  discussion is a starting guess only: **measure the real FS90 moving and
   stall current on the bench before you freeze a threshold.**
-- When the 5 V rail is cut, the FS90MG back-drives reasonably easily, which is
+- When the 5 V rail is cut, the plastic-gear FS90 back-drives easily, which is
   what makes an electronic limp mode possible. That is not a substitute for a
   rated mechanical breakaway.
 - Route the camera FPC as a loose vertical U-bend through the hollow journal.
@@ -147,7 +153,7 @@ Notes worth keeping:
   the speaker magnet and the battery at least 20 mm away.
 - Rough cost from the design discussion: about A$120 at JLCPCB for five 4-layer
   boards and two assembled, plus about A$60 of local parts (camera, mic,
-  speaker, FS90MGs, 2000 mAh pack) per robot. V.01 (passive hug) uses two FS90MGs.
+  speaker, servos, battery) per robot. Lighter Tomo uses two FS90s and a 400 mAh pack.
 
 A first bring-up checklist, before anyone spins a board: smoke-test the rails
 with peripherals unplugged; enumerate native USB (GPIO19/20); confirm
@@ -157,7 +163,7 @@ INA219 current.
 
 ## Fit against the V.01 CAD (electronics pockets unchanged from v4)
 
-- Speaker pocket and grille: Adafruit 3351 — keep this part.
+- Speaker frame and grille: Adafruit 3923 mini oval on the inside of torso_back (centre x 0, y 38, z 64), 5 × 3 grid of Ø2.2 holes. The 3351 pocket is gone.
 - Amp pocket: sized for Adafruit 3006 (19.4 × 17.8 × 3.0 mm + 8 mm headroom).
   Clone boards should be measured.
 - Mic pocket: sized for Adafruit 3421 (SPH0645). An INMP441 on a short lead,
@@ -167,5 +173,5 @@ INA219 current.
   overlay before you commit.
 - Neck ribbon path: loop bay r = 14 mm, 17 × 2.5 mm slot for a 15 × 1 mm FPC,
   now in the neck_turret deck, then the +x side of the Ø34 yaw bore. Still the
-  right idea for an OV2640 / OV3660 ribbon. The loop bay sits close to the tilt
+  right idea for an OV3660 / OV5640 ribbon. The loop bay sits close to the tilt
   axis, so ±10° of nod moves the FPC only about ±3 mm.

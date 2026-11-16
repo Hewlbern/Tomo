@@ -111,7 +111,7 @@ TY,TZ=6.0,119.0
 tilt_p=[hole_radius(M["neck_turret"],[-16.3,TY,z],[1,0,0],r_max=3,z_span=1.5) for z in (TZ+s_off-span/2,TZ+s_off+span/2)]
 tov=dict(servo_turret=vol_int(M["dummy_servo_tilt"],M["neck_turret"]),servo_head_back=vol_int(M["dummy_servo_tilt"],M["head_back"]),
          servo_head_front=vol_int(M["dummy_servo_tilt"],M["head_front"]),servo_cam=vol_int(M["dummy_servo_tilt"],M["dummy_cam"]))
-add("Tilt servo seat (FS90MG in the neck_turret cradle, official 27.7 span)",
+add("Tilt servo seat (Feetech FS90, same case as the FS90MG drawing, official 27.7 span)",
     "neck_turret, dummy_servo_tilt, head_back, head_front, dummy_cam",
     f"Tab pilots in the cradle plate (design 1.7): {tilt_p}. Overlaps (mm³, must be ~0): {tov}. Spline on the tilt axis (x direction) at y={TY}, z={TZ}; "
     f"case top x=-22, horn x -26.3..-28.3, tilt_hub keyed into head_back. Body window 0.3 mm per side through the cradle.",
@@ -150,7 +150,7 @@ for sx in (-1,1):
     o=np.array([-s_off+sx*(span/2), 0, 86.0])    # mid pilot boss, above the tab cutout
     h=hole_radius(M["yaw_collar"], o, [0,0,1], r_max=3, z_span=1.5)
     yaw_holes.append((o.tolist(), h))
-add("Yaw servo seat (FS90MG, official 27.7 span, 1.7 pilots)",
+add("Yaw servo seat (Feetech FS90, FS90MG-drawing case, official 27.7 span, 1.7 pilots)",
     "yaw_collar, dummy_servo_yaw, dummy_horn_yaw, yaw_coupler",
     f"Pilots at x={[-s_off-span/2,-s_off+span/2]} y=0: {yaw_holes}. "
     f"yaw_top=84, boss top=88.3, horn 88.3-90.3, coupler disc 90.3-91.9 (sits on the horn). "
@@ -347,13 +347,24 @@ add("Tray tab pockets",
 
 # ---------- 5. Electronics seats ----------
 spk=M["dummy_speaker"]; amp=M["dummy_amp"]; mic=M["dummy_mic"]; cam=M["dummy_cam"]; pi=M["dummy_pi"]
-add("Speaker seat (Adafruit 3351, 3 W 4 Ω)",
-    "torso_front, dummy_speaker",
-    f"Published Adafruit 3351 / Core ADA3351: 70×30×17 mm enclosed, 3 W 4 Ω, holes Ø3.4 on 63×24, Core A$8.95. "
+add("Speaker seat (Adafruit 3923 Mini Oval 8 Ω 1 W, on the back wall)",
+    "torso_back, dummy_speaker",
+    f"Adafruit 3923 / Core ADA3923: 30×20×5 mm, 3 g, 8 Ω 1 W (replaces the 25 g Adafruit 3351 enclosure). "
     f"Dummy extents {np.round(spk.extents,3).tolist()}, centroid {np.round(spk.centroid,2).tolist()}. "
-    f"Matches MAX98357A (3.2 W into 4 Ω at 5 V). The v2 Ø28 placeholder and any 0.5 W 8 Ω mini are retired. "
-    f"Speaker↔shell overlap {vol_int(M['torso_front'],spk)} mm³ (pocket has 0.3 mm per-side clearance; grille is a 66×26 window).",
-    "pass" if (vol_int(M['torso_front'],spk) or 0)<=0.05 else "fail")
+    f"Pocket 0.3 mm per side in a frame on the inside of torso_back, open to the inside (glue / foam tape), 5×3 grille of Ø2.2 holes. "
+    f"Speaker↔torso_back {vol_int(M['torso_back'],spk)} mm³, ↔ torso_front {vol_int(M['torso_front'],spk)} mm³, ↔ tray {vol_int(M['tray'],spk)} mm³.",
+    "pass" if max(vol_int(M['torso_back'],spk) or 0,vol_int(M['torso_front'],spk) or 0,vol_int(M['tray'],spk) or 0)<=0.05 else "fail")
+
+# camera pod + nose window + safety-eye holes (head_front, Mirumi face)
+nose=hole_radius(M["head_front"],[0,-42.0,110.0],[0,1,0],r_max=4,z_span=1.0)
+eyes=[hole_radius(M["head_front"],[sx*10.5,-40.6,114.0],[0,1,0],r_max=5,z_span=1.0) for sx in (1,-1)]
+cam_hf=vol_int(cam,M["head_front"]); cam_tor=vol_int(cam,M["torso_front"])
+add("Face: camera pod, nose window and 8 mm safety eyes (head_front)",
+    "head_front, dummy_cam",
+    f"Camera module envelope (ASSUMED 8.5×6×8.5 incl. lens, XIAO ESP32S3 Sense OV3660/OV5640 on a long 24-pin FPC) centred at x 0, z 110, lens 0.5 mm behind the inner skin; "
+    f"nose window (design Ø3.5) {nose}; safety-eye shank holes (design Ø5.0) at x ±10.5, z 114: {eyes}. "
+    f"Camera ↔ head_front {cam_hf} mm³, ↔ torso_front at rest {cam_tor} mm³. Eye bezels and the shutter are gone (bought 8 mm safety eyes with push-on washers).",
+    "pass" if (cam_hf or 0)<=0.05 and (cam_tor or 0)<=0.05 and nose and 3.2<=nose["dia"]<=3.8 and all(e and 4.7<=e["dia"]<=5.3 for e in eyes) else "fail")
 
 add("Amp pocket (Adafruit 3006 MAX98357A 19.4×17.8×3.0)",
     "tray, dummy_amp",
@@ -405,16 +416,16 @@ add("Pi envelope",
 SW=json.load(open("results/summary_sweep.json")) if os.path.exists("results/summary_sweep.json") else None
 nov=SW is not None and len(SW["rigid_overlaps_in_travel"])==0
 st=SW["stop_engagement"] if SW else {}
-add("Head pan joint (motorised yaw, FS90MG in the collar)",
+add("Head pan joint (motorised yaw, FS90 in the collar)",
     "yaw_collar, yaw_coupler, neck_turret, head_back, head_front, dummy_servo_yaw, dummy_horn_yaw",
-    "Pan servo is the v3 collar FS90MG (unchanged): horn → coupler blade → slot in neck_turret (the slot, skirt, cone and retainers moved "
+    "Pan servo is an FS90 in the v3 collar seat (same case as the old FS90MG): horn → coupler blade → slot in neck_turret (the slot, skirt, cone and retainers moved "
     "from head_back to the turret). Software clamp ±42°. "
     + (f"Sweep: {SW['sweep']['poses']} poses, rigid overlaps in travel = {len(SW['rigid_overlaps_in_travel'])}; first yaw stop contact at "
        f"{st['yaw_pos']['yaw']}° / {st['yaw_neg']['yaw']}° (collar lug ↔ turret lug)." if SW else "Run scripts/sim_v01.py first."),
     "pass" if nov else "fail")
 hc=SW.get("head_tilt_clearance_mm") if SW else None
 tilt_ok=bool(SW and nov and st.get("tilt_down") and st["tilt_down"]["tilt"]>=11.5 and st.get("tilt_up") and st["tilt_up"]["tilt"]<=-11.5)
-add("Head tilt / nod joint (FS90MG on the neck turret, NEW)",
+add("Head tilt / nod joint (FS90 on the neck turret)",
     "neck_turret, tilt_hub, head_back, head_front, dummy_servo_tilt, dummy_horn_tilt, dummy_cam, yaw_collar",
     ("Tilt axis along x through y=6, z=119 (near the head centre, so the shell barely moves). Firmware clamp ±10° (+ = nod down). "
      f"First rigid contact: nod down {st['tilt_down']['tilt']}° ({st['tilt_down']['a']} ↔ {st['tilt_down']['b']}), look up {st['tilt_up']['tilt']}° "
@@ -471,17 +482,21 @@ add("Belly groove (R8 channel, off-centre and diagonal, 35° from vertical)",
 add("Test coupon",
     "coupon",
     f"Separate STL stl/coupon.stl (also coupon/coupon.stl): journal ring + skirt (0.35 mm radial) + 0.8 mm washer, "
-    f"10 mm tab in a 10.6 mm pocket, and an FS90MG shelf with 27.7 mm span / 1.7 mm pilots. Print this first. "
+    f"10 mm tab in a 10.6 mm pocket, and an FS90/FS90MG shelf with 27.7 mm span / 1.7 mm pilots. Print this first. "
     f"Volume {M['coupon'].volume:.0f} mm³, extents {np.round(M['coupon'].extents,2).tolist()}.",
     "pass")
 
 # watertight
-if "bezel" not in M and os.path.exists("stl/bezel.stl"):
-    M["bezel"]=load("bezel")
 wt_names=["torso_front","torso_back","tray","yaw_collar","yaw_retainer_A","yaw_retainer_B",
     "yaw_coupler","yaw_thrust_washer","neck_turret","tilt_hub","head_back","head_front","arm_L","arm_R",
     "paw_pad_L","paw_pad_R","coupon"]
-if "bezel" in M: wt_names.append("bezel")
+LT=json.load(open("results/lightening.json")) if os.path.exists("results/lightening.json") else None
+if LT:
+    add("Lightening windows (egg shells)",
+        "torso_front, torso_back, head_front, head_back",
+        "Ø%.0f windows on a %.0f mm hex pitch, kept only where the shell is plain 2.4 mm wall inside a Ø%.0f test disc (≥%.0f mm land round every boss, lip, seam, ear, liner, pocket and hole); base z<12 and the face stay solid. "%(LT["window_d_mm"],LT["pitch_mm"],LT["window_d_mm"]+2*LT["land_mm"],LT["land_mm"])
+        +"; ".join(f'{k}: {v["windows"]} windows, {v["removed_pct"]} % volume' for k,v in LT["parts"].items())+". The fur skin covers them.",
+        "pass" if all(v["windows"]>0 for v in LT["parts"].values()) else "marginal")
 wt={n:bool(M[n].is_watertight) for n in wt_names}
 add("Mesh watertight (printable parts)",
     "all printable STLs",
@@ -496,12 +511,12 @@ summary=dict(n=len(rows),
              cad_only=True, physically_tested=False)
 out=dict(assumptions=dict(
     cad_only=True, physically_tested=False, child_ready=False, power="bench rail only",
-    servo_source="Official Feetech FS90MG drawing p.5, edition A/0, 2021-04-30, ±0.1 mm. File copied to datasheets/FS90MG.pdf.",
+    servo_source="Seats from the official Feetech FS90MG drawing p.5 (datasheets/FS90MG.pdf). Lighter Tomo uses the plastic-gear FS90, whose Feetech spec sheet gives the same 22.5 × 12.1 × 22.4 case (9 g, 1.3 kg·cm at 4.8 V, 21T spline): https://www.feetech.cn/en/6v-15kg-9g-dc-reduction-steering-gear-tooth-box",
     horn="ASSUMED typical 2.0 mm disc + 4-arm star, Ø24. Not on the drawing. p.6 says No Accessories.",
-    spline_teeth="Drawing and 6-9 say 20T/Ø4.7; product pages say 21T. Measure on arrival.",
+    spline_teeth="FS90 spec sheet: 21T (Ø4.86). Use the horns that come with the servo; measure on arrival.",
     arm_servos="None. Arms are passive: vertical shoulder hinge + torsion spring (3HPG6 LH / 3HPD1 RH, 3.36 N·mm/°, 50° preload), printed stops at 0° and 30°.",
-    head_servos="2× FS90MG: pan in the yaw collar, tilt on the neck turret (spline on the tilt axis).",
-    speaker="Adafruit 3351 Mono Enclosed 3W 4Ω, 70×30×17, Core A$8.95",
+    head_servos="2× Feetech FS90 (was FS90MG): pan in the yaw collar, tilt on the neck turret (spline on the tilt axis).",
+    speaker="Adafruit 3923 Mini Oval 8Ω 1W, 30×20×5, 3 g, Core ADA3923 A$4.80",
     amp="Adafruit 3006 MAX98357A 19.4×17.8×3.0",
     mic="Adafruit 3421 16.7×12.7×1.8 bottom-ported",
     fastener_scheme="M2.5 clearance 2.8 / pilot 2.1 (front=clearance, back=pilot). Servo self-tap pilots 1.7. Retainer M2 clearance 2.3 / pilot 1.7.",

@@ -3,11 +3,14 @@
 //
 // The arms are passive: a torsion spring in each shoulder holds the hug with zero power and you open
 // them by hand. There is no clasp logic, no grip current and no arm interlock any more.
-// This sketch only drives the head: pan (FS90MG in the yaw collar) and tilt/nod (FS90MG on the
-// neck turret), with three simple behaviours: look-around, nod and a shy turn-away.
+// This sketch only drives the head: pan (Feetech FS90 in the yaw collar) and tilt/nod (FS90 on the
+// neck turret; lighter Tomo swapped the FS90MG for the 9 g plastic-gear FS90, same case and 21T spline), with three simple behaviours: look-around, nod and a shy turn-away.
 //
 // Untested planning code — nothing has been built or brought up. Bench power only, on a
 // current-limited 5 V supply, servos unplugged from the head until the centre trim is set.
+// Portable power (lighter Tomo): 1S 400 mAh LiPo (2C = 0.8 A, 1 A leads) -> Pololu U3V16F5 5 V boost
+// (~1 A at 5 V). Two FS90s stalling together draw ~1.4 A at 5 V, more than the cell and the boost give,
+// so ONE_JOINT_AT_A_TIME moves pan and tilt in turn, and the head goes limp between behaviours.
 //
 // Board: Seeed XIAO ESP32S3 (Sense). Library: ESP32Servo (Kevin Harrington / madhephaestus).
 // Pins: D0 = pan, D1 = tilt (see electronics/esp32-board-notes.md).
@@ -21,13 +24,16 @@ static const int PIN_TILT = D1;
 
 // CAD: pan hard stop ≈ ±47°, so the software clamp stays inside it.
 static const float PAN_MIN  = -42.0f, PAN_MAX  = 42.0f;
-// CAD: first rigid contact at +16.5° nose down / −23.5° looking up; clamp ±10°.
+// CAD: first rigid contact at +13.5° nose down (camera pod on the collar) / −23.5° looking up; clamp ±10°.
 static const float TILT_MIN = -10.0f, TILT_MAX = 10.0f;   // + = nod down
 
 // Servo centre trims (µs) and direction. Set these on the bench before fitting the head.
 static const int   PAN_CENTRE_US  = 1500, TILT_CENTRE_US = 1500;
-static const float US_PER_DEG     = 1000.0f / 90.0f;     // FS90MG: ~500–2500 µs over ~180°
+static const float US_PER_DEG     = 1000.0f / 90.0f;     // FS90: ~500–2500 µs over ~180° (check on the bench)
 static const int   PAN_DIR = +1, TILT_DIR = +1;           // flip if a joint runs backwards
+
+// Battery build: move one joint at a time to keep the peak servo current under the 400 mAh cell's limit.
+static const bool ONE_JOINT_AT_A_TIME = true;
 
 // Motion smoothing: max speed (deg/s) per joint.
 static const float PAN_SPEED  = 90.0f;
@@ -62,8 +68,21 @@ static void detachServos() {   // limp head: lets a child push it without fighti
   attached = false;
 }
 
-// Move both joints together with an ease-in/ease-out, respecting the speed limits.
+static void moveTogether(float panDeg, float tiltDeg, float speedScale);
+
+// Move to a pose with an ease-in/ease-out, respecting the speed limits. On the battery build the
+// joints move in turn (pan, then tilt), so only one servo accelerates at a time.
 static void moveTo(float panDeg, float tiltDeg, float speedScale = 1.0f) {
+  if (ONE_JOINT_AT_A_TIME) {
+    float t0 = tiltNow;
+    moveTogether(panDeg, t0, speedScale);
+    moveTogether(panDeg, tiltDeg, speedScale);
+  } else {
+    moveTogether(panDeg, tiltDeg, speedScale);
+  }
+}
+
+static void moveTogether(float panDeg, float tiltDeg, float speedScale) {
   attachServos();
   panDeg  = clampf(panDeg,  PAN_MIN,  PAN_MAX);
   tiltDeg = clampf(tiltDeg, TILT_MIN, TILT_MAX);

@@ -4,7 +4,7 @@ Mirumi-style passive spring hug, Mirumi proportions: one egg body, face cap pans
 about a vertical SHOULDER hinge (left arm axis through (HX, HY), right at (-HX, HY)); the arms are asymmetric and
 cross a diagonal belly groove at C_L (left arm) and C_R (right arm). 0 deg = closed on the rest stop, + = opened by
 hand, printed open stop at 30 deg.
-Head: pan (yaw about z, FS90MG in the collar) and tilt/nod (about x through y=6, z=119, FS90MG on the neck turret).
+Head: pan (yaw about z, FS90 in the collar) and tilt/nod (about x through y=6, z=119, FS90 on the neck turret).
 Not dynamics. No contact mechanics, no friction, no print tolerance, no soft-body. Spring force from the catalogue rate."""
 import numpy as np, trimesh, json, csv, itertools, time, os, sys, math
 from trimesh.transformations import rotation_matrix as Rm

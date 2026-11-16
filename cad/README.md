@@ -10,6 +10,16 @@ Source: [`evokin_v01.scad`](evokin_v01.scad) (internal file names keep the `evok
 
 Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (opening angle, 0 = closed on the rest stop). STLs are exported at all zeros. Pose a part by hand with `-D yaw=… -D tilt=… -D armL=… -D armR=…`.
 
+## What changed in the lighter Tomo / Mirumi-look pass (vs 6ad85c3)
+
+- **Mass ≈191 g with battery** (was ≈334 g; ASSUMED print profiles, see `results/metrics_v01.json` → `mass.budget_before_after` and the README table).
+- **Lightening windows** (`scripts/lighten_shells.py`, run once by `build_stl.sh` after export): Ø14 holes on a 17.5 mm hex pattern, 3.5 mm land, kept only where the shell is plain 2.4 mm wall (within 1.5 % of a revolved plain shell), not below z 12 and not in the face zone (|x| < 24, z < 128). torso_front 14, torso_back 12, head_front 7, head_back 10 windows (11.5–19.6 % of each shell's volume). The posed head copies in `check/` get the same windows so the sweep's transform check still matches. Windows list: `results/lightening.json`. Not idempotent: re-export before re-running.
+- **Arms** thinner: `ARM_RS` 3.0 (was 3.5), `ARM_HW` 4, root 3.5 / tip 3.0; the band is offset inward by `ARM_THIN` so the inner face (pad contact, grip geometry) is unchanged.
+- **Face**: Pi-camera block and Ø21.6 bezel seats removed. Camera pod at the nose (`nose_z` 110, lens 0.5 mm behind a Ø3.5 window, pocket open to the inside, FPC exit on top, 45° chamfer on the pod's inner lower edge so it clears the collar until +13.5° of nod). Ø5 safety-eye shank holes at x ±10.5, z 114. `bezel` and `shutter` are no longer exported.
+- **Speaker**: Adafruit 3923 (30 × 5 × 20 envelope) in a printed frame on the inside of `torso_back` at (0, 38, 64), 5 × 3 grid of Ø2.2 grille holes; the 3351 bosses and front grille are gone.
+- **Servos**: Feetech FS90 in both seats (same case as the FS90MG drawing per the Feetech spec sheet; 21T spline). Seat geometry unchanged.
+- The egg (R 46, ZEQ 58, H 148, n 3.4) is unchanged: at H 145 / n 3.6 the turret already clears the dome by −0.02 mm, so it cannot be lowered with this neck stack.
+
 ## What changed in the Mirumi-proportion pass (vs 1b048e5)
 
 - **One egg body.** `torso_front/back` and `head_front/back` are now cut from one egg of revolution (`begg`): R 46 at z = 58, ellipse below, superellipse n = 3.4 above, top at z = 148. The face cap is split off by a **seam sphere** centred at (0, 0, 119) on the tilt-axis line, radius √(r(101)² + 18²) ≈ 48.3 mm, meeting the skin at z ≈ 101 with a 2 × 1.5 mm gap. Because the egg is round in plan and the sphere is centred near the tilt axis, the cap pans and tilts inside the body.
@@ -22,7 +32,7 @@ Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (
 
 - **Arm servos removed.** Shoulder pods in `torso_back`, `shoulder_bracket_L/R`, arm hubs, arm-servo and arm-horn dummies are gone.
 - **Passive hug arms** on vertical sprung hinges (now at the shoulders, see above).
-- **Head tilt.** New `neck_turret` (rides the yaw journal, carries the tilt FS90MG) and `tilt_hub`; `head_back` / `head_front` changed. Servo count stays at two.
+- **Head tilt.** New `neck_turret` (rides the yaw journal, carries the tilt servo) and `tilt_hub`; `head_back` / `head_front` changed. Servo count stays at two.
 - Reference module `grip_rod(d, h = 50)` (Ø12.5 test rod lying diagonally on the groove floor, `stl/reference/grip_rod.stl`).
 
 ### Shoulder hinge (each side, mirrored)
@@ -60,14 +70,14 @@ Each arm clamps on its own crossing. Pad force = spring torque ÷ perpendicular 
 
 The rigid arm stays ≈1.42–1.47 mm clear of each object; the 1.5 mm TPU pad makes the contact. Holding the arms fully open takes ≈4.6 N (L) / 4.1 N (R) at the pads. Open: pads ↔ belly 24.7 / 23.9 mm. Loading: a Ø15 rod slides in sideways at 4 mm stand-off and drops onto the floor without touching the arms or shell (it cannot go straight in along the groove normal, because the open arms still lie across the groove).
 
-**Clinging.** Mass ≈297 g (no battery), COM (−1.1, −6.6, 74.3), 42.3 mm from the handle axis. *Seated on the bag* (Mirumi's pose): the bag carries the weight and the hug only resists toppling; at 90° of lean the hug moment is 1.38× the toppling moment. *Free hang*: the body rolls about the round handle until the COM is underneath (≈35° sideways for a vertical handle); slip along a vertical handle is held by friction only, 6.99 N × μ 0.5 (assumed) → safety factor 2.4 (2.1 with a 2000 mAh battery).
+**Clinging (lighter Tomo).** Mass ≈180 g (no battery) / 191 g with the 400 mAh cell, COM (−1.0, −4.4, 73.4), ≈44 mm from the handle axis. *Seated on the bag* (Mirumi's pose): the bag carries the weight and the hug only resists toppling; at 90° of lean the hug moment is 2.30× (2.24× with battery) the toppling moment. *Free hang*: the body rolls about the round handle until the COM is underneath (≈35° sideways for a vertical handle); slip along a vertical handle is held by friction only, 7.03 N × μ 0.5 (assumed) → safety factor 4.0 (3.8 with the battery). Springs unchanged.
 
 ### Head tilt
 
 | Item | Value |
 |---|---|
 | Axis | along x through y = 6, z = 119 (+ = nose down) |
-| Servo | FS90MG, case top at x = −22, spline pointing −x, screwed by its tabs to a cradle plate on the turret (x −17.8…−14.8) |
+| Servo | Feetech FS90 (FS90MG-drawing case), case top at x = −22, spline pointing −x, screwed by its tabs to a cradle plate on the turret (x −17.8…−14.8) |
 | Hub | `tilt_hub`: Ø18 × 2.5 disc on the horn (2 × M2 at r = 7, assumed), 10 × 10 key into a pocket in `head_back` (cut through the shell; the fur covers it) |
 | Idler | turret column at x 24–27 with an M3 thread-forming pivot screw into a boss on `head_back` |
 | Turret | `neck_turret` carries the skirt, cone, coupler slot, retainer pilots and pan-stop lug |
@@ -125,11 +135,11 @@ File: [`../datasheets/FS90MG.pdf`](../datasheets/FS90MG.pdf) (edition A/0, model
 
 ## Electronics seats
 
-- **Speaker:** Adafruit **3351** Mono Enclosed, **3 W 4 Ω**, 70 × 30 × 17 mm, holes Ø3.4 on 63 × 24, Core **A$8.95**. This is the honest match for MAX98357A (3.2 W into 4 Ω at 5 V). The v2 Ø28 placeholder and any 0.5 W 8 Ω mini are retired. The front grille is now a 66 × 26 window.
+- **Speaker:** Adafruit **3923** mini oval, **8 Ω 1 W**, 30 × 20 × 5 mm, 3 g, Core **A$4.80** (ADA3923). Printed frame on the inside of `torso_back` at (0, 38, 64), firing through a 5 × 3 grid of Ø2.2 holes (the fur is acoustically open). The MAX98357A can put ≈1.4 W into 8 Ω at 5 V, so keep its gain low. The 25 g Adafruit 3351 and its front grille are retired.
 - **Amp:** Adafruit 3006 MAX98357A, pocket 19.4 × 17.8 × 3.0 plus 8 mm headroom for the post-2024 terminal block, on the +y face of the tray spine. Two M2 pilots at an **assumed** 15 × 13 span — measure the board.
 - **Mic:** Adafruit 3421, 16.7 × 12.7 × 1.8, bottom-ported, pocket aligned to the Ø2.4 shell hole at (18, front, 80).
 - **Ribbon:** loop bay r = 14 mm (π·14 ≈ 44 mm extra vs the ≥ 9.4 mm requirement), slot 17 × 2.5 mm for a 15 × 1 mm FPC. Path: camera → loop (head) → turret deck slot at x = 14 → +x side of the Ø34 bore → torso duct → Pi CSI.
-- **Pi:** y-envelope 8.5 mm (v2’s 5 mm was tight if a header is used). Camera is the standard Module 3 (25 × 24 × 11.5), not the Wide.
+- **Pi:** y-envelope 8.5 mm (v2’s 5 mm was tight if a header is used); a XIAO ESP32S3 Sense fits easily. **Camera:** ASSUMED 8.5 × 6 × 8.5 module (XIAO Sense OV3660/OV5640) in the nose pod at z 110 on a long 24-pin FPC.
 
 ## Tray tabs
 
@@ -139,12 +149,12 @@ File: [`../datasheets/FS90MG.pdf`](../datasheets/FS90MG.pdf) (edition A/0, model
 
 1. **Shoulders:** spring into the knuckle recess (arm leg in its slot); knuckle under the ear with the spring over the spigot; wind 50° and hook the torso leg; M3 × 30 pin down through the ear (thread-forming), washer and nyloc under the knuckle, snug. Stretch the TPU sleeves onto the crossings.
 2. **Tray** into the torso pockets; close the torso shells on the registration lip (M2.5 front → back).
-3. **Head pan:** FS90MG into the collar hangers from below; collar onto the torso. From above, through the Ø34 bore: horn, coupler, longer M2.5 horn screw; thrust washer on the journal. Lower the `neck_turret`; retainers from the side into its skirt.
-4. **Head tilt:** tilt FS90MG to the turret cradle (tab self-tappers). Centre it, horn on, `tilt_hub` on the horn (2 × M2). Hang `head_back` on the hub key and the M3 idler screw; close `head_front` (M2.5).
+3. **Head pan:** FS90 into the collar hangers from below; collar onto the torso. From above, through the Ø34 bore: horn, coupler, longer M2.5 horn screw; thrust washer on the journal. Lower the `neck_turret`; retainers from the side into its skirt.
+4. **Head tilt:** tilt FS90 to the turret cradle (tab self-tappers). Centre it, horn on, `tilt_hub` on the horn (2 × M2). Hang `head_back` on the hub key and the M3 idler screw; push the safety eyes through `head_front` and fit their washers, seat the camera in the nose pod, then close `head_front` (M2.5, nylon).
 
 ## Test coupon
 
-`../stl/coupon.stl`: one plate with the journal + skirt (0.35 mm radial) + 0.8 mm washer, a 10 mm tab in a 10.6 mm pocket, and an FS90MG shelf with 27.7 mm span / 1.7 mm pilots. Print this first if you print at all. A passing coupon is **not** a full fit-check.
+`../stl/coupon.stl`: one plate with the journal + skirt (0.35 mm radial) + 0.8 mm washer, a 10 mm tab in a 10.6 mm pocket, and an FS90/FS90MG shelf with 27.7 mm span / 1.7 mm pilots. Print this first if you print at all. A passing coupon is **not** a full fit-check.
 
 ## Parts that changed vs the servo clasp (bed94ce)
 
@@ -154,7 +164,7 @@ File: [`../datasheets/FS90MG.pdf`](../datasheets/FS90MG.pdf) (edition A/0, model
 
 **Removed:** `shoulder_bracket_L/R`, `dummy_servo_arm_L/R`, `dummy_horn_arm_L/R`.
 
-**Unchanged:** `tray`, `yaw_collar`, `yaw_coupler`, `yaw_retainer_A/B`, `yaw_thrust_washer`, `bezel`, `shutter`, `coupon`. Per-file volumes: `results/metrics_v01.json` → `changed_vs_servo_clasp_bed94ce`.
+**Unchanged:** `tray`, `yaw_collar`, `yaw_coupler`, `yaw_retainer_A/B`, `yaw_thrust_washer`, `coupon` (`bezel` / `shutter` dropped in the lighter pass). Per-file volumes: `results/metrics_v01.json` → `changed_vs_servo_clasp_bed94ce`.
 
 ## Rebuild / audit
 
@@ -171,17 +181,18 @@ python3 scripts/render_v01.py
 
 ## Residual blockers
 
-- Nothing here has been printed or assembled. The audit is CAD measurements on exported STLs (25/25 fit-audit rows, 0 rigid overlaps in a 417-pose sweep).
+- Nothing here has been printed or assembled. The audit is CAD measurements on exported STLs (27/27 fit-audit rows, 0 rigid overlaps in a 417-pose sweep).
 - Grip forces come from the catalogue spring rate with no hinge friction; real pads, fur and friction will change them. Spring price on Raptor Supplies AU is inconsistent (A$16.98 vs ≈A$108 per 6-pack); confirm the part and winding hand before ordering.
 - The pads close to a soft ≈3.5 N pinch; the arms open by hand.
 - The open arms still lie across the groove, so handles load sideways, not straight in.
 - Free hanging from a handle rolls the body ≈35° until the COM is under the handle; the seated Mirumi pose is the intended one.
-- Tilt margin is now 6.5° nodding down (+10° clamp, +16.5° contact). Keep the firmware clamp.
+- Tilt margin is 3.5° nodding down (+10° clamp, +13.5° contact: the camera pod on the collar). Keep the firmware clamp.
 - The tilt servo lead now crosses the pan joint beside the FPC.
 - The fur skin needs a diagonal slit down the groove, shoulder-knuckle openings, bare TPU pads and a pile-covered seam round the face cap.
 - Horn size and screw radius (assumed Ø24, r = 7), tooth count (20T vs 21T) and the included screws must be measured on arrival.
-- Two servos can draw up to 1.6 A at stall; size the 5 V rail accordingly.
-- Heavier than Mirumi (≈297 g vs 155 g) and ≈9 mm taller (≈152 vs ≈143 mm with fur).
-- Portable power is unresolved. Bench rail only. Not child-ready.
+- Two FS90s can draw ≈1.4 A at stall, more than the 400 mAh cell (0.8 A) or the U3V16F5 (≈1 A) supply: move one joint at a time (firmware default) and set the INA219 trip below ≈0.6 A.
+- Heavier than Mirumi (≈191 g with battery vs ≈135–155 g; target was 160–180 g) and taller (148 mm egg, ≈160 mm over the pile, vs ≈143 mm). Next ≈11 g: sub-micro servos with new seats.
+- Windowed 2.4 mm shells at a 1-perimeter profile are unprinted and undropped.
+- Portable power (400 mAh + U3V16F5) is planned, untested. Not child-ready.
 
-Priced mechanical subtotal **A$23.75** (2 × FS90MG A$7.40 + Adafruit 3351 A$8.95). Springs and fasteners are not priced into it. Nothing purchased. See [`../BOM.csv`](../BOM.csv).
+Priced mechanical + power subtotal **A$21.75** (2 × FS90 A$5.70 + Adafruit 3923 A$4.80 + 400 mAh LiPo A$5.55). Springs and fasteners are not priced into it. Nothing purchased. See [`../BOM.csv`](../BOM.csv).

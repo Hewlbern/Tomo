@@ -1,41 +1,68 @@
 # SPDX-License-Identifier: MIT
-"""Tomo (formerly evoKin V.01) metrics from the exported STLs: mass and centre of mass, hanging stability on a strap,
-passive-hug spring forces (from results/summary_sweep.json), head pan/tilt loads vs the FS90MG, servo power budget,
+"""Tomo by DreamMachina (formerly evoKin V.01) metrics from the exported STLs: mass and centre of mass, hanging stability on a strap,
+passive-hug spring forces (from results/summary_sweep.json), head pan/tilt loads vs the FS90 (plastic gear; was FS90MG), servo power budget,
 and which STLs changed vs the servo-clasp V.01 (commit bed94ce). Estimates only; nothing has been built or weighed."""
 import numpy as np, trimesh, json, os, sys, hashlib, subprocess, math
 os.chdir(os.path.dirname(os.path.abspath(__file__))+"/..")
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__))))
 from stl_paths import stl_path
 G=9.81; RHO_PLA=1.24e-3; RHO_TPU=1.21e-3
-FILL=0.75      # ASSUMED effective density of a 3-perimeter, 20 % infill print of these thin parts (solid = 1.0)
-STALL_KGCM_6V=2.2; STALL_A_6V=0.8
+FILL0=0.75     # v0.1 Mirumi-proportions estimate (6ad85c3): every printed part at 0.75 of solid
+# Lighter Tomo print profiles (ASSUMED effective fraction of solid; weigh the first prints):
+#  shells: 1 perimeter (0.45 mm) each face + 10 % gyroid + 2 top/bottom layers on a 2.4 mm wall ≈ 0.48
+#  arms (spring loads): 2 perimeters + 15 % gyroid, PETG ≈ 0.62;  collar / turret: 3 perimeters + 15 % ≈ 0.60;  tray 0.50
+#  small bearing parts (retainers, coupler, washer, hub): 0.75 (unchanged)
+FILL={"torso_front":0.48,"torso_back":0.48,"head_front":0.48,"head_back":0.48,"arm_L":0.62,"arm_R":0.62,
+      "yaw_collar":0.60,"neck_turret":0.60,"tray":0.50,"yaw_retainer_A":0.75,"yaw_retainer_B":0.75,"yaw_coupler":0.75,
+      "yaw_thrust_washer":0.75,"tilt_hub":0.75}
+STALL_KGCM=1.3; STALL_KGCM_6V=1.5; STALL_A=0.7; STALL_A_6V=0.8     # Feetech FS90 at 4.8 V / 6 V (Feetech spec sheet)
 L=lambda n: trimesh.load(stl_path(n))
 SW=json.load(open("results/summary_sweep.json"))
-o={"assumptions":dict(material=f"PLA 1.24 g/cm³ × {FILL} effective fill (solid upper bound also given); TPU pads 1.21 g/cm³ solid",
-   components="FS90MG 13.4 g each (Feetech listing), horn 1 g, Adafruit 3351 speaker 25 g (ASSUMED), XIAO ESP32S3 Sense + camera 8 g, amp 2 g, mic 1 g, INA219 2 g, boost 5 g, wiring 8 g, fasteners 8 g, springs 2 × 1 g, fur skin 30 g (ASSUMED). Battery listed separately (portable power unresolved).",
+o={"assumptions":dict(material="PLA 1.24 g/cm³ × per-part effective fill (see print_profiles); TPU pads 1.21 g/cm³ solid",
+   print_profiles=FILL,
+   components="Feetech FS90 9 g each (Feetech spec sheet / Core Electronics CE09376) + horn 1 g; Adafruit 3923 mini oval speaker 3 g (Adafruit listing); "
+     "XIAO ESP32S3 Sense with camera 6.6 g (distributor spec) + long-FPC camera allowance 0.9 g; MAX98357A amp 2 g; mic 1 g; INA219 2 g; Pololu U3V16F5 boost 0.4 g (Pololu listing); "
+     "wiring 5 g (ASSUMED, trimmed 30 AWG); fasteners 5.5 g (steel M3 pins and servo/horn screws; nylon M2.5 shell/collar screws); springs 2 × 1 g; 8 mm safety eyes 2 × 0.4 g (ASSUMED); "
+     "long-pile fur skin 19 g (ASSUMED light knit-backed faux fur ≈380 g/m² over ≈0.050 m²) + feet fibrefill 2 g; battery Core Electronics CE04375 1S 400 mAh 11 g (listing).",
    cad_only=True,physically_tested=False)}
-printed="torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer neck_turret tilt_hub head_back head_front arm_L arm_R bezel shutter".split()
+printed=list(FILL)
 items=[]
 for n in printed:
-    m=L(n); q=2 if n=="bezel" else 1
-    items.append((n,m.volume*RHO_PLA*FILL*q,m.center_mass if n!="bezel" else np.array([0,-37.0,120.0]),m.volume*RHO_PLA*q))
+    m=L(n); items.append((n,m.volume*RHO_PLA*FILL[n],m.center_mass,m.volume*RHO_PLA))
 for n in ("paw_pad_L","paw_pad_R"):
     m=L(n); items.append((n,m.volume*RHO_TPU,m.center_mass,m.volume*RHO_TPU))
 def cen(n): return L(n).center_mass
-comp=[("FS90MG pan + horn",14.4,cen("dummy_servo_yaw")),("FS90MG tilt + horn",14.4,cen("dummy_servo_tilt")),
-      ("speaker (Adafruit 3351)",25.0,cen("dummy_speaker")),("brain + camera",8.0,cen("dummy_pi")),("amp",2.0,cen("dummy_amp")),
-      ("mic",1.0,cen("dummy_mic")),("INA219 + boost",7.0,np.array([0,10.0,40.0])),("wiring",8.0,np.array([0,0,60.0])),
-      ("fasteners",8.0,np.array([0,-5.0,60.0])),("springs",2.0,np.array([0,-31.2,78.0])),("fur skin",30.0,np.array([0,0,70.0]))]
+comp=[("FS90 pan + horn",10.0,cen("dummy_servo_yaw")),("FS90 tilt + horn",10.0,cen("dummy_servo_tilt")),
+      ("speaker (Adafruit 3923)",3.0,cen("dummy_speaker")),("brain + camera (XIAO ESP32S3 Sense)",7.5,cen("dummy_pi")),("amp",2.0,cen("dummy_amp")),
+      ("mic",1.0,cen("dummy_mic")),("INA219 + U3V16F5 boost",2.4,np.array([0,10.0,40.0])),("wiring",5.0,np.array([0,0,60.0])),
+      ("fasteners",5.5,np.array([0,-5.0,60.0])),("springs",2.0,np.array([0,-31.2,78.0])),("safety eyes",0.8,np.array([0,-44.0,114.0])),
+      ("fur skin (long pile) + feet",21.0,np.array([0,-2.0,68.0]))]
 for c in comp: items.append((c[0],c[1],c[2],c[1]))
 def summ(items,solid=False):
     m=np.array([it[3] if solid else it[1] for it in items]); p=np.array([it[2] for it in items]); return float(m.sum()), (m[:,None]*p).sum(0)/m.sum()
 mt,cm=summ(items); ms,_=summ(items,True)
-bat=("1S LiPo 2000 mAh (optional, portable power unresolved)",38.0,np.array([0,12.0,14.0]),38.0)
+bat=("battery 1S 400 mAh (Core CE04375)",11.0,np.array([0,12.0,30.0]),11.0)
 mtb,cmb=summ(items+[bat])
-o["mass"]=dict(estimate_g=round(mt,0),solid_print_upper_bound_g=round(ms,0),with_2000mAh_battery_g=round(mtb,0),
+# before (v0.1 Mirumi proportions, commit 6ad85c3)
+BEFORE={"shells (torso + head, 4 parts)":106.3,"arms":22.3,"TPU pads":4.0,"tray":11.5,"yaw collar":15.3,"turret + hub + yaw small parts":10.4,
+        "eye bezels + shutter":6.0,"servos 2 × FS90MG + horns":28.8,"speaker (Adafruit 3351)":25.0,"brain + camera":8.0,"amp + mic":3.0,
+        "INA219 + XL6009 boost":7.0,"wiring":8.0,"fasteners":8.0,"springs":2.0,"eyes (in bezels)":0.0,"fur skin":30.0,"battery (2000 mAh)":38.0}
+bd={it[0]:it[1] for it in items}
+AFTER={"shells (torso + head, 4 parts)":sum(bd[k] for k in ("torso_front","torso_back","head_front","head_back")),
+       "arms":bd["arm_L"]+bd["arm_R"],"TPU pads":bd["paw_pad_L"]+bd["paw_pad_R"],"tray":bd["tray"],"yaw collar":bd["yaw_collar"],
+       "turret + hub + yaw small parts":sum(bd[k] for k in ("neck_turret","tilt_hub","yaw_retainer_A","yaw_retainer_B","yaw_coupler","yaw_thrust_washer")),
+       "eye bezels + shutter":0.0,"servos 2 × FS90MG + horns":20.0,"speaker (Adafruit 3351)":3.0,"brain + camera":7.5,"amp + mic":3.0,
+       "INA219 + XL6009 boost":2.4,"wiring":5.0,"fasteners":5.5,"springs":2.0,"eyes (in bezels)":0.8,"fur skin":21.0,"battery (2000 mAh)":11.0}
+RENAME={"servos 2 × FS90MG + horns":"servos (2 × FS90MG → 2 × FS90, + horns)","speaker (Adafruit 3351)":"speaker (Adafruit 3351 → 3923)",
+        "INA219 + XL6009 boost":"INA219 + boost (XL6009 → Pololu U3V16F5)","eyes (in bezels)":"8 mm safety eyes","fur skin":"fur skin (→ long pile + feet)",
+        "battery (2000 mAh)":"battery (1S 2000 mAh → 400 mAh)","fasteners":"fasteners (→ nylon M2.5 shell screws)","eye bezels + shutter":"eye bezels + shutter (removed)"}
+budget=[dict(item=RENAME.get(k,k),before_g=round(BEFORE[k],1),after_g=round(AFTER[k],1)) for k in BEFORE]
+o["mass"]=dict(estimate_g=round(mt,0),solid_print_upper_bound_g=round(ms,0),with_battery_g=round(mtb,0),
+   battery="Core Electronics CE04375 1S 400 mAh, 11 g",
    centre_of_mass_mm=np.round(cm,1).tolist(),centre_of_mass_with_battery_mm=np.round(cmb,1).tolist(),
    breakdown_g={it[0]:round(it[1],1) for it in items},
-   note="Mirumi is 155 g and about 100 x 118 x 143 mm. Tomo is one Ø92 x 148 mm egg (about 102 x 108 x 152 mm with 4-5 mm fur and the arms) and carries a speaker and a camera brain, so it is heavier.")
+   budget_before_after=budget,before_total_with_battery_g=round(sum(BEFORE.values()),0),after_total_with_battery_g=round(sum(AFTER.values()),0),
+   note="Mirumi is about 135–155 g and about 100 x 118 x 143 mm. Target 160–180 g with battery, ceiling 200 g. Printed masses use the ASSUMED print profiles; weigh the first prints.")
 # ---- clinging to a bag handle that runs diagonally across the chest (Mirumi pose) and hanging free from it
 sys.path.insert(0,"scripts"); import groove_geo as gg
 H=SW["hug"]; g125=next(g for g in H["grip"] if g["d_mm"]==12.5)
@@ -71,23 +98,24 @@ o["hug_springs"]=dict(rate_Nmm_per_deg=H["spring"]["rate_Nmm_per_deg"],preload_d
    grip={f'{g["d_mm"]}':dict(open_deg_L=g["L"].get("open_deg"),open_deg_R=g["R"].get("open_deg"),force_L_N=g["L"].get("pad_normal_force_N"),force_R_N=g["R"].get("pad_normal_force_N"),total_N=g["total_pad_force_N"]) for g in H["grip"]},
    spring_stress_check=f"σ ≈ 32·M·Ki/(π·d³) with M = {Mopen:.0f} N·mm at the open stop (80° wind-up), d = 1.22 mm, Ki ≈ 1.1: ≈{sig/1000:.2f} GPa, under the ≈1.86 GPa at the catalogue 90° rating (302.7 N·mm).")
 # ---- head pan / tilt loads
-head=[L(n) for n in ("head_front","head_back","tilt_hub")]
-hm=sum(h.volume for h in head)*RHO_PLA*FILL+8.0+2*1.0    # + camera/brain allowance + bezels
+head=[L(n) for n in ("head_front","head_back","tilt_hub")]; h_cam=1.0
+hm=sum(h.volume for h in head)*RHO_PLA*FILL['head_front']+0.9*h_cam+0.8+4.0    # + camera module/FPC, safety eyes, head fur share (ASSUMED 4 g)
 hc=sum(h.volume*h.center_mass for h in head)/sum(h.volume for h in head)
 ax=np.array([0,6.0,119.0]); arm=float(np.hypot(hc[1]-ax[1],hc[2]-ax[2]))
 tau_tilt=hm/1000*G*arm/1000      # N·m worst case (lever horizontal)
 turret=[L(n) for n in ("neck_turret","yaw_coupler","yaw_retainer_A","yaw_retainer_B")]
 parts=head+turret
-I=sum(p.moment_inertia[2,2]*RHO_PLA*FILL + p.volume*RHO_PLA*FILL*(p.center_mass[0]**2+p.center_mass[1]**2) for p in parts)+14.4*(15**2)
+I=sum(p.moment_inertia[2,2]*RHO_PLA*0.6 + p.volume*RHO_PLA*0.6*(p.center_mass[0]**2+p.center_mass[1]**2) for p in parts)+10.0*(15**2)
 th=np.radians(60); t=0.12; alpha=4*th/t**2; tau_acc=float(I)*1e-9*alpha
-o["head"]=dict(pan=dict(servo="FS90MG in the yaw collar (unchanged)",software_clamp_deg=[-42,42],hard_stop_deg=SW["stop_engagement"]["yaw_pos"]["yaw"],
-      moving_inertia_g_mm2=round(float(I),0),accel_torque_60deg_in_0p12s_kgcm=round(tau_acc/G*100,4),fraction_of_stall_6V=round(tau_acc/G*100/STALL_KGCM_6V,4),
+o["head"]=dict(pan=dict(servo="Feetech FS90 (plastic gear, 9 g) in the yaw collar; same 22.5 x 12.1 x 22.4 case as the FS90MG",software_clamp_deg=[-42,42],hard_stop_deg=SW["stop_engagement"]["yaw_pos"]["yaw"],
+      moving_inertia_g_mm2=round(float(I),0),accel_torque_60deg_in_0p12s_kgcm=round(tau_acc/G*100,4),fraction_of_stall_4p8V=round(tau_acc/G*100/STALL_KGCM,4),
       note="Pan now also turns the turret and the tilt servo."),
-   tilt=dict(servo="FS90MG on the neck turret, spline on the tilt axis (x direction, y=6, z=119)",software_clamp_deg=[-10,10],
+   tilt=dict(servo="Feetech FS90 on the neck turret, spline on the tilt axis (x direction, y=6, z=119)",software_clamp_deg=[-10,10],
       first_contact_deg=dict(nod_down=SW["stop_engagement"]["tilt_down"]["tilt"],look_up=SW["stop_engagement"]["tilt_up"]["tilt"]),
-      head_mass_g=round(hm,1),head_com_from_axis_mm=round(arm,1),gravity_torque_kgcm=round(tau_tilt/G*100,3),fraction_of_stall_6V=round(tau_tilt/G*100/STALL_KGCM_6V,3)))
-o["servo_power"]=dict(servos=2,channels=["head pan","head tilt"],stall_each_A_6V=STALL_A_6V,worst_case_all_stalled_A=round(2*STALL_A_6V,2),
-   note="Arms are passive and draw nothing; hugging costs no power. Budget the 5 V servo rail for ≥1.6 A peak.")
+      head_mass_g=round(hm,1),head_com_from_axis_mm=round(arm,1),gravity_torque_kgcm=round(tau_tilt/G*100,3),fraction_of_stall_4p8V=round(tau_tilt/G*100/STALL_KGCM,3)))
+o["servo_power"]=dict(servos=2,channels=["head pan","head tilt"],stall_each_A_5V=STALL_A,worst_case_all_stalled_A=round(2*STALL_A,2),
+   note="Arms are passive and draw nothing. FS90 stall 700 mA at 4.8 V (Feetech). U3V16F5 from a 3.7 V cell gives roughly 1 A continuous at 5 V, so the firmware must not stall both servos at once; the INA219 trip covers it.",
+   runtime=dict(battery_mAh=400,idle_wifi_mA=110,servo_avg_mA=60,est_hours=round(400*0.85/(110+60),1),note="XIAO ESP32S3 Sense Wi-Fi active ≈110 mA (Seeed), servos moving ~20 % of the time ≈60 mA average (ASSUMED): ≈2 h; ≈3–4 h with Wi-Fi light-sleep between interactions."))
 def sha(b): return hashlib.sha1(b).hexdigest()
 chg={}
 for f in sorted(os.listdir("stl"))+["reference/"+x for x in sorted(os.listdir("stl/reference"))]:

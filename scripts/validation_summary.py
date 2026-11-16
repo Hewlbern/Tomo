@@ -5,7 +5,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__))+"/..")
 SW=json.load(open("results/summary_sweep.json")); FA=json.load(open("results/fit_audit.json")); ME=json.load(open("results/metrics_v01.json"))
 st=SW["stop_engagement"]; H=SW["hug"]
 out=dict(
-  version="V.01 passive spring hug",
+  version="V.01 passive spring hug, Mirumi proportions (one egg body, shoulder arms, diagonal groove)",
   project="Tomo by DreamMachina (formerly evoKin V.01)",
   repository="https://github.com/Hewlbern/Tomo",
   cad_only=True, physically_tested=False, child_ready=False, power="bench rail only",
@@ -16,9 +16,9 @@ out=dict(
     head_tilt=f"FS90MG on neck_turret, axis along x through y=6, z=119; software ±10°, first contact +{st['tilt_down']['tilt']}° (nod down) / {st['tilt_up']['tilt']}° (look up)",
     arms="none — passive"),
   hug=dict(
-    mechanism="Mirumi-style passive hug: each arm turns on a vertical M3 hip pin; a music-wire torsion spring in the knuckle closes it onto a printed rest stop; opened by hand to a 40° printed stop; zero power to hold",
-    spring=H["spring"], arm_angle_convention="0 = closed on the rest stop, + = open; rotation about z through each hip (x=±49.95, y=−16.19)",
-    groove="R8 channel down the belly, floor y = −30 − 0.25(z − 30) (leans 14°), z 12–62, 2.4 mm liner",
+    mechanism="Mirumi-style passive hug: each arm turns on a vertical M3 shoulder pin just under the face (knuckle z 70–86); a music-wire torsion spring in the knuckle closes it onto a printed rest stop (50° preload); opened by hand to a 30° printed stop; zero power to hold. Asymmetric arms: left over the chest, right under the belly",
+    spring=H["spring"], arm_angle_convention="0 = closed on the rest stop, + = open; rotation about z through each shoulder (x=±44.6, y=−31.2)",
+    groove="R8 channel, off-centre and diagonal (35° from vertical, lower +x to upper −x), floor 7 mm below the skin at both arm crossings, 2.4 mm liner",
     grip=H["grip"], open=H["open"], assumption=H["assumption"],
     stops=dict(closed=st["armL_closed_stop"]["armL"], open=st["armL_open_stop"]["armL"])),
   sweep=dict(poses=SW["sweep"]["poses"], pair_tests=SW["sweep"]["pair_tests"], booleans=SW["sweep"]["aabb_passed_to_boolean"],
@@ -27,6 +27,7 @@ out=dict(
   fit_audit=FA["summary"] if "summary" in FA else None,
   mass=dict(estimate_g=ME["mass"]["estimate_g"], solid_upper_bound_g=ME["mass"]["solid_print_upper_bound_g"],
             with_2000mAh_battery_g=ME["mass"]["with_2000mAh_battery_g"], centre_of_mass_mm=ME["mass"]["centre_of_mass_mm"]),
-  hanging=ME["hanging"]["no_battery"], hanging_verdict=ME["hanging"]["verdict"],
+  proportions=dict(shell_mm="Ø92 x 148 (one egg: R46 at z58, superellipse n=3.4 dome)", with_fur_mm="≈106 wide (arm knuckles) x 104 deep x 152 tall", mirumi_mm="≈100 x 118 x 143"),
+  clinging=ME["clinging"],
   servo_power=ME["servo_power"])
 json.dump(out,open("results/validation_summary.json","w"),indent=1,ensure_ascii=False); print("wrote results/validation_summary.json")

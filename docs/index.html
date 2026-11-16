@@ -231,30 +231,34 @@
         <h2>How it looks</h2>
         <p class="sub">Blender Cycles renders of the fur model, plus CAD stills of the mechanism. Full-size PNGs are in the <a href="https://github.com/Hewlbern/Tomo/tree/main/renders">repository</a>.</p>
         <figure class="wide" style="margin-top:0">
-          <a href="renders/01_hero_hug_handle.jpg"><img src="renders/01_hero_hug_handle.jpg" width="960" height="720" alt="Tomo, an orange furry bear-like robot, hanging from a round brown bag handle with its paws closed around the handle in front of its belly"></a>
-          <figcaption>Hanging from a Ø12.5 mm round bag handle: the handle lies in the belly groove and the spring-loaded paws close on it.</figcaption>
+          <a href="renders/01_hero_hug_handle.jpg"><img src="renders/01_hero_hug_handle.jpg" width="960" height="720" alt="Tomo, an orange furry egg-shaped robot, sitting on a black tote and hugging its curved handle, which runs diagonally across its chest"></a>
+          <figcaption>Sitting on a tote, hugging its Ø12.5&nbsp;mm curved handle the way Mirumi does: the handle runs diagonally across the chest in the off-centre groove and both arms wrap round it.</figcaption>
         </figure>
         <div class="gallery" style="margin-top:16px">
           <figure>
-            <a href="renders/02_arms_open.jpg"><img src="renders/02_arms_open.jpg" width="960" height="720" alt="Tomo sitting with both arms pulled open, showing the groove down its belly, head turned and looking up"></a>
-            <figcaption>Arms pulled open by hand to the 40° stop; head panned 20° and looking up.</figcaption>
+            <a href="renders/02_arms_open.jpg"><img src="renders/02_arms_open.jpg" width="960" height="720" alt="Tomo with both arms pulled open, head turned"></a>
+            <figcaption>Arms pulled open by hand to the 30° stop; head panned 20°.</figcaption>
           </figure>
           <figure>
-            <a href="renders/03_cutaway_hinge_tilt.jpg"><img src="renders/03_cutaway_hinge_tilt.jpg" width="960" height="720" alt="Colour-coded cutaway of Tomo showing the hip hinges, neck turret with the tilt servo, speaker and board"></a>
-            <figcaption>Cutaway: hip hinges, neck turret and tilt servo, speaker and board; head nodding 8°.</figcaption>
+            <a href="renders/03_mirumi_angle.jpg"><img src="renders/03_mirumi_angle.jpg" width="960" height="720" alt="Tomo hugging the tote handle, framed like Mirumi's product photo"></a>
+            <figcaption>The same hug framed roughly like Mirumi's product photo, for comparison.</figcaption>
+          </figure>
+          <figure>
+            <a href="renders/04_cutaway_shoulder_tilt.jpg"><img src="renders/04_cutaway_shoulder_tilt.jpg" width="960" height="720" alt="Colour-coded cutaway of Tomo showing the shoulder hinges, diagonal groove, neck turret with the tilt servo, speaker and board"></a>
+            <figcaption>Cutaway: shoulder hinges and arms, neck turret and tilt servo, speaker and board; face cap nodding 8°.</figcaption>
           </figure>
         </div>
         <figure class="wide">
-          <a href="renders/v01_hug_handle.jpg"><img src="renders/v01_hug_handle.jpg" width="960" height="540" alt="CAD views of the arms closing on a round handle lying in the belly groove"></a>
-          <figcaption>CAD: hugging a Ø12.5 handle (front 3/4 and a section through the arms).</figcaption>
+          <a href="renders/v01_hug_handle.jpg"><img src="renders/v01_hug_handle.jpg" width="960" height="540" alt="CAD views of the arms closing on a round handle lying diagonally in the belly groove"></a>
+          <figcaption>CAD: hugging a Ø12.5 handle lying diagonally in the groove (front 3/4 and front).</figcaption>
         </figure>
         <figure class="wide">
           <a href="renders/v01_arms_open_tilt.jpg"><img src="renders/v01_arms_open_tilt.jpg" width="960" height="540" alt="CAD views with the arms open and the head panned and tilted"></a>
-          <figcaption>CAD: arms open, head pan +30° looking up 10°; side view nodding 10°.</figcaption>
+          <figcaption>CAD: arms open, head pan +30° looking up 10°; side view with the face cap nodding 10° inside the egg.</figcaption>
         </figure>
         <figure class="wide">
-          <a href="renders/v01_hip_turret_exploded.jpg"><img src="renders/v01_hip_turret_exploded.jpg" width="960" height="540" alt="Exploded CAD views of the hip hinge and the pan/tilt neck"></a>
-          <figcaption>CAD: hip hinge and pan/tilt neck, exploded.</figcaption>
+          <a href="renders/v01_shoulder_turret_exploded.jpg"><img src="renders/v01_shoulder_turret_exploded.jpg" width="960" height="540" alt="Exploded CAD views of the shoulder hinge and the pan/tilt neck"></a>
+          <figcaption>CAD: shoulder hinge and pan/tilt neck, exploded.</figcaption>
         </figure>
       </div>
     </section>
@@ -262,23 +266,27 @@
     <section id="works">
       <div class="wrap">
         <h2>How it works</h2>
-        <p class="sub">Two springs hold the hug; two metal-gear micro servos move the head. The shells are FDM-printed and closed on a registration lip.</p>
+        <p class="sub">One egg-shaped body; two springs hold the hug; two metal-gear micro servos move the face cap. The shells are FDM-printed and closed on a registration lip.</p>
         <div class="grid-2">
           <article class="card">
-            <h3>Passive spring hug (Mirumi-style)</h3>
-            <p>Each arm is a curved band that follows the belly and curls into a paw. It turns on a vertical M3 pin at the hip. A music-wire torsion spring in the knuckle (Grainger 3HPG6 left-hand / 3HPD1 right-hand, 3.36&nbsp;N·mm per degree) is preloaded 35° against a printed rest stop. You open the arms by hand to a 40° stop and let go. Holding costs zero power.</p>
+            <h3>Mirumi proportions</h3>
+            <p>Head and body are one egg, about 106 × 104 × 152&nbsp;mm with fur (Mirumi ≈100 × 118 × 143&nbsp;mm). The face is a cap cut off by a seam sphere on the tilt axis, so it pans and nods inside the egg. The arm hinges sit at the shoulders, just under the face.</p>
           </article>
           <article class="card">
-            <h3>Belly groove and paws</h3>
-            <p>A rounded channel down the belly takes round straps and handles 10–15&nbsp;mm thick, or a flat strap up to 25&nbsp;mm laid across it. It leans 14° so a straight strap clears the upper belly. TPU paw pads take the squash; with the arms open there is 28&nbsp;mm between pad and belly.</p>
+            <h3>Passive spring hug</h3>
+            <p>Two long, curved, asymmetric arms: the left crosses the chest high and ends low on the far side; the right drops down its flank and sweeps under the belly. Each turns on a vertical M3 pin at the shoulder. A music-wire torsion spring in the knuckle (Grainger 3HPG6 left-hand / 3HPD1 right-hand, 3.36&nbsp;N·mm per degree) is preloaded 50° against a printed rest stop. You open the arms by hand to a 30° stop and let go. Holding costs zero power.</p>
+          </article>
+          <article class="card">
+            <h3>Diagonal groove and pads</h3>
+            <p>An off-centre channel runs 35° from vertical across the belly, like the line Mirumi's handle takes. It takes round handles 10–15&nbsp;mm thick, or a flat strap up to 25&nbsp;mm. TPU sleeves on both arms take the squash; with the arms open the pads are ≈24&nbsp;mm off the belly, and the handle slides in from the side.</p>
           </article>
           <article class="card">
             <h3>Clamp force</h3>
-            <p>About <strong>2.4&nbsp;N</strong> per paw on Ø10, <strong>2.6&nbsp;N</strong> on Ø12.5, <strong>2.8&nbsp;N</strong> on Ø15 and <strong>2.9&nbsp;N</strong> on a flat 25&nbsp;mm strap. Assumption: catalogue spring rate, no hinge friction, force = spring torque ÷ the ≈51&nbsp;mm lever to the pad contact. On paper the ≈263&nbsp;g robot hangs with a friction safety factor of about 3.5 (μ ≈ 0.5 assumed). Not measured.</p>
+            <p>Total pad force about <strong>6.6&nbsp;N</strong> on Ø10, <strong>7.0&nbsp;N</strong> on Ø12.5, <strong>7.3&nbsp;N</strong> on Ø15 and <strong>6.1&nbsp;N</strong> on a flat 25&nbsp;mm strap (3.2–3.7&nbsp;N per arm). Assumption: catalogue spring rate, no hinge friction, force = spring torque ÷ the ≈54–57&nbsp;mm lever to the pad contact. Sitting on a bag, the ≈297&nbsp;g robot is held upright with 1.4× margin even at 90° lean; hanging free it rolls until its centre of mass is under the handle, with a slip safety factor of ≈2.4 (μ ≈ 0.5 assumed). Not measured.</p>
           </article>
           <article class="card">
             <h3>Head pan and tilt</h3>
-            <p>Two FS90MG servos. Pan: in the yaw collar, ±42° (hard stop ±47°). Tilt: a second servo on a new neck turret nods the head about an axis near its centre, ±10° (first contact at +12° / −15.5°). The tilt servo lead and the camera ribbon cross the pan joint in loose loops.</p>
+            <p>Two FS90MG servos. Pan: in the yaw collar, ±42° (hard stop ±47°). Tilt: a second servo on the neck turret nods the face cap about an axis near its centre, ±10° (first contact at +16.5° / −23.5°). The tilt servo lead and the camera ribbon cross the pan joint in loose loops.</p>
           </article>
           <article class="card">
             <h3>Firmware</h3>
@@ -286,7 +294,7 @@
           </article>
           <article class="card">
             <h3>Shells and fasteners</h3>
-            <p>Male lip on the back half, female groove on the front, 0.25&nbsp;mm FDM clearance, 0.40&nbsp;mm elephant-foot chamfer. M2.5 at 2.8&nbsp;mm clearance / 2.1&nbsp;mm pilot. The hip caps unscrew so an arm, pin and spring come out without opening the torso.</p>
+            <p>Male lip on the back half, female groove on the front, 0.25&nbsp;mm FDM clearance, 0.40&nbsp;mm elephant-foot chamfer. M2.5 at 2.8&nbsp;mm clearance / 2.1&nbsp;mm pilot. Each arm hangs on an M3 × 30 pin with a washer and nyloc under the knuckle, so an arm and spring come out without opening the torso.</p>
           </article>
         </div>
       </div>
@@ -298,11 +306,12 @@
         <div class="card">
           <ul>
             <li><strong>The arms cannot move on their own.</strong> No wave, no motorised hug — but no arm current, no gears to strip and no grip interlock.</li>
-            <li><strong>Grip is modest and fixed</strong> (≈2.4–2.9&nbsp;N per paw). A stronger spring grips harder but is harder for small hands to open. The spring price is uncertain.</li>
-            <li><strong>The paws are a soft pinch point</strong> (≈2.5&nbsp;N); they open by hand.</li>
-            <li><strong>Strap range</strong> is Ø10–15&nbsp;mm round or up to 25&nbsp;mm flat. The strap leans 14° on the body, so Tomo hangs leaning back.</li>
-            <li><strong>Heavier than Mirumi</strong>: about 263&nbsp;g against 155&nbsp;g, because Tomo is bigger and carries a speaker and a camera brain.</li>
-            <li><strong>Tilt margin is tight</strong>: 2° between the +10° clamp and the first contact nodding down.</li>
+            <li><strong>Grip is modest and fixed</strong> (≈3.2–3.7&nbsp;N per arm, 6–7&nbsp;N total). A stronger spring grips harder but is harder for small hands to open. The spring price is uncertain.</li>
+            <li><strong>The pads are a soft pinch point</strong> (≈3.5&nbsp;N); the arms open by hand.</li>
+            <li><strong>Handle range</strong> is Ø10–15&nbsp;mm round or up to 25&nbsp;mm flat, loaded from the side. Tomo is meant to sit on the bag like Mirumi; hanging free, it rolls until its centre of mass is under the handle.</li>
+            <li><strong>Taller than Mirumi</strong>: ≈152 against ≈143&nbsp;mm with fur, because the eyes, camera and tilt servo sit at z ≈ 120.</li>
+            <li><strong>Heavier than Mirumi</strong>: about 297&nbsp;g against 155&nbsp;g, because Tomo carries a speaker and a camera brain.</li>
+            <li><strong>Tilt margin</strong>: 6.5° between the +10° clamp and the first contact nodding down.</li>
           </ul>
         </div>
       </div>
@@ -389,8 +398,8 @@
               <tr><th>Part</th><th>File</th><th>Print notes</th><th class="num">Qty</th></tr>
             </thead>
             <tbody>
-              <tr><td>Torso front</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/torso_front.stl">torso_front.stl</a></td><td>Seam-down. Belly groove with liner; hip webs and upper ears (spring spigot, stop lug).</td><td class="num">1</td></tr>
-              <tr><td>Torso back</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/torso_back.stl">torso_back.stl</a></td><td>Male lip, 1.2 mm. M2.5 pilots 2.1 mm. Shoulder pods removed.</td><td class="num">1</td></tr>
+              <tr><td>Torso front</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/torso_front.stl">torso_front.stl</a></td><td>Seam-down. Lower egg up to the face-cap seam; diagonal groove with liner; shoulder ears (spring spigot, stop lug, rear post).</td><td class="num">1</td></tr>
+              <tr><td>Torso back</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/torso_back.stl">torso_back.stl</a></td><td>Male lip, 1.2 mm. M2.5 pilots 2.1 mm. Egg back up to the seam.</td><td class="num">1</td></tr>
               <tr><td>Tray</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/tray.stl">tray.stl</a></td><td>Spine with amp pocket; 10 mm tabs at x = ±29.</td><td class="num">1</td></tr>
               <tr><td>Yaw collar</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/yaw_collar.stl">yaw_collar.stl</a></td><td>Pan-servo hangers, stepped Ø34 bore.</td><td class="num">1</td></tr>
               <tr><td>Yaw retainers</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/yaw_retainer_A.stl">yaw_retainer_A.stl</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/yaw_retainer_B.stl">B</a></td><td>M2 clearance 2.3 mm.</td><td class="num">1+1</td></tr>
@@ -398,10 +407,9 @@
               <tr><td>Thrust washer</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/yaw_thrust_washer.stl">yaw_thrust_washer.stl</a></td><td>0.8 mm. Print flat, no supports.</td><td class="num">1</td></tr>
               <tr><td>Neck turret (new)</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/neck_turret.stl">neck_turret.stl</a></td><td>Skirt, cone, coupler slot, pan stop, tilt-servo cradle and idler column. Skirt-down.</td><td class="num">1</td></tr>
               <tr><td>Tilt hub (new)</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/tilt_hub.stl">tilt_hub.stl</a></td><td>On the tilt horn (2 × M2); key into head_back.</td><td class="num">1</td></tr>
-              <tr><td>Head front / back</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/head_front.stl">head_front.stl</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/head_back.stl">head_back.stl</a></td><td>Camera and bezel seats; tilt-hub socket and idler boss in the back.</td><td class="num">1+1</td></tr>
-              <tr><td>Arms L / R</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/arm_L.stl">arm_L.stl</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/arm_R.stl">arm_R.stl</a></td><td>Critter’s own left is +x. Curved hug band with the hip knuckle (spring recess, stop relief). PETG preferred, print flat.</td><td class="num">1+1</td></tr>
-              <tr><td>Hip caps (new)</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/hip_cap_L.stl">L</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/hip_cap_R.stl">R</a></td><td>2 × M2.5 to the hip web; M3 nyloc trap.</td><td class="num">1+1</td></tr>
-              <tr><td>Paw pads (new)</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/paw_pad_L.stl">L</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/paw_pad_R.stl">R</a></td><td>TPU 85A–95A, 1.5 mm.</td><td class="num">1+1</td></tr>
+              <tr><td>Head front / back</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/head_front.stl">head_front.stl</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/head_back.stl">head_back.stl</a></td><td>The face cap. Camera and bezel seats; tilt-hub pocket and idler boss in the back.</td><td class="num">1+1</td></tr>
+              <tr><td>Arms L / R</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/arm_L.stl">arm_L.stl</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/arm_R.stl">arm_R.stl</a></td><td>Critter’s own left is +x. Long asymmetric band from the shoulder knuckle (spring recess, stop relief). PETG preferred, print with supports.</td><td class="num">1+1</td></tr>
+              <tr><td>Paw pads (new)</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/paw_pad_L.stl">L</a>, <a href="https://github.com/Hewlbern/Tomo/raw/main/stl/paw_pad_R.stl">R</a></td><td>TPU 85A–95A, 1.5 mm sleeves at the handle crossings.</td><td class="num">1+1</td></tr>
               <tr><td>Eye bezel</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/bezel.stl">bezel.stl</a></td><td>Print two (left and right are mirrors).</td><td class="num">2</td></tr>
               <tr><td>Shutter</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/shutter.stl">shutter.stl</a></td><td>Camera shutter.</td><td class="num">1</td></tr>
               <tr><td>Test coupon</td><td><a href="https://github.com/Hewlbern/Tomo/raw/main/stl/coupon.stl">coupon.stl</a></td><td>Print first. Journal, washer, tab, servo seat.</td><td class="num">1</td></tr>
@@ -445,15 +453,15 @@
             <thead><tr><th>Check</th><th>Result</th></tr></thead>
             <tbody>
               <tr><td>Fit-audit interfaces</td><td class="ok">25 / 25 pass, 0 marginal, 0 fail</td></tr>
-              <tr><td>Imposed-motion sweep</td><td>457 poses, 147,154 pair tests, 15,815 booleans</td></tr>
-              <tr><td>Rigid overlaps in travel</td><td class="ok">0 (pan ±42°, tilt ±10°, arms 0–40°)</td></tr>
-              <tr><td>Hug on Ø10 / 12.5 / 15 mm</td><td class="ok">Arms open 1.9° / 4.4° / 6.8°; 2.4 / 2.6 / 2.8 N per paw</td></tr>
-              <tr><td>Hug on a flat 25 × 2.5 mm strap</td><td class="ok">Arms open 2.6°; 2.9 N per paw</td></tr>
-              <tr><td>Arms open</td><td class="ok">Pad ↔ belly 28.3 mm (≥ 20 mm), a Ø15 rod slides in clear</td></tr>
-              <tr><td>Arm stops</td><td>Engage at −0.5° and 40.5°; arm ↔ hip cap 0.4 mm</td></tr>
+              <tr><td>Imposed-motion sweep</td><td>417 poses, 120,930 pair tests, 25,184 booleans</td></tr>
+              <tr><td>Rigid overlaps in travel</td><td class="ok">0 (pan ±42°, tilt ±10°, arms 0–30°)</td></tr>
+              <tr><td>Hug on Ø10 / 12.5 / 15 mm (diagonal)</td><td class="ok">Arms open 4–10°; 6.6 / 7.0 / 7.3 N total pad force</td></tr>
+              <tr><td>Hug on a flat 25 × 2.5 mm strap</td><td class="ok">Arms open 6.2° / 6.3°; 6.1 N total</td></tr>
+              <tr><td>Arms open</td><td class="ok">Pads ↔ belly 24.7 / 23.9 mm (≥ 15 mm); a Ø15 rod slides in sideways clear</td></tr>
+              <tr><td>Arm stops</td><td>Engage at −0.5° and 30.5°; left ↔ right arm ≥ 2.95 mm</td></tr>
               <tr><td>Head pan hard stop</td><td>±47°, beyond the ±42° clamp</td></tr>
-              <tr><td>Head tilt</td><td>First contact +12° / −15.5°, beyond the ±10° clamp; camera ↔ tilt servo ≥ 4.9 mm</td></tr>
-              <tr><td>Mass (estimate)</td><td>≈ 263 g; hangs with slip safety factor ≈ 3.5</td></tr>
+              <tr><td>Head tilt</td><td>First contact +16.5° / −23.5°, beyond the ±10° clamp; camera ↔ tilt servo ≥ 8.9 mm</td></tr>
+              <tr><td>Mass (estimate)</td><td>≈ 297 g; seated hug margin 1.4×, free-hang slip safety factor ≈ 2.4</td></tr>
               <tr><td>Printable meshes</td><td class="ok">Watertight</td></tr>
             </tbody>
           </table>
@@ -461,7 +469,7 @@
         <div class="card" style="margin-top:18px">
           <h3>Status</h3>
           <ul>
-            <li>Prototype. V.01 passive-hug CAD is complete and unprinted. Grip, hanging, spring life and wear are untested.</li>
+            <li>Prototype. V.01 passive-hug CAD with Mirumi proportions is complete and unprinted. Grip, clinging, spring life and wear are untested.</li>
             <li>The concept video shows an older design (v3).</li>
             <li>Nothing has been ordered or purchased. The spring price is uncertain.</li>
             <li>Power is bench-tethered only. Portable power is unresolved.</li>

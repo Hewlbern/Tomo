@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: MIT
 """Tomo (formerly evoKin V.01) reproducible verification: imposed-motion kinematics on the EXPORTED STLs.
-Mirumi-style passive spring hug: each arm turns about a vertical hip hinge (left arm axis through (HX, HY),
-right mirrored); 0 deg = closed on the rest stop, + = opened by hand, printed open stop at 40 deg.
+Mirumi-style passive spring hug, Mirumi proportions: one egg body, face cap pans/tilts inside it; each arm turns
+about a vertical SHOULDER hinge (left arm axis through (HX, HY), right at (-HX, HY)); the arms are asymmetric and
+cross a diagonal belly groove at C_L (left arm) and C_R (right arm). 0 deg = closed on the rest stop, + = opened by
+hand, printed open stop at 30 deg.
 Head: pan (yaw about z, FS90MG in the collar) and tilt/nod (about x through y=6, z=119, FS90MG on the neck turret).
 Not dynamics. No contact mechanics, no friction, no print tolerance, no soft-body. Spring force from the catalogue rate."""
 import numpy as np, trimesh, json, csv, itertools, time, os, sys, math
@@ -11,16 +13,16 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__))))
 from stl_paths import stl_path
 TOL=0.05
 # ---- geometry constants (must match cad/evokin_v01.scad)
-def ea(z): return 46*math.sqrt(1-((z-50)/50)**2)
-def eb(z): return 40*math.sqrt(1-((z-50)/50)**2)
-HX=(ea(38)+8.5)*math.cos(math.radians(-20)); HY=(eb(38)+8.5)*math.sin(math.radians(-20))
+import groove_geo as gg
+R_AX=gg.eggr(78)+8.5; PSI_H=-35.0
+HX=R_AX*math.cos(math.radians(PSI_H)); HY=R_AX*math.sin(math.radians(PSI_H))
 HL=np.array([HX,HY,0.0]); HR=np.array([-HX,HY,0.0])
-TILT_AX=np.array([0,6.0,119.0]); GF=-30.0; G_SLOPE=0.25   # groove floor y = GF - G_SLOPE*(z-30)
-G_ANG=math.atan(G_SLOPE); G_N=np.array([0,-math.cos(G_ANG),-math.sin(G_ANG)])   # outward normal of the floor line
-YAW_SOFT=(-42,42); TILT_SOFT=(-10,10); ARM_TRAVEL=(0,40)
+TILT_AX=np.array([0,6.0,119.0])
+G_FR=gg.FR; G_U=gg.U; G_N=gg.N; G_MID=G_FR+G_U*19.0        # diagonal groove floor line (point, direction), outward normal
+YAW_SOFT=(-42,42); TILT_SOFT=(-10,10); ARM_TRAVEL=(0,30)
 SPRING_K=0.3027/90*1000      # N·mm/deg, 3HPG6 / 3HPD1 catalogue: 2.679 lbf·in at 90°
-SPRING_PRE=35.0              # deg of wind-up at the rest stop
-PRINTED="torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer neck_turret tilt_hub head_back head_front arm_L arm_R hip_cap_L hip_cap_R paw_pad_L paw_pad_R".split()
+SPRING_PRE=50.0              # deg of wind-up at the rest stop
+PRINTED="torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer neck_turret tilt_hub head_back head_front arm_L arm_R paw_pad_L paw_pad_R".split()
 PROXY="sleeve_proxy_L sleeve_proxy_R fur_proxy_torso".split()
 DUMMIES="dummy_servo_yaw dummy_horn_yaw dummy_servo_tilt dummy_horn_tilt dummy_pi dummy_cam dummy_speaker dummy_amp dummy_mic".split()
 M={p:trimesh.load(stl_path(p)) for p in PRINTED+PROXY+DUMMIES}
@@ -35,7 +37,7 @@ def T(p,y,t,aL,aR):
     return np.eye(4)
 def pose(p,y=0,t=0,aL=0,aR=0): m=M[p].copy(); m.apply_transform(T(p,y,t,aL,aR)); return m
 out=dict(tolerance_mm3=TOL, naming="arm_L = critter's own LEFT = +x; arm_R = -x",
-         arm_angle=f"opening angle about the vertical hip hinge (left axis x={HX:.2f}, y={HY:.2f}); 0 = closed on the rest stop, + = open; printed open stop 40°",
+         arm_angle=f"opening angle about the vertical shoulder hinge (left axis x={HX:.2f}, y={HY:.2f}, knuckle z 70-86; right mirrored); 0 = closed on the rest stop, + = open; printed open stop 30°",
          head=f"yaw about z (± = CCW/CW from above); tilt about x through y={TILT_AX[1]}, z={TILT_AX[2]}, + = nose down",
          travel=f"yaw {YAW_SOFT}, tilt {TILT_SOFT} (firmware), arms {ARM_TRAVEL} (printed stops, passive)",
          note="Washer is fixed on the collar journal (does not yaw). Seam lips are NOT excluded: any front/back overlap is a defect.")
@@ -56,8 +58,7 @@ excluded={
   ("sleeve_proxy_L","arm_L"):"sleeve envelope contains own arm",("sleeve_proxy_R","arm_R"):"sleeve envelope contains own arm",
   ("paw_pad_L","arm_L"):"TPU pad bonded on the paw",("paw_pad_R","arm_R"):"TPU pad bonded on the paw",
   ("paw_pad_L","sleeve_proxy_L"):"same arm",("paw_pad_R","sleeve_proxy_R"):"same arm",
-  ("fur_proxy_torso","torso_front"):"fur on shell (hip brackets poke through the 4 mm fur skin)",("fur_proxy_torso","torso_back"):"fur on shell",
-  ("fur_proxy_torso","hip_cap_L"):"hip cap sits in the fur skin opening",("fur_proxy_torso","hip_cap_R"):"hip cap sits in the fur skin opening",
+  ("fur_proxy_torso","torso_front"):"fur on shell (shoulder brackets poke through the 4 mm fur skin)",("fur_proxy_torso","torso_back"):"fur on shell",
   ("fur_proxy_torso","arm_L"):"knuckle sits in the fur skin opening",("fur_proxy_torso","arm_R"):"knuckle sits in the fur skin opening",
   ("yaw_coupler","neck_turret"):"blade in slot",
   ("yaw_retainer_A","yaw_collar"):"retainer under lip",("yaw_retainer_B","yaw_collar"):"retainer under lip",
@@ -87,9 +88,9 @@ for y in np.arange(-50,50.01,1.0): poses.add((round(y,2),0.0,0.0,0.0))
 for t in np.arange(-25,25.01,0.5): poses.add((0.0,round(t,2),0.0,0.0))
 for y in (-42,-21,0,21,42):
     for t in (-12,-6,0,6,12): poses.add((float(y),float(t),0.0,0.0))
-for a in np.arange(-5,50.01,0.5): poses.add((0.0,0.0,round(a,2),0.0)); poses.add((0.0,0.0,0.0,round(a,2)))
-for aL in (0,20,40):
-    for aR in (0,20,40):
+for a in np.arange(-5,40.01,0.5): poses.add((0.0,0.0,round(a,2),0.0)); poses.add((0.0,0.0,0.0,round(a,2)))
+for aL in (0,15,30):
+    for aR in (0,15,30):
         for (y,t) in ((-42,12),(42,-12),(0,0)): poses.add((float(y),float(t),float(aL),float(aR)))
 poses=sorted(poses); rows=[]; npairs=0; nbool=0; t0=time.time()
 for (y,t,aL,aR) in poses:
@@ -103,8 +104,8 @@ for (y,t,aL,aR) in poses:
         v=float(trimesh.boolean.intersection([PM[a],PM[b]],engine="manifold").volume)
         if v>TOL: rows.append(dict(yaw=y,tilt=t,armL=aL,armR=aR,a=a,b=b,vol_mm3=round(v,3),compliant=key(a,b,compliant) or ""))
 out["sweep"]=dict(poses=len(poses),pair_tests=npairs,aabb_passed_to_boolean=nbool,seconds=round(time.time()-t0,1),
-  head_yaw_range=[-50,50,1.0],head_tilt_range=[-25,25,0.5],arm_range=[-5,50,0.5],
-  cross_grid="yaw {-42,-21,0,21,42} x tilt {-12,-6,0,6,12}; arms {0,20,40}² at (yaw,tilt) = (-42,12), (42,-12), (0,0)",
+  head_yaw_range=[-50,50,1.0],head_tilt_range=[-25,25,0.5],arm_range=[-5,40,0.5],
+  cross_grid="yaw {-42,-21,0,21,42} x tilt {-12,-6,0,6,12}; arms {0,15,30}² at (yaw,tilt) = (-42,12), (42,-12), (0,0)",
   excluded_pairs={f"{a}|{b}":v for (a,b),v in excluded.items()},compliant_pairs={f"{a}|{b}":v for (a,b),v in compliant.items()})
 with open("results/interference_events.csv","w",newline="") as f:
     w=csv.DictWriter(f,fieldnames=["yaw","tilt","armL","armR","a","b","vol_mm3","compliant"]); w.writeheader(); w.writerows(rows)
@@ -134,14 +135,22 @@ def mindist(a,b,n=3000):
             d=-trimesh.proximity.signed_distance(y,pts[i:i+500]); best=min(best,float(d.min()))
     return best
 mc={}
-for a in (0,10,20,30,40):
-    arm=pose("arm_L",aL=a); pad=pose("paw_pad_L",aL=a)
-    mc[f"a{a}"]=dict(arm_to_torso_front=round(mindist(arm,M["torso_front"]),2),pad_to_torso_front=round(mindist(pad,M["torso_front"]),2),
-                     arm_to_hip_cap=round(mindist(arm,M["hip_cap_L"]),2))
-worst=dict(arm_to_shell=min(v["arm_to_torso_front"] for v in mc.values() if True),
-           pad_to_shell=min(v["pad_to_torso_front"] for v in mc.values()),arm_to_hip_cap=min(v["arm_to_hip_cap"] for v in mc.values()))
-worst["arm_lowest_z_mm"]=round(float(M["arm_L"].bounds[0][2]),2)   # rotation about z keeps z
-worst["ok"]=worst["arm_to_hip_cap"]>=0.3 and worst["arm_lowest_z_mm"]>=2.0
+for a in (0,10,20,30):
+    row={}
+    for sd in ("L","R"):
+        kw={"aL":a} if sd=="L" else {"aR":a}
+        arm=pose(f"arm_{sd}",**kw); pad=pose(f"paw_pad_{sd}",**kw)
+        row[f"arm_{sd}_to_torso_front"]=round(mindist(arm,M["torso_front"]),2); row[f"pad_{sd}_to_torso_front"]=round(mindist(pad,M["torso_front"]),2)
+    row["arm_L_to_arm_R_both_at_angle"]=round(mindist(pose("arm_L",aL=a),pose("arm_R",aR=a)),2)
+    mc[f"a{a}"]=row
+worst=dict(arm_to_shell=min(v[k] for v in mc.values() for k in v if k.startswith("arm_") and k.endswith("torso_front")),
+           pad_to_shell=min(v[k] for v in mc.values() for k in v if k.startswith("pad_")),
+           arm_to_arm=min(v["arm_L_to_arm_R_both_at_angle"] for v in mc.values()),
+           arm_L_closed_vs_arm_R_open=round(mindist(pose("arm_L"),pose("arm_R",aR=30)),2),
+           arm_L_open_vs_arm_R_closed=round(mindist(pose("arm_L",aL=30),pose("arm_R")),2))
+worst["arm_lowest_z_mm"]=round(float(min(M["arm_L"].bounds[0][2],M["arm_R"].bounds[0][2])),2)   # rotation about z keeps z
+worst["note"]="arm_to_shell 0 = the stop lug resting on its relief face (by design); knuckle to ear is 0.4 mm"
+worst["ok"]=worst["arm_to_arm"]>=1.0 and worst["arm_L_closed_vs_arm_R_open"]>=1.0 and worst["arm_L_open_vs_arm_R_closed"]>=1.0 and worst["arm_lowest_z_mm"]>=2.0
 out["arm_min_clearance_by_angle_mm"]=mc; out["arm_min_clearance_mm"]=worst
 # head: rigid clearance head <-> turret / collar across the tilt clamp
 hc={}
@@ -152,76 +161,95 @@ for t in (-12,-6,0,6,12):
                      camera_to_tilt_servo=round(mindist(cam,M["dummy_servo_tilt"]),2),
                      head_to_tilt_servo=round(min(mindist(hb,M["dummy_servo_tilt"]),mindist(hf,M["dummy_servo_tilt"])),2))
 out["head_tilt_clearance_mm"]=hc
-# ---- passive hug: grip on round straps / handles and a flat strap
+# ---- passive hug: grip on round handles / straps lying diagonally in the groove, and a flat strap
 k=SPRING_K
-def rod(d,lift=0.0):
-    # Ø d strap/handle lying in the leaning groove, touching the floor line; lift = extra stand-off along the outward normal
-    c=trimesh.creation.cylinder(radius=d/2,height=130,sections=64); c.apply_transform(Rm(G_ANG,[1,0,0]))
-    c.apply_translation(np.array([0,GF,30])+G_N*(d/2+lift)); return c
-def hits(obj,a,parts=("arm","paw_pad")):
-    v=0.0
-    for s,sgn in (("L",1),("R",1)):
-        for p in parts:
-            m=pose(f"{p}_{s}",aL=a,aR=a); v+=trimesh.boolean.intersection([m,obj],engine="manifold").volume
-    return v
-def clamp_angle(obj,parts=("arm","paw_pad")):
-    if hits(obj,0.0,parts)<=TOL: return 0.0
-    lo,hi=0.0,45.0
-    for _ in range(24):
+def place(m,centre_along=19.0,lift=0.0,d=0.0):
+    # z of the mesh -> groove line direction G_U; mesh centre on the floor line + G_N*(d/2+lift)
+    z=np.array([0,0,1.0]); v=np.cross(z,G_U); s_=np.linalg.norm(v); ang=math.atan2(s_,np.dot(z,G_U))
+    m.apply_transform(Rm(ang,v/s_)); m.apply_translation(G_FR+G_U*centre_along+G_N*(d/2+lift)); return m
+def rod(d,lift=0.1): return place(trimesh.creation.cylinder(radius=d/2,height=50,sections=64),lift=lift,d=d)   # 50 mm handle segment spanning both crossings (t -6..44)
+def side_pose(p,sd,a): return pose(f"{p}_{sd}",**({"aL":a} if sd=="L" else {"aR":a}))
+def hits(obj,sd,a,parts=("arm","paw_pad")):
+    return sum(trimesh.boolean.intersection([side_pose(p,sd,a),obj],engine="manifold").volume for p in parts)
+def clamp_angle(obj,sd,parts=("arm","paw_pad")):
+    if hits(obj,sd,0.0,parts)<=TOL: return 0.0
+    lo,hi=0.0,40.0
+    for _ in range(22):
         mid=(lo+hi)/2
-        if hits(obj,mid,parts)>TOL: lo=mid
+        if hits(obj,sd,mid,parts)>TOL: lo=mid
         else: hi=mid
     return hi
-def contact(obj,a,centre):
-    pad=pose("paw_pad_L",aL=a); pts=pad.sample(40000,seed=7); pts=np.vstack([pts,pad.vertices])
-    d=trimesh.proximity.signed_distance(obj,pts)   # >0 inside obj
-    i=int(np.argmax(d)); cp=pts[i]
-    u=np.array([0,-math.sin(G_ANG),math.cos(G_ANG)]); centre=centre+u*np.dot(cp-centre,u)   # axis point nearest the contact
-    n=np.array([centre[0]-cp[0],centre[1]-cp[1],0.0]); n/=np.linalg.norm(n)   # force on the object, in plan, toward its axis
-    r=cp-HL; lever=abs(r[0]*n[1]-r[1]*n[0])
+def contact(obj,sd,a,axis_pt,flat_=False):
+    pad=side_pose("paw_pad",sd,a); pts=np.vstack([pad.sample(40000,seed=7),pad.vertices])
+    d=trimesh.proximity.signed_distance(obj,pts); cp=pts[int(np.argmax(d))]
+    if flat_: n=-G_N.copy()                                                   # flat strap: pad pushes on its face, into the groove
+    else:
+        c=axis_pt+G_U*np.dot(cp-axis_pt,G_U); n=c-cp; n/=np.linalg.norm(n)   # force on the object, toward its axis
+    H=HL if sd=="L" else HR; r=cp-H
+    lever=abs(r[0]*n[1]-r[1]*n[0])                                            # |(r x n)_z|: torque arm about the vertical hinge
     return cp,n,lever
+def grip_case(obj,label,d,axis_pt,flat_=False):
+    res=dict(object=label,d_mm=d); tot=0.0; push=0.0
+    for sd in ("L","R"):
+        a=clamp_angle(obj,sd); ar=clamp_angle(obj,sd,("arm",))
+        if a<=0.0:
+            res[sd]=dict(open_deg=0.0,note="no contact at rest"); continue
+        cp,n,lev=contact(obj,sd,a,axis_pt,flat_); Tq=k*(SPRING_PRE+a); F=Tq/lev
+        res[sd]=dict(open_deg=round(a,2),rigid_arm_only_open_deg=round(ar,2),rigid_arm_clear_of_object_mm=round(mindist(side_pose("arm",sd,a),obj),2),
+                     spring_torque_Nmm=round(Tq,1),contact_point=np.round(cp,1).tolist(),lever_mm=round(lev,1),pad_normal_force_N=round(F,2),
+                     into_groove_N=round(F*float(np.dot(n,-G_N)),2))
+        tot+=F; push+=F*float(np.dot(n,-G_N))
+    res["total_pad_force_N"]=round(tot,2); res["total_into_groove_N"]=round(push,2)
+    res["object_vs_torso_front_mm3"]=round(float(trimesh.boolean.intersection([obj,M["torso_front"]],engine="manifold").volume),3)
+    return res
 grip=[]
 for d in (10.0,12.5,15.0):
-    c=rod(d); a=clamp_angle(c); a_rigid=clamp_angle(c,("arm",))
-    cp,n,lever=contact(c,a,np.array([0,GF,30])+G_N*(d/2))
-    Tq=k*(SPRING_PRE+a); F=Tq/lever
-    rod_vs_torso=float(trimesh.boolean.intersection([c,M["torso_front"]],engine="manifold").volume)
-    grip.append(dict(object=f"round Ø{d} lying in the groove (leans 14°)",d_mm=d,open_deg=round(a,2),rigid_arm_only_open_deg=round(a_rigid,2),
-        rigid_arm_clear_of_object_mm=round(mindist(pose("arm_L",aL=a),c),2),
-        spring_torque_Nmm=round(Tq,1),contact_point=np.round(cp,1).tolist(),lever_mm=round(lever,1),paw_force_N=round(F,2),
-        push_into_groove_N=round(2*F*n[1]*-1*-1,2) if False else round(2*F*abs(n[1]),2),
-        object_vs_torso_front_mm3=round(rod_vs_torso,3)))
-# flat strap 25 x 2.5 across the groove mouth: slide it back until it touches the torso, then close the arms
-def flat(y_back):
-    b=trimesh.creation.box(extents=[25,2.5,130]); b.apply_transform(Rm(G_ANG,[1,0,0])); b.apply_translation([0,y_back-1.25,30]); return b
-lo,hi=-50.0,-20.0
+    grip.append(grip_case(rod(d),f"round Ø{d} lying diagonally in the groove (35° from vertical)",d,G_MID+G_N*(d/2)))
+# flat strap 25 x 2.5 along the groove line, across the mouth: slide it back along -G_N until it touches the torso
+def flat(lift):
+    b=trimesh.creation.box(extents=[25,2.5,50])
+    # box y (thickness) must lie along G_N: rotate about the line after aligning z
+    z=np.array([0,0,1.0]); v=np.cross(z,G_U); ang=math.atan2(np.linalg.norm(v),np.dot(z,G_U)); R=Rm(ang,v/np.linalg.norm(v))
+    yb=R[:3,:3]@np.array([0,1.0,0]); tgt=G_N; tw=math.atan2(np.dot(np.cross(yb,tgt),G_U),np.dot(yb,tgt))
+    b.apply_transform(Rm(tw,G_U)@R); b.apply_translation(G_FR+G_U*19.0+G_N*(1.25+lift)); return b
+lo,hi=0.0,20.0
 for _ in range(22):
     mid=(lo+hi)/2
-    if trimesh.boolean.intersection([flat(mid),M["torso_front"]],engine="manifold").volume>TOL: hi=mid
-    else: lo=mid
-yb=lo; fb=flat(yb); af=clamp_angle(fb); cpf,nf,levf=contact(fb,af,np.array([cpx:=0,yb-1.25-50,0])) if False else (None,None,None)
-pad=pose("paw_pad_L",aL=af); pts=np.vstack([pad.sample(40000,seed=7),pad.vertices]); dd=trimesh.proximity.signed_distance(fb,pts)
-cpf=pts[int(np.argmax(dd))]; nf=np.array([0,1.0,0]); rf=cpf-HL; levf=abs(rf[0]*nf[1]-rf[1]*nf[0])
-Tf=k*(SPRING_PRE+af)
-grip.append(dict(object="flat strap 25 x 2.5 resting on the belly across the groove",d_mm=25,strap_back_face_y=round(yb,2),open_deg=round(af,2),
-    rigid_arm_clear_of_object_mm=round(mindist(pose("arm_L",aL=af),fb),2),spring_torque_Nmm=round(Tf,1),contact_point=np.round(cpf,1).tolist(),
-    lever_mm=round(levf,1),paw_force_N=round(Tf/levf,2),push_into_groove_N=round(2*Tf/levf,2)))
+    if trimesh.boolean.intersection([flat(mid),M["torso_front"]],engine="manifold").volume>TOL: lo=mid
+    else: hi=mid
+fb=flat(hi); fg=grip_case(fb,"flat strap 25 x 2.5 across the groove mouth, along the groove line",25,G_MID+G_N*(1.25+hi),True)
+fg["strap_back_face_lift_above_floor_mm"]=round(hi,2); grip.append(fg)
 hug=dict(spring=dict(part="music-wire torsion spring, 0.048 in (1.22 mm) wire, 3/8 in (9.5 mm) OD, 90° legs (trim to ~6 mm); catalogue 3HPG6 (LH) / 3HPD1 (RH)",
                      rate_Nmm_per_deg=round(k,3),rated_torque_Nmm_at_90deg=302.7,preload_deg=SPRING_PRE,max_windup_deg=SPRING_PRE+ARM_TRAVEL[1],
-                     torque_at_rest_Nmm=round(k*SPRING_PRE,1),torque_at_open_stop_Nmm=round(k*(SPRING_PRE+40),1)),
+                     torque_at_rest_Nmm=round(k*SPRING_PRE,1),torque_at_open_stop_Nmm=round(k*(SPRING_PRE+ARM_TRAVEL[1]),1)),
          grip=grip,
-         assumption="Spring rate from the catalogue (2.679 lbf·in at 90°), linear; no friction in the hinge; force = torque / perpendicular lever from the hinge axis to the pad contact line. TPU pads assumed rigid for the angle (real pads add ~1 mm of squash). Not measured.")
-# open: paw gap with both arms on the open stop
-pl=pose("paw_pad_L",aL=40,aR=40); pr=pose("paw_pad_R",aL=40,aR=40)
-hug["open"]=dict(open_stop_deg=40,pad_to_belly_mm=round(mindist(pl,M["torso_front"]),2),pad_tip_to_tip_mm=round(mindist(pl,pr),2),
-                 pad_to_belly_at_closed_mm=round(mindist(pose("paw_pad_L"),M["torso_front"]),2))
-ins=[]
-for lift in np.arange(60,-0.01,-2.0):
-    c=rod(15.0,lift); ins.append(hits(c,40.0))
-hug["open"]["rod15_insertion_path_clear"]=bool(max(ins[:-3])<=TOL)
-hug["open"]["note"]="Ø15 rod slid in along the groove normal from 60 mm out to the groove floor with both arms on the open stop; the last 3 steps are the clamp zone."
-hug["ok"]=bool(all(g["open_deg"]<=ARM_TRAVEL[1] for g in grip) and hug["open"]["pad_to_belly_mm"]>=20 and hug["open"]["rod15_insertion_path_clear"]
-               and all(g.get("rigid_arm_clear_of_object_mm",1)>=0.3 for g in grip))
+         assumption="Spring rate from the catalogue (2.679 lbf·in at 90°), linear; no hinge friction; each arm clamps on its own (left over the chest at C_L, right under the belly at C_R); pad normal force = spring torque / |(r x n)_z| at the deepest pad contact. TPU pads assumed rigid for the angle (real pads add ~1 mm of squash). Not measured.")
+pl=side_pose("paw_pad","L",30); pr=side_pose("paw_pad","R",30)
+hug["open"]=dict(open_stop_deg=30,pad_L_to_belly_mm=round(mindist(pl,M["torso_front"]),2),pad_R_to_belly_mm=round(mindist(pr,M["torso_front"]),2),
+                 pad_to_belly_at_closed_mm=round(min(mindist(pose("paw_pad_L"),M["torso_front"]),mindist(pose("paw_pad_R"),M["torso_front"])),2))
+# Mirumi-style loading: with both arms on the open stop, slide the handle in SIDEWAYS (across the groove, in the skin
+# tangent plane) at a stand-off, then drop it onto the floor. A straight-in push along the normal is blocked by design
+# (the arms still lie across the groove line when open).
+W_=np.cross(G_U,G_N); W_/=np.linalg.norm(W_)
+def rod_at(d,lift,w):
+    c=rod(d,lift); c.apply_translation(W_*w); return c
+best=None
+for lift in (4.0,6.0,8.0,10.0):
+    for sgn in (1,-1):
+        lat=[(w,hits(rod_at(15.0,lift,sgn*w),"L",30.0)+hits(rod_at(15.0,lift,sgn*w),"R",30.0),
+              float(trimesh.boolean.intersection([rod_at(15.0,lift,sgn*w),M["torso_front"]],engine="manifold").volume)) for w in np.arange(90,-0.01,3.0)]
+        drop=[hits(rod(15.0,l),"L",30.0)+hits(rod(15.0,l),"R",30.0) for l in np.arange(lift,-0.01,0.5)]
+        ok_=all(a_<=TOL and t_<=TOL for _,a_,t_ in lat) and all(x<=TOL for x in drop)
+        if ok_: best=dict(lift_mm=lift,side="+w" if sgn>0 else "-w"); break
+    if best: break
+hug["open"]["rod15_insertion_path_clear"]=bool(best)
+hug["open"]["rod15_insertion_path"]=best
+hug["open"]["note"]="Ø15 x 50 rod slid in sideways across the groove (90 mm travel) at a stand-off above the floor, then dropped onto the floor, both arms on the 30° open stop; checked against both arms, both pads and torso_front."
+rg=[g for g in grip]
+hug["ok"]=bool(all(g[sd].get("open_deg",0)<=ARM_TRAVEL[1] for g in rg for sd in ("L","R"))
+               and all(g[sd].get("open_deg",0)>0 for g in rg[:3] for sd in ("L","R"))
+               and min(hug["open"]["pad_L_to_belly_mm"],hug["open"]["pad_R_to_belly_mm"])>=15 and hug["open"]["rod15_insertion_path_clear"]
+               and all(g[sd].get("rigid_arm_clear_of_object_mm",1)>=0.3 for g in rg for sd in ("L","R")))
 out["hug"]=hug
 # static checks
 static_rows=[]
@@ -229,7 +257,8 @@ for a,b,why in [("torso_front","torso_back","seam lip/groove should clear 0.25 m
                 ("head_front","head_back","seam lip/groove should clear 0.25 mm"),
                 ("yaw_thrust_washer","neck_turret","designed 0.30 mm axial gap"),
                 ("tray","torso_front","tabs in pockets"),("tray","torso_back","tabs in pockets"),
-                ("hip_cap_L","torso_front","cap under the web, 0.3 mm off the shell"),("hip_cap_R","torso_front","cap under the web, 0.3 mm off the shell"),
+                ("arm_L","arm_R","arms at rest must not touch"),("arm_L","torso_front","knuckle under the ear"),("arm_R","torso_front","knuckle under the ear"),
+                ("head_front","torso_front","face cap vs body at rest"),("head_back","torso_back","face cap vs body at rest"),
                 ("dummy_servo_tilt","neck_turret","tilt servo in the cradle window"),("dummy_servo_tilt","head_back","static"),
                 ("tilt_hub","dummy_horn_tilt","hub on horn face")]:
     v=float(trimesh.boolean.intersection([M[a],M[b]],engine="manifold").volume)

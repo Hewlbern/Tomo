@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Tomo by DreamMachina (formerly evoKin V.01) — head motion sketch, passive-hug build.
 //
-// The arms are passive: a torsion spring in each hip holds the hug with zero power and you open
+// The arms are passive: a torsion spring in each shoulder holds the hug with zero power and you open
 // them by hand. There is no clasp logic, no grip current and no arm interlock any more.
 // This sketch only drives the head: pan (FS90MG in the yaw collar) and tilt/nod (FS90MG on the
 // neck turret), with three simple behaviours: look-around, nod and a shy turn-away.
@@ -21,7 +21,7 @@ static const int PIN_TILT = D1;
 
 // CAD: pan hard stop ≈ ±47°, so the software clamp stays inside it.
 static const float PAN_MIN  = -42.0f, PAN_MAX  = 42.0f;
-// CAD: first rigid contact at +12° nose down / −15.5° looking up; clamp ±10°.
+// CAD: first rigid contact at +16.5° nose down / −23.5° looking up; clamp ±10°.
 static const float TILT_MIN = -10.0f, TILT_MAX = 10.0f;   // + = nod down
 
 // Servo centre trims (µs) and direction. Set these on the bench before fitting the head.

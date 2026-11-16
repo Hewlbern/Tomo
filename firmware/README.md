@@ -9,7 +9,7 @@ off / limp) over serial at 115200 baud; otherwise it picks one at random every 8
 goes limp.
 
 Limits are clamped in software inside the CAD hard stops: pan ±42° (stop ≈ ±47°), tilt ±10°
-(+ = nod down; first contact +12° / −15.5°). Set `PAN_CENTRE_US`, `TILT_CENTRE_US` and the
+(+ = nod down; first contact +16.5° / −23.5°). Set `PAN_CENTRE_US`, `TILT_CENTRE_US` and the
 direction signs on the bench before the head is fitted.
 
 Untested: nothing has been built or brought up. Bench power only, on a current-limited supply.

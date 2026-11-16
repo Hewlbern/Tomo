@@ -26,7 +26,7 @@ run_os() {
 }
 export_part() { run_os -D "part=\"$1\"" -D yaw=0 -D tilt=0 -D armL=0 -D armR=0 -o "$2" "$SCAD"; }
 
-PRINT="torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer neck_turret tilt_hub head_back head_front arm_L arm_R hip_cap_L hip_cap_R paw_pad_L paw_pad_R bezel shutter coupon"
+PRINT="torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer neck_turret tilt_hub head_back head_front arm_L arm_R paw_pad_L paw_pad_R bezel shutter coupon"
 REFERENCE="dummies dummy_servo_yaw dummy_horn_yaw dummy_servo_tilt dummy_horn_tilt dummy_pi dummy_cam dummy_speaker dummy_amp dummy_mic fur_proxy_torso sleeve_proxy_L sleeve_proxy_R grip_rod"
 
 pids=()
@@ -38,7 +38,7 @@ if [ "${EXPORT_CHECK:-0}" = "1" ]; then
   mkdir -p check
   rm -f check/*.stl
   pids=()
-  for a in 40 20; do
+  for a in 30 15; do
     run_os -D 'part="arm_L"' -D yaw=0 -D tilt=0 -D armL=$a -D armR=0 -o "check/arm_L_a${a}.stl" "$SCAD" & pids+=($!)
     run_os -D 'part="arm_R"' -D yaw=0 -D tilt=0 -D armL=0 -D armR=$a -o "check/arm_R_a${a}.stl" "$SCAD" & pids+=($!)
   done

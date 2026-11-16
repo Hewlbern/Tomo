@@ -17,7 +17,7 @@ A condensed source for the custom-board section is a Gemini (Code and analysis
 | Camera | OV2640 or OV3660, on a 24-pin 0.5 mm FPC through the hollow neck journal |
 | Voice in | I2S or PDM MEMS microphone |
 | Voice out | I2S amplifier (MAX98357A) into the Adafruit 3351 3 W 4 Ω enclosed speaker already seated in the torso |
-| Motion | **Two** Feetech FS90MG servos (V.01 passive hug): head pan and head tilt/nod — two PWM channels. The arms are passive (torsion spring per hip, opened by hand) and need no electronics |
+| Motion | **Two** Feetech FS90MG servos (V.01 passive hug): head pan and head tilt/nod — two PWM channels. The arms are passive (torsion spring per shoulder, opened by hand) and need no electronics |
 | Power | USB-C in, 1S LiPo, a clean 3.3 V rail that holds up as the pack sags, and a **separate 5 V servo rail** with bulk capacitance |
 | Fail-safe | Sense current on the 5 V rail and cut servo power so the head goes limp if a child forces it. The arms are no longer motorised, so there is no grip current and no clasp interlock; the only driven parts are the pan and tilt servos (firmware clamps ±42° pan, ±10° tilt). |
 

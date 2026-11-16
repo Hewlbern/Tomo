@@ -2,20 +2,22 @@
 // evoKin V.01 CAD. MIT License, see LICENSE.
 // evokin_v01.scad -- BENCH PROTOTYPE CAD. UNPRINTED, MOTION/FORCE UNTESTED.
 // Not production, not child-ready, not waterproof, power bench-tethered only.
-// V.01 (Nov 2026): MIRUMI-STYLE PASSIVE SPRING HUG (replaces the servo scissor clasp of commit bed94ce).
-//  * ARMS ARE PASSIVE. Each arm hangs on a vertical hinge at the hip (axis parallel to z through HX,HY;
-//    left arm at +x, right mirrored). A music-wire torsion spring (0.048 in / 1.22 mm wire, 3/8 in OD, 90 deg
-//    legs; catalogue 3HPG6 LH / 3HPD1 RH, 2.679 lbf.in = 0.303 N.m at 90 deg, i.e. 3.36 N.mm/deg) sits in the arm
-//    knuckle and is preloaded SPRING_PRE deg against a printed hard stop, so the arms hug the lower belly with
-//    zero power. Push the paws open by hand (a second printed stop at ARM_OPEN deg), slip a strap or handle
-//    into the belly groove, let go: the arms spring back and press it into the groove.
-//  * BELLY GROOVE: vertical R8 channel down the front of torso_front (floor at y=GF), sized for 10-15 mm round
-//    straps / handles (Mirumi's recommended range); TPU paw pads (paw_pad_L/R) give the grip.
-//  * HEAD: pan (FS90MG in the yaw collar, unchanged) + NEW tilt/nod (FS90MG on a neck_turret that rides the
-//    yaw journal; spline on the tilt axis, x direction, through y=TILT_Y z=TILT_Z). The old head_back skirt,
-//    cone, coupler slot and retainer pilots moved to neck_turret. 2x FS90MG total; the arm servos are gone.
-// History: servo clasp V.01 = bed94ce, v4 = d8b6367, v3 = 237c37d.
-// NAMING: arm_L / hip_cap_L = the CRITTER'S OWN LEFT = +x.
+// V.01 (Nov 2026): MIRUMI-STYLE PASSIVE SPRING HUG, MIRUMI PROPORTIONS (replaces the servo clasp of bed94ce
+//   and the hip-hinge layout of 1b048e5).
+//  * ONE EGG BODY: head and torso are cut from one egg of revolution (begg); the face is a cap split off by a
+//    seam sphere centred on the tilt-axis line, so it pans and tilts inside the egg.
+//  * ARMS ARE PASSIVE. Each arm hangs on a vertical hinge at the SHOULDER, just under the face (axis parallel to z
+//    through HX,HY; left arm at +x, right mirrored). A music-wire torsion spring (0.048 in / 1.22 mm wire, 3/8 in
+//    OD, 90 deg legs; catalogue 3HPG6 LH / 3HPD1 RH, 2.679 lbf.in = 0.303 N.m at 90 deg, i.e. 3.36 N.mm/deg) sits in
+//    the knuckle, preloaded SPRING_PRE deg against a printed hard stop, so the arms hug with zero power. The arms
+//    are long, curved and asymmetric: the left crosses the chest high and ends low on the far side, the right drops
+//    down its flank and sweeps under the belly. Open by hand to the ARM_OPEN stop, slide a handle in sideways, let go.
+//  * BELLY GROOVE: off-centre R8 channel, 35 deg from vertical (lower +x to upper -x, like Mirumi's handle line),
+//    for 10-15 mm round handles or a flat strap up to 25 mm; TPU sleeves (paw_pad_L/R) at both arm crossings.
+//  * HEAD: pan (FS90MG in the yaw collar) + tilt/nod (FS90MG on a neck_turret that rides the yaw journal; spline on
+//    the tilt axis, x direction, through y=TILT_Y z=TILT_Z). 2x FS90MG total; the arm servos are gone.
+// History: hip-hinge passive hug = 1b048e5, servo clasp V.01 = bed94ce, v4 = d8b6367, v3 = 237c37d.
+// NAMING: arm_L / paw_pad_L = the CRITTER'S OWN LEFT = +x.
 // Units mm. Frame: z up, -y = face/front, +y = back.
 // Pose variables: yaw (pan, + = turn to its own left / +x, CCW from above), tilt (+ = nod DOWN), armL/armR = arm OPENING
 // angle in deg (0 = closed on the rest stop, ARM_OPEN = open stop). STLs export at yaw=0, tilt=0, armL=armR=0.
@@ -70,41 +72,66 @@ M25_CLR=2.8; M25_PIL=2.1; M2_CLR=2.3; M2_PIL=1.7; SERVO_PIL=1.7;
 JRN_RAD=0.35; BLADE_CLR=0.35; AXIAL_GAP=0.30; AXIAL_PLAY=0.35;
 SEAM_LIP_CLR=0.25; SEAM_CHAMFER=0.40;
 /* ---- envelopes ---- */
-TH=100; TW=92; TD=80; tw=2.4; tcut=85;
-HC=118; HH=64; HW=84; HD=74; hcut=98;
+/* MIRUMI PROPORTIONS (Nov 2026): one egg/bean of revolution for the whole body (no separate head egg).
+   Radius R_EGG at the equator ZEQ; lower half an ellipse (semi-axis ZEQ), upper half a superellipse (exponent
+   N_UP, semi-axis H_EGG-ZEQ) so the dome stays blunt. The face is a CAP cut off by the seam sphere (centre on the
+   tilt axis line, radius SEAM_R): it pans and tilts inside the egg, and because the egg is round in plan the cap
+   skin matches the body at every pan angle. tcut / hcut stay as the internal yaw-stack datums. */
+R_EGG=46; ZEQ=58; H_EGG=148; N_UP=3.4; tw=2.4; tcut=85; hcut=98;
+TD=2*R_EGG; HD=2*R_EGG;
 sb=FS_BODY; s_off=FS_S_OFF; s_tab=FS_TAB; s_tab_t=FS_TAB_T; s_tab_dz=FS_TAB_DZ; s_boss=[FS_BOSS_D,FS_BOSS_H];
 yaw_top=84;
 /* ---- V.01 passive hug arms ----
    Body egg at height z: half-width ea(z), half-depth eb(z). The arm band follows the egg at offset O_ARM
    (band centre line) from the hinge at PSI_H to PSI_P, then the paw curls in to PAW_TIP.
    Band = hull chain of spheres r=ARM_RS at z=ARM_ZT (top) and z=ARM_ZB (bottom): band z 22..38. */
-function ea(z)=TW/2*sqrt(1-pow((z-TH/2)/(TH/2),2));
-function eb(z)=TD/2*sqrt(1-pow((z-TH/2)/(TH/2),2));
-ARM_ZT=35; ARM_ZB=25; ARM_RS=3; EZ_T=38; EZ_B=25;      // offsets taken from the egg at z=38 (widest in the band) and z=25
-O_ARM=8.5;                                            // band centre 8.5 mm off the shell: inner face 5.5 mm off (clears 4 mm fur)
-PSI_H=-20; PSI_P=-76;
-HX=(ea(EZ_T)+O_ARM)*cos(PSI_H); HY=(eb(EZ_T)+O_ARM)*sin(PSI_H);   // hinge axis (49.95, -16.19) for the left arm
-KN_R=8; KN_Z0=22; KN_Z1=38;                           // knuckle Ø16, z 22..38
-EAR_T=5; EAR_GAP=0.4;                                 // upper ear (torso) z 38.4..43.4, hip_cap z 16.6..21.6
-PIN_D=3.2; PIN_RUN=3.4;                               // M3 pin screw: 3.2 in ears/spigot, 3.4 running in the knuckle
-REC_D=11; REC_Z0=30;                                  // spring recess Ø11 from z=30 to the knuckle top
-SPIG_D=5.9; SPIG_Z0=30.4;                             // arbor spigot on the upper ear (spring ID 7.09 free, ≈6.8 at 75 deg wind-up)
-ARM_OPEN=40;                                          // printed open stop (deg)
-SPRING_PRE=35;                                        // spring preload at the rest stop (deg)
+function eggr(z,o=0)= z<ZEQ ? (R_EGG-o)*sqrt(max(0,1-pow((z-ZEQ)/(ZEQ-o),2)))
+                            : (R_EGG-o)*pow(max(0,1-pow(abs(z-ZEQ)/(H_EGG-ZEQ-o),N_UP)),1/N_UP);
+function eggdr(z)=(eggr(z+0.2)-eggr(z-0.2))/0.4;
+function on_egg(psi,z,off=0)=[(eggr(z)+off)*cos(psi),(eggr(z)+off)*sin(psi),z];
+/* ---- SHOULDER hinges: vertical axes just under the face (was the hip, z 22..38).
+   Left arm (critter's own left, +x) hinge at azimuth PSI_H, right arm mirrored (azimuth 180-PSI_H). ---- */
+ARM_RS=3.5; ARM_HW=5;                                  // band = pairs of r3.5 spheres ±5 across the path (≈7 x 17 section)
+KN_R=8; KN_Z0=70; KN_Z1=86;                           // knuckle Ø16, z 70..86 (shoulder, just under the face seam; ear top 92.4 clears the nodding cap rim)
+PSI_H=-35; O_ARM=8.5;
+R_AX=eggr((KN_Z0+KN_Z1)/2)+O_ARM;                     // 54.4
+HX=R_AX*cos(PSI_H); HY=R_AX*sin(PSI_H);               // hinge axis (44.4, -31.1) for the left arm
+EAR_T=6; EAR_GAP=0.4;                                 // ear (moulded into torso_front) z 86.4..92.4; NO lower cap: the knuckle
+                                                      // hangs on an M3x30 pin thread-formed into the ear (pilot PIN_D), nyloc +
+                                                      // washer under the knuckle, so the arm band can leave the knuckle downwards
+PIN_D=2.5; PIN_RUN=3.4;                               // M3 pin: 2.5 thread-forming pilot in the ear/spigot, 3.4 running in the knuckle
+REC_D=11; REC_Z0=KN_Z0+8;                             // spring recess Ø11 from KN_Z0+8 to the knuckle top
+SPIG_D=5.9; SPIG_Z0=KN_Z0+8.4;                        // arbor spigot on the upper ear (spring ID 7.09 free)
+ARM_OPEN=30;                                          // printed open stop (deg); 30 deg opens the crossing ≈ 27 mm
+SPRING_PRE=50;                                        // spring preload at the rest stop (deg); 80 deg wind-up at the open stop (rated 90)
 SPRING_K=0.3027/90*1000;                              // N.mm per deg (3HPG6/3HPD1 catalogue: 2.679 lbf.in at 90 deg)
-LUG_A=60; LUG_W=24; LUG_R=[5.7,7.7]; LUG_Z0=35.8;     // stop lug on the upper ear, hangs into the knuckle relief
-REL_R=[5.3,8.6]; REL_Z0=35.4;                         // relief sector in the knuckle top: [LUG_A-LUG_W/2-ARM_OPEN, LUG_A+LUG_W/2]
-PAW_TOP=[[8.6,-44.6],[5,-42.5]]; PAW_BOT=[[8.4,-42.4],[5,-40.5]];   // paw curl (top z=35 / bottom z=25 sphere centres)
-PAD_T=1.5;                                            // TPU paw pad thickness
+LUG_A=60; LUG_W=24; LUG_R=[5.7,7.7]; LUG_Z0=KN_Z0+13.8;   // stop lug on the upper ear, hangs into the knuckle relief
+REL_R=[5.3,8.6]; REL_Z0=KN_Z0+13.4;                   // relief sector in the knuckle top: [LUG_A-LUG_W/2-ARM_OPEN, LUG_A+LUG_W/2]
+PAD_T=1.5;                                            // TPU pad thickness
+/* ---- arm paths [azimuth, z, offset of the band centre from the skin]. Asymmetric, Mirumi-style:
+   LEFT (over) arm runs from the left shoulder down across the chest, crosses the handle at C_L and ends low on
+   the far (right) side. RIGHT (under) arm drops down the right flank and sweeps across the lower belly, crossing
+   the handle at C_R. Offset 8.5 clears 4 mm fur; 6.5 at the crossings (pads). ---- */
+ARM_PATH_L=[[PSI_H,78,O_ARM],[-43,77.5,8.5],[-51,76.5,8.5],[-59,75,8.5],[-67,72.5,8.5],[-75,68.5,8.5],[-83,64.5,8],[-91,60.5,7],
+            [-98,57.5,6.5],[-104,54,6.5],[-108,49,7.5],[-110,44,7.5]];
+ARM_PATH_R=[[180-PSI_H,78,O_ARM],[-140,76.5,8.5],[-136,72,8.5],[-134,66,8.5],[-133,57,8.5],[-132,48,8.5],[-129,40,8.5],
+            [-124,33,8.5],[-116,28,8.5],[-106,25.3,8.5],[-95,24.5,8.5],[-85,24.8,8],[-76,25.6,7],[-68,26.5,6.5],[-61,27.5,6.5],[-55,29,7.5]];
+PAD_SEC_L=[7,10]; PAD_SEC_R=[12,15];                   // path sections covered by the TPU pads (around the crossings)
 /* ---- belly groove: R8 channel down the front, floor line y = GF - G_SLOPE*(z-30) (leans 14 deg so a straight strap
    clears the upper-belly bulge and the speaker grille), capsule from z=GZ0 to GZ1, wall GW ---- */
-GR=8; GF=-30; G_SLOPE=0.25; GZ0=12; GZ1=62; GW=2.4;
-function gfloor(z)=GF-G_SLOPE*(z-30);
+/* ---- DIAGONAL belly groove (Mirumi grips to one side): floor line through G_FL (under the left-arm crossing
+   C_L, azimuth -98, z 57.5) and G_FR (under the right-arm crossing C_R, -68, z 26.5), each 7 mm below the skin
+   along the egg normal. Line direction G_U runs from lower +x to upper -x, 35 deg from vertical. G_N = outward
+   groove normal. R8 capsule from t=G_T0 to G_T1 along the line, wall GW. Constants from scripts/groove_geo.py. ---- */
+GR=8; GW=2.4; G_DEPTH=7;
+G_FR=[12.136,-30.037,29.695]; G_FL=[-5.428,-38.619,57.548];
+G_U=[-0.5161,-0.2522,0.8185]; G_N=[0.0972,-0.9667,-0.2366]; G_T0=-8; G_T1=46;
+function gline(t)=G_FR+t*G_U;
 /* ---- head tilt (nod): spline axis along x through (TILT_Y, TILT_Z); FS90MG case top at x=-TS_X, spline pointing -x ---- */
 TILT_Y=6; TILT_Z=119; TS_X=22;
 TILT_SOFT=[-10,10];                                    // firmware clamp (deg), see results/summary_sweep.json for the first contact
 pi=[65,8.5,30]; pi_holes=[58,23]; pi_z=43;           // 8.5 mm y-envelope allows a header
-cam=[25,11.5,24]; cam_holes=[21,12.5]; eye_z=120; eye_x=13; cam_y=-20;
+cam=[25,11.5,24]; cam_holes=[21,12.5]; eye_z=120; eye_x=13; cam_y=-24;   // Mirumi proportions: 4 mm forward so the lens sits ~16 mm behind the eye hole
 // Adafruit 3351 Mono Enclosed Speaker 3 W 4 Ω (Core A$8.95): 70 x 30 x 17, holes 3.4 on 63 x 24.
 // Matches MAX98357A (3.2 W into 4 Ω at 5 V). The Ø28 placeholder and the 0.5 W 8 Ω mini are retired.
 SPK=[70,17,30]; SPK_HOLES=[63,24];
@@ -113,9 +140,16 @@ AMP=[19.4,17.8,3.0]; AMP_HEAD=8.0;
 // Adafruit 3421 SPH0645LM4H breakout 16.7 x 12.7 x 1.8, bottom-ported, aligned to the mic hole.
 MIC=[16.7,12.7,1.8];
 
-module egg(c,h,w,d) translate([0,0,c]) scale([w/2,d/2,h/2]) sphere(1);
-module tegg(o=0) egg(TH/2,TH-2*o,TW-2*o,TD-2*o);
-module hegg(o=0) egg(HC,HH-2*o,HW-2*o,HD-2*o);
+EGG_NP=72;
+function egg_prof(o)=concat([[0,o]],[for(i=[1:EGG_NP-1]) let(t=-90+180*i/EGG_NP)
+    t<0 ? [(R_EGG-o)*cos(t),ZEQ+(ZEQ-o)*sin(t)] : [(R_EGG-o)*pow(cos(t),2/N_UP),ZEQ+(H_EGG-ZEQ-o)*pow(sin(t),2/N_UP)]],[[0,H_EGG-o]]);
+module begg(o=0) rotate_extrude($fn=144) polygon(egg_prof(o));
+module tegg(o=0) begg(o);
+module hegg(o=0) begg(o);
+/* face cap / body split: seam sphere on the tilt axis line (0,0,TILT_Z), meeting the skin at z=SEAM_Z; gap 2*SEAM_G */
+SEAM_Z=101; SEAM_G=1.5;
+module cap_region()  translate([0,0,119]) sphere(r=sqrt(pow(eggr(SEAM_Z),2)+pow(119-SEAM_Z,2))-SEAM_G,$fn=144);
+module body_region() difference(){ translate([-150,-150,-10]) cube([300,300,300]); translate([0,0,119]) sphere(r=sqrt(pow(eggr(SEAM_Z),2)+pow(119-SEAM_Z,2))+SEAM_G,$fn=144); }
 module F() translate([-150,-150,-10]) cube([300,150,300]);
 module B() translate([-150,0,-10]) cube([300,150,300]);
 module below(z) translate([-150,-150,-10]) cube([300,300,z+10]);
@@ -145,23 +179,23 @@ module horn_env() {                     // ASSUMED typical; sits on the boss
 LIP_IN=0.55; LIP_W=1.30; LIP_H=1.20;
 module torso_ribbon(inset, thick) difference(){ tegg(inset); tegg(inset+thick); }
 module head_ribbon(inset, thick) difference(){ hegg(inset); hegg(inset+thick); }
-module seam_male_torso() intersection(){ torso_ribbon(LIP_IN, LIP_W); translate([-80,-LIP_H,-5]) cube([160,LIP_H,120]); below(tcut); }
-module seam_fem_torso()  intersection(){ torso_ribbon(LIP_IN-SEAM_LIP_CLR, LIP_W+2*SEAM_LIP_CLR); translate([-80,-(LIP_H+SEAM_LIP_CLR),-5]) cube([160,LIP_H+SEAM_LIP_CLR+0.2,120]); below(tcut); }
-module seam_male_head()  intersection(){ head_ribbon(LIP_IN, LIP_W); translate([-80,-LIP_H,-5]) cube([160,LIP_H,200]); above(hcut+5.5); }
-module seam_fem_head()   intersection(){ head_ribbon(LIP_IN-SEAM_LIP_CLR, LIP_W+2*SEAM_LIP_CLR); translate([-80,-(LIP_H+SEAM_LIP_CLR),-5]) cube([160,LIP_H+SEAM_LIP_CLR+0.2,200]); above(hcut+5.5); }
-module seam_chamfer_torso() intersection(){ difference(){ tegg(-SEAM_CHAMFER); tegg(0); } translate([-80,-0.5,-5]) cube([160,1.0,120]); below(tcut); }
-module seam_chamfer_head()  intersection(){ difference(){ hegg(-SEAM_CHAMFER); hegg(0); } translate([-80,-0.5,-5]) cube([160,1.0,200]); above(hcut+5.5); }
+module seam_male_torso() intersection(){ torso_ribbon(LIP_IN, LIP_W); translate([-80,-LIP_H,-5]) cube([160,LIP_H,160]); body_region(); }
+module seam_fem_torso()  intersection(){ torso_ribbon(LIP_IN-SEAM_LIP_CLR, LIP_W+2*SEAM_LIP_CLR); translate([-80,-(LIP_H+SEAM_LIP_CLR),-5]) cube([160,LIP_H+SEAM_LIP_CLR+0.2,160]); body_region(); }
+module seam_male_head()  intersection(){ head_ribbon(LIP_IN, LIP_W); translate([-80,-LIP_H,-5]) cube([160,LIP_H,200]); cap_region(); }
+module seam_fem_head()   intersection(){ head_ribbon(LIP_IN-SEAM_LIP_CLR, LIP_W+2*SEAM_LIP_CLR); translate([-80,-(LIP_H+SEAM_LIP_CLR),-5]) cube([160,LIP_H+SEAM_LIP_CLR+0.2,200]); cap_region(); }
+module seam_chamfer_torso() intersection(){ difference(){ tegg(-SEAM_CHAMFER); tegg(0); } translate([-80,-0.5,-5]) cube([160,1.0,160]); body_region(); }
+module seam_chamfer_head()  intersection(){ difference(){ hegg(-SEAM_CHAMFER); hegg(0); } translate([-80,-0.5,-5]) cube([160,1.0,200]); cap_region(); }
 
 /* ================= TORSO ================= */
 // v4: upper torso bosses moved to z=79 and lower to z=12. V.01 hug: shoulder pods removed from torso_back;
-// belly groove + hip hinge brackets added to torso_front.
+// belly groove + shoulder hinge ears added to torso_front (module names keep the old hip_ prefix).
 tboss=[[-24,12],[24,12],[-30,79],[30,79]];
 cboss=[[-16,-18],[16,-18],[-16,18],[16,18]];
 TAB_Z=23; TAB_X=29;             // v4: tray tabs moved from (x=±34, z=40) to (x=±29, z=23): clear of the shoulder pods and the Pi standoffs
-module torso_shell() intersection(){ difference(){ tegg(); tegg(tw); } below(tcut); }
+module torso_shell() intersection(){ difference(){ tegg(); tegg(tw); } body_region(); }
 module torso_add(){ intersection(){ tegg(0.1); union(){
   for(p=tboss) translate([p[0],0,p[1]]) rotate([90,0,0]) hull(){ cylinder(d=7,h=16,center=true); translate([sign(p[0])*12,0,0]) cylinder(d=7,h=16,center=true);}
-  for(p=cboss) translate([p[0],p[1],tcut-10]) hull(){ cylinder(d=7,h=10); translate([0,sign(p[1])*14,0]) cylinder(d=7,h=10);}
+  for(p=cboss) translate([p[0],p[1],tcut-10]) hull(){ cylinder(d=7,h=10); translate([0,sign(p[1])*24,0]) cylinder(d=7,h=10);}
   for(sx=[-1,1]) translate([sx*TAB_X,1.5,TAB_Z]) cube([14,10,12],center=true);
   // speaker mounting bosses (63 x 24 hole rectangle), inside the front
   for(sx=[-1,1],sz=[-1,1]) translate([sx*SPK_HOLES[0]/2,-28,68+sz*SPK_HOLES[1]/2]) rotate([90,0,0]) cylinder(d=6,h=8,center=true);
@@ -189,40 +223,28 @@ module torso_cuts_shared(){
 function aside(side)=side=="L"?1:-1;
 module mir(side) mirror([side=="L"?0:1,0,0]) children();
 /* ---- belly groove ---- */
-module groove_capsule(o=0) hull(){ translate([0,gfloor(GZ0)-GR,GZ0]) sphere(r=GR+o); translate([0,gfloor(GZ1)-GR,GZ1]) sphere(r=GR+o); }
-module groove_liner() intersection(){ tegg(0.1); difference(){ groove_capsule(GW); groove_capsule(0); } }
-/* ---- hip hinge (left; right mirrored). Upper ear + web are moulded into torso_front; hip_cap is separate. ---- */
-module hip_plan_upper() hull(){ translate([HX,HY]) circle(r=KN_R+0.5); translate([36,-14]) square([6,8]); }
-module hip_plan_lower() hull(){ translate([HX,HY]) circle(r=KN_R+0.5); translate([35,-14]) square([8,8]); }
-WEB_PIL=[[38.5,-10],[42.2,-10]];
+module groove_capsule(o=0) hull(){ translate(gline(G_T0)+GR*G_N) sphere(r=GR+o,$fn=48); translate(gline(G_T1)+GR*G_N) sphere(r=GR+o,$fn=48); }
+module groove_liner() intersection(){ begg(0.1); difference(){ groove_capsule(GW); groove_capsule(0); } }
+/* ---- SHOULDER hinge (left; right mirrored). Ear + rear post are moulded into torso_front. Local frame sh_frame():
+   x radial at PSI_H. The post ties the ear back into the shell behind the knuckle (away from the arm swing). ---- */
+module sh_frame() rotate(PSI_H) children();
+POST=[43,9,10,9];                                     // post block in the local frame: u0, v0, du, dv
+module hip_plan_upper() hull(){ translate([R_AX,0]) circle(r=KN_R+0.5); translate([41,-6]) square([11,24]); }
 module hip_web() difference(){
-  translate([34,-14,KN_Z0-EAR_GAP]) cube([HX-6-34,8,(KN_Z1+EAR_GAP)-(KN_Z0-EAR_GAP)]);
-  translate([HX,HY,0]) cylinder(r=KN_R+0.4,h=100);
+  translate([POST[0],POST[1],KN_Z0]) cube([POST[2],POST[3],(KN_Z1+EAR_GAP)-KN_Z0+0.01]);
+  translate([R_AX,0,0]) cylinder(r=KN_R+0.4,h=200);
 }
-module hip_upper_ear() difference(){
-  union(){
-    translate([0,0,KN_Z1+EAR_GAP]) linear_extrude(EAR_T) hip_plan_upper();
-    translate([HX,HY,SPIG_Z0]) cylinder(d=SPIG_D,h=KN_Z1+EAR_GAP-SPIG_Z0+0.01);                 // arbor spigot
-    translate([HX,HY,LUG_Z0]) rotate(LUG_A-LUG_W/2) rotate_extrude(angle=LUG_W,$fn=96)
-      translate([LUG_R[0],0]) square([LUG_R[1]-LUG_R[0],KN_Z1+EAR_GAP-LUG_Z0+0.01]);              // stop lug
-  }
-  translate([HX,HY,0]) cylinder(d=PIN_D,h=100);
-  translate([HX,HY,KN_Z1+EAR_GAP+EAR_T-2.2]) cylinder(d=6.0,h=3);                                // M3 head counterbore
+module hip_upper_ear() {
+  sh_frame() translate([0,0,KN_Z1+EAR_GAP]) linear_extrude(EAR_T) hip_plan_upper();
+  translate([HX,HY,SPIG_Z0]) cylinder(d=SPIG_D,h=KN_Z1+EAR_GAP-SPIG_Z0+0.01);                    // arbor spigot
+  translate([HX,HY,LUG_Z0]) rotate(LUG_A-LUG_W/2) rotate_extrude(angle=LUG_W,$fn=96)
+    translate([LUG_R[0],0]) square([LUG_R[1]-LUG_R[0],KN_Z1+EAR_GAP-LUG_Z0+0.01]);                 // stop lug
 }
-module hip_bracket(side) mir(side) { hip_upper_ear(); hip_web(); }
+module hip_bracket(side) mir(side) { hip_upper_ear(); sh_frame() hip_web(); }
 module hip_bracket_cuts(side) mir(side) {
-  translate([HX,HY,0]) cylinder(d=PIN_D,h=100);
-  for(p=WEB_PIL) translate([p[0],p[1],KN_Z0-EAR_GAP-0.1]) cylinder(d=M25_PIL,h=9);              // hip_cap screw pilots
+  translate([HX,HY,0]) cylinder(d=PIN_D,h=200);                                                  // M3 thread-forming pilot
+  translate([HX,HY,KN_Z1+EAR_GAP+EAR_T-1.0]) cylinder(d=6.2,h=3);                                // head seat
 }
-module hip_cap_local() difference(){
-  translate([0,0,KN_Z0-EAR_GAP-EAR_T]) linear_extrude(EAR_T) hip_plan_lower();
-  tegg(-0.3);                                                                                    // stays 0.3 off the shell
-  translate([HX,HY,0]) cylinder(d=PIN_D,h=100);
-  translate([HX,HY,KN_Z0-EAR_GAP-EAR_T-0.01]) cylinder(d=6.4,h=2.6,$fn=6);                       // M3 nyloc nut trap
-  for(p=WEB_PIL) translate([p[0],p[1],0]) cylinder(d=M25_CLR,h=100);
-  for(p=WEB_PIL) translate([p[0],p[1],KN_Z0-EAR_GAP-EAR_T-0.01]) cylinder(d=5.0,h=1.6);
-}
-module hip_cap(side) mir(side) hip_cap_local();
 module torso_front() difference(){
   union(){ intersection(){ torso_shell(); F(); } intersection(){ torso_add(); F(); } groove_liner();
     hip_bracket("L"); hip_bracket("R"); }
@@ -316,10 +338,10 @@ module yaw_coupler() rotate(yaw) difference(){
 module tilt_pose() translate([0,TILT_Y,TILT_Z]) rotate([tilt,0,0]) translate([0,-TILT_Y,-TILT_Z]) children();
 module head_pose() rotate(yaw) tilt_pose() children();
 HEAD_Z0=hcut+5.5;   // V.01 hug: head shell now starts at z=103.5 (was 101) so the rim clears the turret/collar when nodding
-module head_shell() intersection(){ difference(){ hegg(); hegg(2.4); } above(HEAD_Z0); }
+module head_shell() intersection(){ difference(){ begg(); begg(2.4); } cap_region(); }
 // V.01 hug: the two lower seam bosses moved from z=110 to z=106 (x ±32) to clear the tilt horn / hub; upper to x ±28.
-hboss=[[-32,hcut+8],[32,hcut+8],[-28,HC+20],[28,HC+20]];
-module head_bosses() intersection(){ hegg(0.1); above(HEAD_Z0); for(p=hboss) translate([p[0],0,p[1]]) rotate([90,0,0]) hull(){ cylinder(d=7,h=16,center=true); translate([sign(p[0])*12,0,0]) cylinder(d=7,h=16,center=true);} }
+hboss=[[-32,hcut+8],[32,hcut+8],[-27,136],[27,136]];
+module head_bosses() intersection(){ begg(0.1); cap_region(); above(HEAD_Z0); for(p=hboss) translate([p[0],0,p[1]]) rotate([90,0,0]) hull(){ cylinder(d=7,h=16,center=true); translate([sign(p[0])*12,0,0]) cylinder(d=7,h=16,center=true);} }
 // Skirt-down printable bearing: vertical skirt, then a 30°-from-vertical cone so a 35° support
 // threshold does not put supports on the bearing faces. Flat thrust is the separate washer.
 // Cone: 30° from vertical, starts at skirt ID 44.7, z=96.8. At z=98.5 (floor), ID ≈ 42.7, over the washer.
@@ -405,6 +427,7 @@ module head_back() head_pose() difference(){
     seam_male_head();
   }
   for(p=hboss) translate([p[0],0,p[1]]) rotate([90,0,0]) cylinder(d=M25_PIL,h=40,center=true);
+  translate([HUB_X0-2.5-6.5,TILT_Y-5.2,TILT_Z-5.2]) cube([7,10.4,10.4]);                         // hub key pocket (also through the shell wall)
   ribbon_loop_bay();
   seam_chamfer_head();
 }
@@ -421,35 +444,52 @@ module head_front() head_pose() difference(){
   seam_chamfer_head();
 }
 
-/* ================= PASSIVE HUG ARMS (V.01) ================= */
-function arm_top(p)=[(ea(EZ_T)+O_ARM)*cos(p),(eb(EZ_T)+O_ARM)*sin(p)];
-function arm_bot(p)=let(w=min(1,max(0,(PSI_H-p)/20)), t=arm_top(p), b=[(ea(EZ_B)+O_ARM)*cos(p),(eb(EZ_B)+O_ARM)*sin(p)]) (1-w)*t+w*b;
-ARM_PSI=[for(p=[PSI_H:-4:PSI_P]) p];
-ARM_TOPS=concat([for(p=ARM_PSI) arm_top(p)],PAW_TOP);
-ARM_BOTS=concat([for(p=ARM_PSI) arm_bot(p)],PAW_BOT);
-NSEC=len(ARM_TOPS);
-module sec(i,r) { translate([ARM_TOPS[i][0],ARM_TOPS[i][1],ARM_ZT]) sphere(r=r,$fn=20); translate([ARM_BOTS[i][0],ARM_BOTS[i][1],ARM_ZB]) sphere(r=r,$fn=20); }
-module arm_band(o=0,i0=0,i1=-1) { e=(i1<0?NSEC-1:i1); for(i=[i0:e-1]) hull(){ sec(i,ARM_RS+o); sec(i+1,ARM_RS+o); } }
-module paw_hull(r) hull() for(i=[NSEC-3:NSEC-1]) sec(i,r);
-module arm_local() difference(){
-  union(){
-    translate([HX,HY,KN_Z0]) cylinder(r=KN_R,h=KN_Z1-KN_Z0,$fn=64);
-    arm_band(0);
-  }
-  translate([HX,HY,0]) cylinder(d=PIN_RUN,h=100);
+/* ================= PASSIVE HUG ARMS (V.01, Mirumi proportions) ================= */
+// Band through the path samples: centre on_egg(psi,z,off); the two spheres of each section sit ±ARM_HW across the
+// path, in the skin tangent plane (binormal = egg normal x path tangent).
+function apath(side)=side=="L"?ARM_PATH_L:ARM_PATH_R;
+function npath(side)=len(apath(side));
+function ac(side,i)=let(p=apath(side)[i]) on_egg(p[0],p[1],p[2]);
+function an(side,i)=let(p=apath(side)[i], n=[cos(p[0]),sin(p[0]),-eggdr(p[1])]) n/norm(n);
+function at(side,i)=let(n=npath(side), a=ac(side,max(0,i-1)), b=ac(side,min(n-1,i+1))) (b-a)/norm(b-a);
+function aw(side,i)=let(w=cross(an(side,i),at(side,i))) w/norm(w);
+function ahw(side,i)= i==0 ? 4 : (i==npath(side)-1 ? 3.5 : ARM_HW);   // narrower root (clears the ear) and paw tip
+module sec(side,i,r) for(s=[-1,1]) translate(ac(side,i)+s*ahw(side,i)*aw(side,i)) sphere(r=r,$fn=20);
+module arm_band(side,o=0,i0=0,i1=-1) { e=(i1<0?npath(side)-1:i1); for(i=[i0:e-1]) hull(){ sec(side,i,ARM_RS+o); sec(side,i+1,ARM_RS+o); } }
+module knuckle_local() difference(){
+  translate([HX,HY,KN_Z0]) cylinder(r=KN_R,h=KN_Z1-KN_Z0,$fn=64);
+  translate([HX,HY,0]) cylinder(d=PIN_RUN,h=200);
+}
+module knuckle_cuts() {
+  translate([HX,HY,0]) cylinder(d=PIN_RUN,h=200);
+  translate([HX,HY,KN_Z0-0.01]) cylinder(d=7.2,h=1.0);                                       // M3 washer seat under the knuckle
   translate([HX,HY,REC_Z0]) cylinder(d=REC_D,h=20);                                          // spring recess
   translate([HX,HY,REL_Z0]) rotate(LUG_A-LUG_W/2-ARM_OPEN) rotate_extrude(angle=LUG_W+ARM_OPEN,$fn=96)
     translate([REL_R[0],0]) square([REL_R[1]-REL_R[0],10]);                                    // stop relief
   translate([HX,HY,REC_Z0-0.01]) rotate(-100) translate([3.0,-0.8,0]) cube([4.5,1.6,2.2]);   // arm-side spring leg slot
 }
-module arm_pose(side) mir(side) translate([HX,HY,0]) rotate(side=="L"?armL:armR) translate([-HX,-HY,0]) children();
-module arm(side) arm_pose(side) arm_local();
-// TPU paw pad: a 1.5 mm mitten over the last 12 mm of the paw (glue or stretch on). Shore 85-95A.
-module paw_pad(side) arm_pose(side) difference(){ paw_hull(ARM_RS+PAD_T); paw_hull(ARM_RS-0.01); arm_band(0); translate([-50,-80,0]) cube([50,100,100]); }
-// fur sleeve proxy over the band (2 mm), not over the knuckle or the padded paw
-module sleeve_proxy(side) arm_pose(side) difference(){ arm_band(2,0,NSEC-3); translate([HX,HY,0]) cylinder(r=KN_R+2.5,h=100); }
-// grip test objects (reference only): round strap/handle Ø d resting on the groove floor; flat strap 25 x 2.5
-module grip_rod(d=12.5,h=130) translate([0,GF,30]) rotate([atan(G_SLOPE),0,0]) translate([0,-d/2,-h/2]) cylinder(d=d,h=h,$fn=48);
+module arm_local(side) difference(){
+  union(){ mir(side) knuckle_local(); arm_band(side,0); }
+  mir(side) knuckle_cuts();
+}
+// opening rotates the arm about its own hinge axis: + for the left arm (CCW from above), - for the right
+module arm_pose(side) let(sx=aside(side)) translate([sx*HX,HY,0]) rotate(side=="L"?armL:-armR) translate([-sx*HX,-HY,0]) children();
+module arm(side) arm_pose(side) arm_local(side);
+// TPU pad: a 1.5 mm sleeve over the band where it crosses the handle (glue or stretch on). Shore 85-95A.
+function padsec(side)=side=="L"?PAD_SEC_L:PAD_SEC_R;
+module paw_pad(side) arm_pose(side) difference(){ arm_band(side,PAD_T,padsec(side)[0],padsec(side)[1]); arm_band(side,0.02); }
+// fur sleeve proxy (2 mm) over the band, not over the knuckle or the pads
+module sleeve_proxy(side) arm_pose(side) difference(){
+  union(){ arm_band(side,2,1,padsec(side)[0]); if(padsec(side)[1]<npath(side)-1) arm_band(side,2,padsec(side)[1],npath(side)-1); }
+  mir(side) translate([HX,HY,0]) cylinder(r=KN_R+2.5,h=200);
+  arm_band(side,PAD_T+0.2,padsec(side)[0],padsec(side)[1]);
+}
+// grip test object (reference only): round handle Ø d lying in the diagonal groove on the floor line
+module grip_rod(d=12.5,h=50) translate(gline(G_T0/2+G_T1/2)+G_N*(d/2+0.1)) multmatrix(rotmat_to(G_U)) translate([0,0,-h/2]) cylinder(d=d,h=h,$fn=48);
+function rotmat_to(u)=let(z=[0,0,1], v=cross(z,u), c=u*z, s=norm(v), k=v/(s>1e-9?s:1))
+  // Rodrigues: rotate z onto u
+  let(K=[[0,-k[2],k[1]],[k[2],0,-k[0]],[-k[1],k[0],0]], I=[[1,0,0],[0,1,0],[0,0,1]], R=I+s*K+(1-c)*K*K)
+  [[R[0][0],R[0][1],R[0][2],0],[R[1][0],R[1][1],R[1][2],0],[R[2][0],R[2][1],R[2][2],0],[0,0,0,1]];
 
 module bezel() difference(){ union(){ cylinder(d=21,h=12); cylinder(d=27,h=1.6); } translate([0,0,-1]) cylinder(d=12,h=20); translate([-8,-1.1,2.2]) cube([30,2.2,2.4]); }
 module shutter() union(){ translate([-6,-0.9,0]) cube([27,1.8,2]); cylinder(d=14,h=0.9); translate([20,-0.9,0]) cube([1.8,1.8,5]); }
@@ -466,7 +506,7 @@ module dummy_mic() translate([18,-30.5,80]) cube([MIC[0],MIC[2],MIC[1]],center=t
 module dummies(){ dummy_servo_yaw(); dummy_horn_yaw(); dummy_servo_tilt(); dummy_horn_tilt();
   dummy_pi(); dummy_cam(); dummy_speaker(); dummy_amp(); dummy_mic(); }
 // torso fur envelope (4 mm), with the belly groove
-module fur_proxy_torso() difference(){ intersection(){ difference(){ tegg(-4); tegg(0); } below(tcut); } groove_capsule(0); }
+module fur_proxy_torso() difference(){ intersection(){ difference(){ tegg(-4); tegg(0); } body_region(); } groove_capsule(0); }
 
 
 /* ================= TEST COUPON (print this first) ================= */
@@ -496,7 +536,7 @@ module coupon() {
 }
 
 PRINTED_PARTS=["torso_front","torso_back","tray","yaw_collar","yaw_retainer_A","yaw_retainer_B","yaw_coupler","yaw_thrust_washer",
-  "neck_turret","tilt_hub","head_back","head_front","arm_L","arm_R","hip_cap_L","hip_cap_R","paw_pad_L","paw_pad_R","bezel","shutter","coupon"];
+  "neck_turret","tilt_hub","head_back","head_front","arm_L","arm_R","paw_pad_L","paw_pad_R","bezel","shutter","coupon"];
 if(part=="torso_front") torso_front(); else if(part=="torso_back") torso_back();
 else if(part=="tray") tray(); else if(part=="yaw_collar") yaw_collar();
 else if(part=="yaw_retainer_A") yaw_retainer_half(1); else if(part=="yaw_retainer_B") yaw_retainer_half(-1);
@@ -504,7 +544,6 @@ else if(part=="yaw_coupler") yaw_coupler(); else if(part=="yaw_thrust_washer") y
 else if(part=="neck_turret") neck_turret(); else if(part=="tilt_hub") tilt_hub();
 else if(part=="head_back") head_back(); else if(part=="head_front") head_front();
 else if(part=="arm_L") arm("L"); else if(part=="arm_R") arm("R");
-else if(part=="hip_cap_L") hip_cap("L"); else if(part=="hip_cap_R") hip_cap("R");
 else if(part=="paw_pad_L") paw_pad("L"); else if(part=="paw_pad_R") paw_pad("R");
 else if(part=="bezel") bezel(); else if(part=="shutter") shutter();
 else if(part=="dummies") dummies();
@@ -522,4 +561,4 @@ else if(part=="dummy_amp") dummy_amp();
 else if(part=="dummy_mic") dummy_mic();
 else if(part=="grip_rod") grip_rod();
 else { torso_front(); torso_back(); tray(); yaw_collar(); yaw_retainer_half(1); yaw_retainer_half(-1); yaw_coupler(); yaw_thrust_washer();
-  neck_turret(); tilt_hub(); head_back(); head_front(); arm("L"); arm("R"); hip_cap("L"); hip_cap("R"); color("black") { paw_pad("L"); paw_pad("R"); } color("red") dummies(); }
+  neck_turret(); tilt_hub(); head_back(); head_front(); arm("L"); arm("R"); color("black") { paw_pad("L"); paw_pad("R"); } color("red") dummies(); }

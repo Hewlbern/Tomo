@@ -470,10 +470,10 @@ add("Hand opening (arms on the open stop)",
     "pass" if H and min(H["open"]["pad_L_to_belly_mm"],H["open"]["pad_R_to_belly_mm"])>=15 and H["open"]["rod15_insertion_path_clear"] else "fail")
 rod=M["grip_rod"]; rv=vol_int(rod,M["torso_front"]); rs=vol_int(rod,M["dummy_speaker"]); rp=vol_int(rod,M["dummy_pi"])
 spk_liner=vol_int(M["torso_front"],M["dummy_speaker"])
-add("Belly groove (R8 channel down the front centre, ≈6° from vertical)",
+add("Belly groove (R8 channel down the front centre, ≈2° from vertical, raised with the hug)",
     "torso_front, dummy_speaker, dummy_pi, grip_rod (Ø12.5 reference)",
     f"Floor line from {np.round(gg.FR,1).tolist()} (bottom, 2.5 mm below the skin) to {np.round(gg.FL,1).tolist()} (top, 4 mm below), at azimuth −90°, "
-    f"{math.degrees(math.acos(gg.U[2])):.1f}° from vertical so a bag-handle upright runs up the belly between the paws like Mirumi's; capsule ≈z 21…75, 2.4 mm liner. "
+    f"{math.degrees(math.acos(gg.U[2])):.1f}° from vertical so a bag-handle upright runs up the belly between the paws like Mirumi's; capsule ≈z 36…94 (up to the torso rim), 2.4 mm liner. "
     f"Ø12.5 reference rod on the floor ↔ torso_front {rv} mm³ (touching), ↔ speaker {rs} mm³, ↔ Pi {rp} mm³; torso_front ↔ speaker {spk_liner} mm³.",
     "pass" if (rv or 0)<=0.1 and (rs or 0)<=0.05 and (rp or 0)<=0.05 else "fail",
     "The fur skin needs a matching vertical channel (or a slit) down the belly. The groove is shallow (2.5–4 mm) on purpose: the paws reach round the front of the handle, so it does not need to sit deep.")

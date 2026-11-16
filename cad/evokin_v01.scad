@@ -115,18 +115,21 @@ PAD_T=1.5;                                            // TPU pad thickness
    forward and down round its own side of the body to the front, where the paws nearly meet in front of a
    near-vertical handle lying in the centre belly groove. The RIGHT path is the left path mirrored (psi -> -180-psi).
    Offset 8.5 clears 4 mm fur; 5.3 at the paws (pads ≈0.3 mm off the skin at rest). ---- */
-ARM_PATH_L=[[PSI_H,78,O_ARM],[-41,76,8.5],[-47,73,8.5],[-53,69,8.5],[-58,64.5,8.5],[-63,60,8.5],[-68,55.5,8],
-            [-74,52,6.5],[-78,49.5,5.3],[-81,48.5,5.3],[-82.5,48,5.3]];
+// Mirumi polish pass: the arms run nearly level round the upper chest, so the paws meet at z ≈ 70, just under the
+// face (were z 48, mid-body).
+ARM_PATH_L=[[PSI_H,78,O_ARM],[-41,77.5,8.5],[-47,77,8.5],[-53,76,8.5],[-58,75,8.5],[-63,74,8.5],[-68,73,8],
+            [-74,71.5,6.5],[-78,70.5,5.3],[-81,70,5.3],[-82.5,70,5.3]];
 ARM_PATH_R=[for(p=ARM_PATH_L) [-180-p[0],p[1],p[2]]];
 PAD_SEC_L=[7,10]; PAD_SEC_R=[7,10];                    // path sections covered by the TPU pads (the paws, in front of the handle)
 /* ---- CENTRE belly groove (two-arms pass): R8 channel down the front centre (azimuth -90) for a near-vertical handle;
-   floor line from G_FR (bottom, z 32.9, 2.5 mm below the skin) to G_FL (top, z 64, 4 mm below), 5.9 deg from vertical;
+   floor line from G_FR (bottom, z 48.3, 2.5 mm below the skin) to G_FL (top, z 80, 4 mm below), 1.7 deg from vertical
+   (Mirumi polish pass: raised from z 33..64 with the hug, paws now meet at z ≈ 70);
    shallow so a Ø10 handle stands proud enough for the paws to reach round it.
    G_U = line direction (up), G_N = outward groove normal. R8 capsule from t=G_T0 to G_T1 along the line, wall GW.
    Constants from scripts/groove_geo.py. ---- */
 GR=8; GW=2.4;
-G_FR=[0.0000,-38.7962,32.9239]; G_FL=[0.0000,-41.9986,63.9969];
-G_U=[0.0000,-0.1025,0.9947]; G_N=[0.0000,-0.9947,-0.1025]; G_T0=-12; G_T1=42; G_MIDT=15;
+G_FR=[0.0000,-42.8349,48.3438]; G_FL=[0.0000,-41.8878,79.9301];
+G_U=[0.0000,0.0300,0.9996]; G_N=[0.0000,-0.9996,0.0300]; G_T0=-12; G_T1=46; G_MIDT=22;   // T1 46: the channel runs on up to the torso rim (z ≈ 94) so a straight handle clears the shell above the paws
 function gline(t)=G_FR+t*G_U;
 /* ---- head tilt (nod): spline axis along x through (TILT_Y, TILT_Z); FS90MG case top at x=-TS_X, spline pointing -x ---- */
 TILT_Y=6; TILT_Z=119; TS_X=22;
@@ -228,7 +231,7 @@ function aside(side)=side=="L"?1:-1;
 module mir(side) mirror([side=="L"?0:1,0,0]) children();
 /* ---- belly groove ---- */
 module groove_capsule(o=0) hull(){ translate(gline(G_T0)+GR*G_N) sphere(r=GR+o,$fn=48); translate(gline(G_T1)+GR*G_N) sphere(r=GR+o,$fn=48); }
-module groove_liner() intersection(){ begg(0.1); difference(){ groove_capsule(GW); groove_capsule(0); } }
+module groove_liner() intersection(){ begg(0.1); body_region(); difference(){ groove_capsule(GW); groove_capsule(0); } }   // body_region: the raised liner stops at the face-cap seam
 /* ---- SHOULDER hinge (left; right mirrored). Ear + rear post are moulded into torso_front. Local frame sh_frame():
    x radial at PSI_H. The post ties the ear back into the shell behind the knuckle (away from the arm swing). ---- */
 module sh_frame() rotate(PSI_H) children();
@@ -539,6 +542,9 @@ module soft_body() difference(){
   union(){ rotate_extrude($fn=96) polygon(concat([[0,0]],[for(z=[0:2:62]) [eggr(z)+FUR_SKIN+pear_pad(z),z]],[[0,62]])); plush_feet(); }
   begg(0);
   hull(){ groove_capsule(0); translate(G_N*30) groove_capsule(0); }      // handle channel stays open
+  // Mirumi polish: the groove now starts at z ≈ 36, so the handle channel through the padding runs on down to the
+  // bag top (the upright leg passes between the feet)
+  hull(){ for(t=[-56,G_T0]) for(o=[0,30]) translate(gline(t)+(GR+o)*G_N) sphere(r=GR,$fn=32); }
 }
 // torso fur envelope (4 mm), with the belly groove
 module fur_proxy_torso() difference(){ intersection(){ difference(){ tegg(-4); tegg(0); } body_region(); } groove_capsule(0); }

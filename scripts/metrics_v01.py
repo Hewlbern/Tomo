@@ -22,7 +22,7 @@ o={"assumptions":dict(material="PLA 1.24 g/cm³ × per-part effective fill (see 
    print_profiles=FILL,
    components="Feetech FS90 9 g each (Feetech spec sheet / Core Electronics CE09376) + horn 1 g; Adafruit 3923 mini oval speaker 3 g (Adafruit listing); "
      "XIAO ESP32S3 Sense with camera 6.6 g (distributor spec) + long-FPC camera allowance 0.9 g; MAX98357A amp 2 g; mic 1 g; INA219 2 g; Pololu U3V16F5 boost 0.4 g (Pololu listing); "
-     "wiring 5 g (ASSUMED, trimmed 30 AWG); fasteners 5.5 g (steel M3 pins and servo/horn screws; nylon M2.5 shell/collar screws); springs 2 × 1 g; 8 mm safety eyes 2 × 0.4 g (ASSUMED); "
+     "wiring 5 g (ASSUMED, trimmed 30 AWG); fasteners 5.5 g (steel M3 pins and servo/horn screws; nylon M2.5 shell/collar screws); springs 2 × 1 g; 10 mm safety eyes 2 × 0.7 g (ASSUMED); "
      "long-pile fur skin 19 g (ASSUMED light knit-backed faux fur ≈380 g/m² over ≈0.050 m²) + feet fibrefill 2 g; battery Core Electronics CE04375 1S 400 mAh 11 g (listing).",
    cad_only=True,physically_tested=False)}
 printed=list(FILL)
@@ -35,7 +35,7 @@ def cen(n): return L(n).center_mass
 comp=[("FS90 pan + horn",10.0,cen("dummy_servo_yaw")),("FS90 tilt + horn",10.0,cen("dummy_servo_tilt")),
       ("speaker (Adafruit 3923)",3.0,cen("dummy_speaker")),("brain + camera (XIAO ESP32S3 Sense)",7.5,cen("dummy_pi")),("amp",2.0,cen("dummy_amp")),
       ("mic",1.0,cen("dummy_mic")),("INA219 + U3V16F5 boost",2.4,np.array([0,10.0,40.0])),("wiring",5.0,np.array([0,0,60.0])),
-      ("fasteners",5.5,np.array([0,-5.0,60.0])),("springs",2.0,np.array([0,-31.2,78.0])),("safety eyes",0.8,np.array([0,-44.0,114.0])),
+      ("fasteners",5.5,np.array([0,-5.0,60.0])),("springs",2.0,np.array([0,-31.2,78.0])),("safety eyes",1.4,np.array([0,-44.0,121.0])),
       ("fur skin (long pile) + feet",21.0,np.array([0,-2.0,68.0]))]
 # thick Mirumi-style soft arm sleeves (soft goods): polyester fibrefill inside (ASSUMED 15 kg/m³ loosely packed) +
 # the extra fur over the larger tube (ASSUMED 380 g/m², same as the body pile) vs the old 2 mm sleeve (7,953 mm² for both arms)
@@ -49,9 +49,9 @@ comp.append(("arm sleeves: fibrefill",stuff,(slv["L"]["centre"]+slv["R"]["centre
 comp.append(("arm sleeves: extra fur over the thicker tubes",xfur,(slv["L"]["centre"]+slv["R"]["centre"])/2))
 # closer-to-Mirumi soft body (soft goods, cad soft_body): lower-body fibrefill padding (pear / bell silhouette), bigger
 # splayed plush feet and a longer shaggy pile. Padding volume from the revolved pad profile less the handle channel;
-# feet are ellipsoids. Long shaggy pile ASSUMED 480 g/m² (was 380) over the body skin area, plus the extra skin area.
+# feet are ellipsoids. Long shaggy pile ASSUMED 540 g/m² (was 380; 480 at 03bc2f7, longer ≈44 mm locks in the Mirumi polish pass) over the body skin area, plus the extra skin area.
 sys.path.insert(0,"scripts"); import groove_geo as gg
-PEAR_P,PEAR_Z=9.0,(28.0,50.0); FUR_SKIN=4.0; FOOT_R=(16.0,13.0,9.0); PILE_OLD,PILE_NEW=380.0,480.0; SKIN_M2=0.050
+PEAR_P,PEAR_Z=9.0,(28.0,50.0); FUR_SKIN=4.0; FOOT_R=(16.0,13.0,9.0); PILE_OLD,PILE_NEW=380.0,540.0; SKIN_M2=0.050
 def pear_pad(z):
     if z<10: return PEAR_P*math.sqrt(max(z,0.0)/10.0)
     if z<=PEAR_Z[0]: return PEAR_P
@@ -81,14 +81,14 @@ AFTER={"shells (torso + head, 4 parts)":sum(bd[k] for k in ("torso_front","torso
        "arms":bd["arm_L"]+bd["arm_R"],"TPU pads":bd["paw_pad_L"]+bd["paw_pad_R"],"tray":bd["tray"],"yaw collar":bd["yaw_collar"],
        "turret + hub + yaw small parts":sum(bd[k] for k in ("neck_turret","tilt_hub","yaw_retainer_A","yaw_retainer_B","yaw_coupler","yaw_thrust_washer")),
        "eye bezels + shutter":0.0,"servos 2 × FS90MG + horns":20.0,"speaker (Adafruit 3351)":3.0,"brain + camera":7.5,"amp + mic":3.0,
-       "INA219 + XL6009 boost":2.4,"wiring":5.0,"fasteners":5.5,"springs":2.0,"eyes (in bezels)":0.8,"fur skin":21.0,"thick arm sleeves (fibrefill + extra fur)":stuff+xfur,"pear padding, feet, shaggy pile":soft_fill+soft_fur,"battery (2000 mAh)":11.0}
+       "INA219 + XL6009 boost":2.4,"wiring":5.0,"fasteners":5.5,"springs":2.0,"eyes (in bezels)":1.4,"fur skin":21.0,"thick arm sleeves (fibrefill + extra fur)":stuff+xfur,"pear padding, feet, shaggy pile":soft_fill+soft_fur,"battery (2000 mAh)":11.0}
 RENAME={"servos 2 × FS90MG + horns":"servos (2 × FS90MG → 2 × FS90, + horns)","speaker (Adafruit 3351)":"speaker (Adafruit 3351 → 3923)",
-        "INA219 + XL6009 boost":"INA219 + boost (XL6009 → Pololu U3V16F5)","eyes (in bezels)":"8 mm safety eyes","fur skin":"fur skin (→ long pile + feet)",
+        "INA219 + XL6009 boost":"INA219 + boost (XL6009 → Pololu U3V16F5)","eyes (in bezels)":"10 mm safety eyes","fur skin":"fur skin (→ long pile + feet)",
         "battery (2000 mAh)":"battery (1S 2000 mAh → 400 mAh)","fasteners":"fasteners (→ nylon M2.5 shell screws)","eye bezels + shutter":"eye bezels + shutter (removed)"}
 budget=[dict(item=RENAME.get(k,k),before_g=round(BEFORE[k],1),after_g=round(AFTER[k],1)) for k in BEFORE]
 o["mass"]=dict(soft_body=dict(padding_volume_cm3=round(pad_v/1000,1),feet_volume_cm3=round(foot_v/1000,1),fibrefill_g=round(soft_fill,2),
-                extra_pile_and_skin_g=round(soft_fur,2),previous_total_with_battery_g_494c22f=185.0,
-                note="Closer-to-Mirumi soft goods: fibrefill padding sewn into the lower body (up to 9 mm below z 28, gone by z 50) for a pear / bell silhouette, two splayed plush feet, and a longer shaggy pile (ASSUMED 480 g/m² vs 380). Fibrefill 15 kg/m³ ASSUMED."),
+                extra_pile_and_skin_g=round(soft_fur,2),previous_total_with_battery_g_494c22f=185.0,previous_total_with_battery_g_03bc2f7=194.0,
+                note="Closer-to-Mirumi soft goods: fibrefill padding sewn into the lower body (up to 9 mm below z 28, gone by z 50) for a pear / bell silhouette, two splayed plush feet, and a longer shaggy pile (ASSUMED 540 g/m² vs 380; 480 at 03bc2f7). Fibrefill 15 kg/m³ ASSUMED."),
    arm_sleeves=dict(L={k:v for k,v in slv["L"].items() if k!="centre"},R={k:v for k,v in slv["R"].items() if k!="centre"},
                 stuffing_g=round(stuff,2),extra_fur_g=round(xfur,2),previous_total_with_battery_g_b458259=191.0,
                 note="Soft goods: a stuffed fur tube (Ø16–18 mm before pile, Ø≈26–28 mm with it) round each printed spine, a shoulder cap over the knuckle and a mitten paw. Stuffing 15 kg/m³ and fur 380 g/m² are ASSUMED."),
@@ -124,7 +124,7 @@ def cling(mass,com,g=g125,mu=0.5):
 o["clinging"]=dict(no_battery=cling(mt,cm),with_battery=cling(mtb,cmb),
    per_handle={f'{g["d_mm"]}':dict(pad_force_total_N=g["total_pad_force_N"],into_groove_N=g["total_into_groove_N"],
         free_hang_slip_SF_no_battery=round(0.5*2*g["total_pad_force_N"]/(mt/1000*G),2)) for g in H["grip"]},
-   assumption="Handle Ø12.5 upright on the centre groove floor line (≈6° from the body vertical). μ = 0.5 TPU/fur on a fabric or leather handle (ASSUMED). Pad forces from scripts/sim_v01.py. Not tested.")
+   assumption="Handle Ø12.5 upright on the centre groove floor line (≈2° from the body vertical). μ = 0.5 TPU/fur on a fabric or leather handle (ASSUMED). Pad forces from scripts/sim_v01.py. Not tested.")
 L_lev={sd:float(np.linalg.norm((L(f"paw_pad_{sd}").center_mass-np.array([(1 if sd=="L" else -1)*(gg.eggr(78)+8.5)*math.cos(math.radians(-35)),(gg.eggr(78)+8.5)*math.sin(math.radians(-35)),0]))[:2])) for sd in ("L","R")}
 Mopen=H["spring"]["torque_at_open_stop_Nmm"]; sig=32*Mopen*1.1/(math.pi*1.22**3)
 o["hug_springs"]=dict(rate_Nmm_per_deg=H["spring"]["rate_Nmm_per_deg"],preload_deg=H["spring"]["preload_deg"],
@@ -134,7 +134,7 @@ o["hug_springs"]=dict(rate_Nmm_per_deg=H["spring"]["rate_Nmm_per_deg"],preload_d
    spring_stress_check=f"σ ≈ 32·M·Ki/(π·d³) with M = {Mopen:.0f} N·mm at the open stop (90° wind-up), d = 1.22 mm, Ki ≈ 1.1: ≈{sig/1000:.2f} GPa, vs ≈1.86 GPa at the catalogue 90° rating (302.7 N·mm): the open stop sits exactly at the rating, no margin; do not hold the arms open past the stop.")
 # ---- head pan / tilt loads
 head=[L(n) for n in ("head_front","head_back","tilt_hub")]; h_cam=1.0
-hm=sum(h.volume for h in head)*RHO_PLA*FILL['head_front']+0.9*h_cam+0.8+4.0    # + camera module/FPC, safety eyes, head fur share (ASSUMED 4 g)
+hm=sum(h.volume for h in head)*RHO_PLA*FILL['head_front']+0.9*h_cam+1.4+4.0    # + camera module/FPC, safety eyes, head fur share (ASSUMED 4 g)
 hc=sum(h.volume*h.center_mass for h in head)/sum(h.volume for h in head)
 ax=np.array([0,6.0,119.0]); arm=float(np.hypot(hc[1]-ax[1],hc[2]-ax[2]))
 tau_tilt=hm/1000*G*arm/1000      # N·m worst case (lever horizontal)

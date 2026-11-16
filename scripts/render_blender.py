@@ -68,11 +68,11 @@ TILT_AX = (0.0, 6.0, 119.0) # head tilt axis along x through y=6, z=119 (+ = nos
 REST_L, REST_R = 0.0, 0.0   # STL export pose: arms closed on their rest stops
 ARM_OPEN = 60.0             # open stop (thick-arm pass; was 30)
 # centre belly groove (two-arms pass): floor line G_FR + t*G_U (scripts/groove_geo.py), outward normal G_N, capsule t -12..42, R8
-G_FR = Vector((0.0, -38.7962, 32.9239))
-G_U = Vector((0.0, -0.1025, 0.9947))
-G_N = Vector((0.0, -0.9947, -0.1025))
-G_T0, G_T1, GR = -12.0, 42.0, 8.0
-G_MIDT = 15.0
+G_FR = Vector((0.0, -42.8349, 48.3438))     # Mirumi polish pass: groove raised with the hug (paws meet at z ≈ 70)
+G_U = Vector((0.0, 0.0300, 0.9996))
+G_N = Vector((0.0, -0.9996, 0.0300))
+G_T0, G_T1, GR = -12.0, 46.0, 8.0
+G_MIDT = 22.0
 # closer-to-Mirumi soft body (cad soft_body): lower-body fibrefill padding (pear / bell silhouette) and splayed plush feet
 PEAR_P, PEAR_Z = 9.0, (28.0, 50.0)
 FOOT_PSI, FOOT_Z, FOOT_OFF, FOOT_R = 34.0, 9.0, 15.0, (16.0, 13.0, 9.0)
@@ -110,8 +110,10 @@ GLOBAL = [None]             # optional whole-robot matrix (hanging pose)
 # Mirumi-like colourways (sRGB albedo; AgX lifts pale tones, so keep them a touch darker than the target)
 PALETTES = {
     # closer to Mirumi: one uniform coat colour (undercoat only a shade deeper), no bright tips
-    "ivory": dict(fur=(218, 192, 152), tip=(222, 197, 158), root=(204, 177, 138), pad=(176, 156, 128)),
-    "pink":  dict(fur=(232, 146, 166), tip=(234, 152, 172), root=(220, 134, 154), pad=(196, 124, 140)),
+    # Mirumi polish: warm cream (sheet2) and a saturated soft candy pink (sheet). Hair multiple-scattering lightens
+    # and desaturates the base colour, so the base is set deeper / more saturated than the look.
+    "ivory": dict(fur=(236, 198, 140), tip=(238, 202, 146), root=(226, 186, 128), pad=(222, 186, 132)),
+    "pink":  dict(fur=(255, 146, 158), tip=(255, 152, 164), root=(250, 134, 148), pad=(240, 136, 148)),
 }
 
 # (legacy note) AgX + studio lights wash mid tones out,
@@ -337,8 +339,9 @@ def mat_fur_hair(name="FurHair", color=None):
         if key in node.inputs:
             node.inputs[key].default_value = val
     _set(hair, "Color", col)
-    _set(hair, "Roughness", 0.28)
-    _set(hair, "Radial Roughness", 0.32)
+    _set(hair, "Roughness", 0.36)
+    _set(hair, "Radial Roughness", 0.4)
+    _set(hair, "IOR", 1.42)          # Mirumi polish: weaker white specular so the coat colour stays saturated
     _set(hair, "Coat", 0.04)
     _set(hair, "Random Color", 0.06)
     _set(hair, "Random Roughness", 0.08)
@@ -445,7 +448,7 @@ def torso_fur_ok(pt):
     # centre belly groove: keep the channel bare so a handle sits in it
     t, tc, dn, dw, c = _groove_local(pt)
     if (Vector(pt) - c).length < GR + 2.0 and y < -10:
-        return False
+        return 1.0                                    # Mirumi polish: short pile in the channel (no bare stripe)
     # shoulder knuckles stay under the coat (Mirumi: no visible hardware)
     return True
 
@@ -537,21 +540,42 @@ def head_len(pt):
     x, y, z = pt
     w = 1.0
     if z > 128:
-        w = min(w, 1.0 - 0.45 * min(1.0, (z - 128) / 16.0))
+        w = min(w, 1.0 - 0.25 * min(1.0, (z - 128) / 16.0))
     if y < -10:
         e = ((x / 22.0) ** 2 + ((z - 116.0) / 13.0) ** 2) ** 0.5
         if e < 1.0:
-            w = min(w, 0.42)
+            w = min(w, 0.7)           # Mirumi polish: short fur over the whole face, no bare patch
         elif e < 1.5:
-            w = min(w, 0.42 + 0.58 * (e - 1.0) / 0.5)
+            w = min(w, 0.7 + 0.3 * (e - 1.0) / 0.5)
+    return w
+
+
+def head_len_guard(pt):
+    """Guard-lock length on the face cap: as head_len, but the face oval and the brow above it are cut short so the
+    long locks frame the face instead of falling over the eyes (Mirumi: short-furred face, only the eyes show)."""
+    x, y, z = pt
+    w = head_len(pt)
+    if y < -10:
+        e = ((x / 24.0) ** 2 + ((z - 118.0) / 15.0) ** 2) ** 0.5
+        if z > 118.0:
+            e = ((x / 24.0) ** 2 + ((z - 118.0) / 26.0) ** 2) ** 0.5     # brow: locks above the eyes stay short
+        if e < 1.0:
+            w = min(w, 0.3)
+        elif e < 1.6:
+            w = min(w, 0.3 + 0.7 * (e - 1.0) / 0.6)
     return w
 
 
 def torso_len(pt):
     """Body pile: longest and shaggiest round the lower body (bell silhouette), a little shorter toward the shoulders."""
     x, y, z = pt
+    t, tc, dn, dw, c = _groove_local(pt)
+    if (Vector(pt) - c).length < GR + 2.0 and y < -10:
+        return 0.5                                    # short pile in the handle channel
     if z < 20 and y < -8:
-        return 0.4 + 0.6 * max(0.0, (z - 8.0) / 12.0)   # shorter round the feet so the paw bumps show
+        return 0.35 + 0.65 * max(0.0, (z - 6.0) / 18.0)   # shorter round the feet so the paw bumps show
+    if z < 30:
+        return 0.72 + 0.28 * z / 30.0                 # Mirumi polish: fluffy, not broom-like, round the bottom
     return 1.0 if z < 45 else max(0.7, 1.0 - 0.3 * (z - 45) / 40.0)
 
 
@@ -560,12 +584,13 @@ def head_fur_ok(pt):
     x, y, z = pt
     w = 1.0
     if y < 5.0:
-        for (cx, cz, r0, r1) in ((EYE_X, EYE_Z, 4.4, 7.0), (-EYE_X, EYE_Z, 4.4, 7.0), (0.0, NOSE_Z, 1.8, 3.6)):
+        # Mirumi polish: only the bead eyes part the fur (no nose dot, no bare skin round them)
+        for (cx, cz, r0, r1) in ((EYE_X, EYE_Z, 4.0, 6.5), (-EYE_X, EYE_Z, 4.0, 6.5)):
             r = ((x - cx) ** 2 + (z - cz) ** 2) ** 0.5
             if r < r0:
                 return 0.0
             if r < r1:
-                w = min(w, 0.15 + 0.85 * (r - r0) / (r1 - r0))
+                w = min(w, 0.4 + 0.6 * (r - r0) / (r1 - r0))
     return w
 
 
@@ -583,8 +608,9 @@ def _arm_flow(hinge, tip_psi, tip_z, tip_off, k=1.1, droop=0.35):
     return (k * d[0] / n, k * d[1] / n, k * d[2] / n - droop)
 
 
-# shoulder -> mitten direction in the arm's rest frame (symmetric paths end at [-82.5, 48, 5.3] / [-97.5, 48, 5.3] in cad)
-ARM_FLOW = {"L": _arm_flow((44.58, -31.21, 78.0), -82.5, 48, 5.3), "R": _arm_flow((-44.58, -31.21, 78.0), -97.5, 48, 5.3)}
+# shoulder -> mitten direction in the arm's rest frame (symmetric paths end at [-82.5, 70, 5.3] / [-97.5, 70, 5.3] in cad)
+# Mirumi polish: the arms run nearly level round the upper chest (paws at z 70), so the locks fall more steeply
+ARM_FLOW = {"L": _arm_flow((44.58, -31.21, 78.0), -82.5, 70, 5.3, droop=0.8), "R": _arm_flow((-44.58, -31.21, 78.0), -97.5, 70, 5.3, droop=0.8)}
 
 
 def add_hair(obj, name, length_m, count, children, material,
@@ -751,8 +777,8 @@ def place_eye(name, sx):
     """8 mm glossy black safety eye: a 4 mm-radius dome sitting on the trimmed fur backing."""
     _deselect()
     bpy.ops.mesh.primitive_uv_sphere_add(
-        segments=40, ring_count=20, radius=0.0036,
-        location=mm(sx * EYE_X, EYE_SKIN_Y - FUR_BASE - 1.0, EYE_Z),
+        segments=40, ring_count=20, radius=0.0046,     # Mirumi polish: 10 mm glossy bead (was 8 mm)
+        location=mm(sx * EYE_X, EYE_SKIN_Y - FUR_BASE - 3.2, EYE_Z),
     )
     obj = bpy.context.active_object
     obj.name = name
@@ -882,7 +908,7 @@ def build_assembly(skip_hair=False, preview=False):
     try:
         bsdf = mats["fur_clay"].node_tree.nodes.get("Principled BSDF")
         if bsdf:
-            bsdf.inputs["Sheen Weight"].default_value = 0.25
+            bsdf.inputs["Sheen Weight"].default_value = 0.0     # Mirumi polish: no glowing sheen on the backing
             bsdf.inputs["Sheen Roughness"].default_value = 0.4
             bsdf.inputs["Sheen Tint"].default_value = srgb_lin(FUR_TIP_SRGB)
     except Exception:
@@ -931,6 +957,7 @@ def build_assembly(skip_hair=False, preview=False):
     # the glossy spheres sit proud of the coat like safety eyes.
     vg_h = density_group(fur_h, "fur_density", head_fur_ok)
     vl_h = density_group(fur_h, "fur_length", head_len)
+    vlg_h = density_group(fur_h, "fur_length_guard", head_len_guard)
     objs["fur_head"] = fur_h
 
     # arm fur: use a slightly inflated copy of sleeve + a paw-region sphere-ish
@@ -951,9 +978,9 @@ def build_assembly(skip_hair=False, preview=False):
             # Knuckle furred over (no visible hardware); only the TPU pads at the handle crossings stay short.
             _, _, dist = kd.find(Vector(pt))
             if dist < 2.0:
-                return 0.0
+                return 1.0                # Mirumi polish: the fur-coloured pads are furred over too
             if dist < 6.0:
-                return 0.5
+                return 1.0
             return 1.0
         return pred
 
@@ -976,42 +1003,40 @@ def build_assembly(skip_hair=False, preview=False):
         # Closer to Mirumi: long, shaggy, clumped pile in layered wavy locks falling downward, one uniform colour.
         # Undercoat ≈12 mm, guard locks ≈28 mm on the body (shortest on the face patch and crown), interpolated
         # children clumped into locks, a gentle wave kink, blunt tips (no bright halo).
-        CH = 7 if not preview else 4
-        GUARD_AL = (0.0, 0.0, -0.45)                    # guard locks stand off the body, then fall
-        add_hair(fur_t, "torso_under", length_m=0.0130, count=int(6000 * mul_c),
+        CH = 10 if not preview else 5
+        GUARD_AL = (0.0, 0.0, -0.62)                    # Mirumi polish: guard locks stand off, then fall in layers
+        # Mirumi polish: longer, heavier, smoother locks (less frizz: low roughness, thicker strands, tight clumps,
+        # a slow wave). Body guard ≈44 mm, head ≈32 mm, arms ≈25 mm.
+        G = dict(clump=0.95, rough=0.05, kink_amp=0.18, kink_freq=2.0, kink="WAVE", clump_shape=-0.1)
+        U = dict(clump=0.8, rough=0.06, kink_amp=0.12, kink_freq=2.5, kink="WAVE", clump_shape=0.2)
+        add_hair(fur_t, "torso_under", length_m=0.0150, count=int(6000 * mul_c),
                  children=CH, material=mats["fur_under"],
-                 clump=0.55, rough=0.18, kink_amp=0.14, kink_freq=3, kink="WAVE",
-                 density_vg=vg_t, length_vg=vl_t, root_m=0.00022, tip_m=0.00010)
-        add_hair(fur_t, "torso_guard", length_m=0.0360, count=int(2600 * mul_c),
+                 density_vg=vg_t, length_vg=vl_t, root_m=0.00026, tip_m=0.00013, **U)
+        add_hair(fur_t, "torso_guard", length_m=0.0440, count=int(2400 * mul_c),
                  children=CH, material=mats["fur_guard"],
-                 clump=0.92, rough=0.22, kink_amp=0.22, kink_freq=1.4, kink="WAVE", clump_shape=-0.45,
-                 density_vg=vg_t, length_vg=vl_t, root_m=0.00026, tip_m=0.00012, align=GUARD_AL)
-        add_hair(fur_h, "head_under", length_m=0.0110, count=int(4000 * mul_c),
+                 density_vg=vg_t, length_vg=vl_t, root_m=0.00032, tip_m=0.00016, align=GUARD_AL, **G)
+        add_hair(fur_h, "head_under", length_m=0.0120, count=int(4800 * mul_c),
                  children=CH, material=mats["fur_under"],
-                 clump=0.55, rough=0.16, kink_amp=0.14, kink_freq=3, kink="WAVE",
-                 density_vg=vg_h, length_vg=vl_h, root_m=0.00020, tip_m=0.00010)
-        add_hair(fur_h, "head_guard", length_m=0.0270, count=int(2000 * mul_c),
+                 density_vg=vg_h, length_vg=vl_h, root_m=0.00024, tip_m=0.00012, **U)
+        add_hair(fur_h, "head_guard", length_m=0.0320, count=int(1900 * mul_c),
                  children=CH, material=mats["fur_guard"],
-                 clump=0.90, rough=0.22, kink_amp=0.22, kink_freq=1.4, kink="WAVE", clump_shape=-0.45,
-                 density_vg=vg_h, length_vg=vl_h, root_m=0.00024, tip_m=0.00011, align=GUARD_AL)
+                 density_vg=vg_h, length_vg=vlg_h, root_m=0.00030, tip_m=0.00015, align=GUARD_AL, **G)
         for side in ("L", "R"):
             em = objs[f"fur_arm_{side}"]
             vg = em.vertex_groups["fur_density"]
             # groom: lay the locks along the arm toward the mitten paw (plus a droop)
             al = ARM_FLOW[side]
-            add_hair(em, f"arm_{side}_under", length_m=0.0090, count=int(4500 * mul_c),
+            add_hair(em, f"arm_{side}_under", length_m=0.0110, count=int(4500 * mul_c),
                      children=CH, material=mats["fur_under"],
-                     clump=0.55, rough=0.16, kink_amp=0.14, kink_freq=3, kink="WAVE",
-                     density_vg=vg, root_m=0.00020, tip_m=0.00010, align=al)
-            add_hair(em, f"arm_{side}_guard", length_m=0.0200, count=int(2000 * mul_c),
+                     density_vg=vg, root_m=0.00024, tip_m=0.00012, align=al, **U)
+            add_hair(em, f"arm_{side}_guard", length_m=0.0250, count=int(1900 * mul_c),
                      children=CH, material=mats["fur_guard"],
-                     clump=0.90, rough=0.22, kink_amp=0.22, kink_freq=1.4, kink="WAVE", clump_shape=-0.45,
-                     density_vg=vg, root_m=0.00022, tip_m=0.00010, align=al)
+                     density_vg=vg, root_m=0.00028, tip_m=0.00014, align=al, **G)
         for side in ("L", "R"):
             ft = objs[f"fur_foot_{side}"]
-            add_hair(ft, f"foot_{side}", length_m=0.0140, count=int(1400 * mul_c),
-                     children=CH, material=mats["fur_guard"], clump=0.8, rough=0.2, kink_amp=0.18, kink_freq=2,
-                     kink="WAVE", clump_shape=-0.4, root_m=0.00022, tip_m=0.00010)
+            add_hair(ft, f"foot_{side}", length_m=0.0170, count=int(1400 * mul_c),
+                     children=CH, material=mats["fur_guard"], root_m=0.00026, tip_m=0.00013,
+                     **dict(G, clump=0.85))
 
     return objs, mats
 
@@ -1233,10 +1258,12 @@ def set_mode_hero(objs, show_emitters=False):
                 obj.hide_render = False
             else:
                 set_emitter_visible(obj, True)
-    for n in ("eye_L", "eye_R", "nose"):
+    for n in ("eye_L", "eye_R"):
         if n in objs:
             set_hide(objs[n], False)
             set_emitter_visible(objs[n], True)
+    if "nose" in objs:                  # Mirumi polish: no nose dot on the finished look (the camera window is furred)
+        set_hide(objs["nose"], True)
 
 
 def set_mode_cutaway(objs, mats):
@@ -1350,16 +1377,16 @@ def handle_points():
     forward to clear the face, arches over and drops back into the bag on the far side, like Mirumi on a tote."""
     pts = []
     r = HANDLE_D / 2.0 + 0.15
-    T1 = 30.0                                           # leave the groove line here (z ≈ 63, just above the paws)
+    T1 = 34.0                                           # leave the groove line here (z ≈ 82, just above the paws)
     for k in range(0, 41):
-        t = -40.0 + (T1 + 40.0) * k / 40.0
+        t = -52.0 + (T1 + 52.0) * k / 40.0
         pts.append(G_FR + G_U * t + G_N * r)
     p0 = pts[-1]
     y0 = p0.y
     # Mirumi on a tote (sheet2): just above the paws the handle bends away over the critter's right shoulder, rises
     # beside the head (clear of the face) and arches over to the far side. Catmull-Rom through control points.
-    ctrl = [pts[-2], p0, Vector((-12.0, y0 - 3.0, 80.0)), Vector((-38.0, y0 + 2.0, 98.0)), Vector((-60.0, y0 + 14.0, 122.0)),
-            Vector((-74.0, y0 + 26.0, 152.0)), Vector((-96.0, y0 + 34.0, 176.0)), Vector((-132.0, y0 + 36.0, 182.0)),
+    ctrl = [pts[-2], p0, Vector((-20.0, y0 - 3.0, 93.0)), Vector((-44.0, y0 + 4.0, 108.0)), Vector((-63.0, y0 + 16.0, 130.0)),
+            Vector((-76.0, y0 + 28.0, 154.0)), Vector((-96.0, y0 + 34.0, 176.0)), Vector((-132.0, y0 + 36.0, 182.0)),
             Vector((-166.0, y0 + 34.0, 158.0)), Vector((-180.0, y0 + 34.0, 110.0)), Vector((-182.0, y0 + 34.0, 60.0))]
     for i in range(1, len(ctrl) - 2):
         a, b, c, d = ctrl[i - 1], ctrl[i], ctrl[i + 1], ctrl[i + 2]
@@ -1483,7 +1510,7 @@ def main():
             n.inputs["Color"].default_value = srgb_lin(col)
         b = mats["fur_clay"].node_tree.nodes.get("Principled BSDF")
         if b:
-            b.inputs["Base Color"].default_value = srgb_lin(P["root"])
+            b.inputs["Base Color"].default_value = srgb_lin(tuple(int(c * 0.86) for c in P["fur"]))   # no glowing backing
             try:
                 b.inputs["Sheen Tint"].default_value = srgb_lin(P["tip"])
             except Exception:

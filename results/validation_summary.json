@@ -26,163 +26,163 @@
    "torque_at_open_stop_Nmm": 302.7
   },
   "arm_angle_convention": "0 = closed on the rest stop, + = open; rotation about z through each shoulder (x=±44.6, y=−31.2)",
-  "groove": "R8 channel down the front centre, 5.9° from vertical (for a handle upright), floor 2.5 mm (z 33) to 4 mm (z 64) below the skin, 2.4 mm liner",
+  "groove": "R8 channel down the front centre, 1.7° from vertical (for a handle upright), floor 2.5 mm (z 48) to 4 mm (z 80) below the skin, capsule z ≈ 36–94 (up to the torso rim), 2.4 mm liner; paws meet at z ≈ 70 (upper chest)",
   "grip": [
    {
-    "object": "round Ø10.0 upright in the centre groove (5.9° from the body vertical)",
+    "object": "round Ø10.0 upright in the centre groove (1.7° from the body vertical)",
     "d_mm": 10.0,
     "L": {
-     "open_deg": 3.22,
-     "rigid_arm_only_open_deg": 1.14,
-     "rigid_arm_clear_of_object_mm": 1.43,
-     "spring_torque_Nmm": 111.7,
+     "open_deg": 3.37,
+     "rigid_arm_only_open_deg": 1.04,
+     "rigid_arm_clear_of_object_mm": 1.45,
+     "spring_torque_Nmm": 112.2,
      "contact_point": [
-      3.8,
-      -48.9,
-      51.5
+      4.1,
+      -50.2,
+      66.3
      ],
-     "lever_mm": 39.4,
-     "pad_normal_force_N": 2.83,
-     "into_groove_N": 1.8,
-     "soft_sleeve_squash_mm": 0.0
+     "lever_mm": 38.8,
+     "pad_normal_force_N": 2.89,
+     "into_groove_N": 1.66,
+     "soft_sleeve_squash_mm": 0.71
     },
     "R": {
-     "open_deg": 3.22,
-     "rigid_arm_only_open_deg": 1.14,
-     "rigid_arm_clear_of_object_mm": 1.4,
-     "spring_torque_Nmm": 111.7,
+     "open_deg": 3.37,
+     "rigid_arm_only_open_deg": 1.04,
+     "rigid_arm_clear_of_object_mm": 1.45,
+     "spring_torque_Nmm": 112.2,
      "contact_point": [
-      -3.8,
-      -49.0,
-      51.5
+      -4.1,
+      -50.2,
+      66.3
      ],
-     "lever_mm": 39.6,
-     "pad_normal_force_N": 2.82,
-     "into_groove_N": 1.81,
-     "soft_sleeve_squash_mm": 0.0
+     "lever_mm": 38.8,
+     "pad_normal_force_N": 2.89,
+     "into_groove_N": 1.66,
+     "soft_sleeve_squash_mm": 0.66
     },
-    "total_pad_force_N": 5.65,
-    "total_into_groove_N": 3.61,
+    "total_pad_force_N": 5.79,
+    "total_into_groove_N": 3.33,
     "object_vs_torso_front_mm3": 0.0
    },
    {
-    "object": "round Ø12.5 upright in the centre groove (5.9° from the body vertical)",
+    "object": "round Ø12.5 upright in the centre groove (1.7° from the body vertical)",
     "d_mm": 12.5,
     "L": {
-     "open_deg": 6.13,
-     "rigid_arm_only_open_deg": 4.06,
+     "open_deg": 6.24,
+     "rigid_arm_only_open_deg": 3.99,
      "rigid_arm_clear_of_object_mm": 1.45,
-     "spring_torque_Nmm": 121.5,
+     "spring_torque_Nmm": 121.9,
      "contact_point": [
-      4.8,
-      -51.0,
-      51.5
+      5.1,
+      -52.2,
+      66.3
      ],
-     "lever_mm": 40.4,
-     "pad_normal_force_N": 3.01,
-     "into_groove_N": 1.91,
-     "soft_sleeve_squash_mm": 0.01
+     "lever_mm": 40.0,
+     "pad_normal_force_N": 3.05,
+     "into_groove_N": 1.77,
+     "soft_sleeve_squash_mm": 0.61
     },
     "R": {
-     "open_deg": 6.13,
-     "rigid_arm_only_open_deg": 4.06,
-     "rigid_arm_clear_of_object_mm": 1.4,
-     "spring_torque_Nmm": 121.5,
+     "open_deg": 6.24,
+     "rigid_arm_only_open_deg": 3.99,
+     "rigid_arm_clear_of_object_mm": 1.45,
+     "spring_torque_Nmm": 121.9,
      "contact_point": [
-      -4.8,
-      -51.0,
-      51.5
+      -5.1,
+      -52.2,
+      66.3
      ],
-     "lever_mm": 40.6,
-     "pad_normal_force_N": 3.0,
-     "into_groove_N": 1.92,
-     "soft_sleeve_squash_mm": 0.01
+     "lever_mm": 40.0,
+     "pad_normal_force_N": 3.05,
+     "into_groove_N": 1.77,
+     "soft_sleeve_squash_mm": 0.64
     },
-    "total_pad_force_N": 6.0,
-    "total_into_groove_N": 3.83,
+    "total_pad_force_N": 6.1,
+    "total_into_groove_N": 3.54,
     "object_vs_torso_front_mm3": 0.0
    },
    {
-    "object": "round Ø15.0 upright in the centre groove (5.9° from the body vertical)",
+    "object": "round Ø15.0 upright in the centre groove (1.7° from the body vertical)",
     "d_mm": 15.0,
     "L": {
-     "open_deg": 8.98,
-     "rigid_arm_only_open_deg": 6.93,
-     "rigid_arm_clear_of_object_mm": 1.46,
-     "spring_torque_Nmm": 131.1,
+     "open_deg": 9.05,
+     "rigid_arm_only_open_deg": 6.85,
+     "rigid_arm_clear_of_object_mm": 1.45,
+     "spring_torque_Nmm": 131.3,
      "contact_point": [
-      5.8,
-      -52.9,
-      51.5
+      6.2,
+      -54.1,
+      66.3
      ],
-     "lever_mm": 41.0,
-     "pad_normal_force_N": 3.2,
-     "into_groove_N": 1.99,
-     "soft_sleeve_squash_mm": 0.0
+     "lever_mm": 40.7,
+     "pad_normal_force_N": 3.23,
+     "into_groove_N": 1.84,
+     "soft_sleeve_squash_mm": 0.65
     },
     "R": {
-     "open_deg": 8.98,
-     "rigid_arm_only_open_deg": 6.93,
-     "rigid_arm_clear_of_object_mm": 1.42,
-     "spring_torque_Nmm": 131.1,
+     "open_deg": 9.05,
+     "rigid_arm_only_open_deg": 6.85,
+     "rigid_arm_clear_of_object_mm": 1.45,
+     "spring_torque_Nmm": 131.3,
      "contact_point": [
-      -5.8,
-      -52.9,
-      51.5
+      -6.2,
+      -54.1,
+      66.3
      ],
-     "lever_mm": 41.0,
-     "pad_normal_force_N": 3.2,
-     "into_groove_N": 1.99,
-     "soft_sleeve_squash_mm": 0.0
+     "lever_mm": 40.7,
+     "pad_normal_force_N": 3.23,
+     "into_groove_N": 1.84,
+     "soft_sleeve_squash_mm": 0.64
     },
-    "total_pad_force_N": 6.39,
-    "total_into_groove_N": 3.99,
+    "total_pad_force_N": 6.45,
+    "total_into_groove_N": 3.68,
     "object_vs_torso_front_mm3": 0.0
    },
    {
     "object": "flat strap 25 x 2.5 across the groove mouth, along the groove line",
     "d_mm": 25,
     "L": {
-     "open_deg": 5.01,
-     "rigid_arm_only_open_deg": 2.57,
-     "rigid_arm_clear_of_object_mm": 1.4,
-     "spring_torque_Nmm": 117.8,
+     "open_deg": 5.35,
+     "rigid_arm_only_open_deg": 2.93,
+     "rigid_arm_clear_of_object_mm": 1.37,
+     "spring_torque_Nmm": 118.9,
      "contact_point": [
       12.4,
-      -47.1,
-      47.2
+      -48.2,
+      66.5
      ],
-     "lever_mm": 32.0,
-     "pad_normal_force_N": 3.68,
-     "into_groove_N": 3.68,
+     "lever_mm": 32.1,
+     "pad_normal_force_N": 3.7,
+     "into_groove_N": 3.7,
      "soft_sleeve_squash_mm": 0.0
     },
     "R": {
-     "open_deg": 5.01,
-     "rigid_arm_only_open_deg": 2.57,
-     "rigid_arm_clear_of_object_mm": 1.42,
-     "spring_torque_Nmm": 117.8,
+     "open_deg": 5.35,
+     "rigid_arm_only_open_deg": 2.93,
+     "rigid_arm_clear_of_object_mm": 1.36,
+     "spring_torque_Nmm": 118.9,
      "contact_point": [
       -12.4,
-      -47.0,
-      46.9
+      -48.2,
+      66.1
      ],
-     "lever_mm": 32.0,
-     "pad_normal_force_N": 3.68,
-     "into_groove_N": 3.68,
+     "lever_mm": 32.2,
+     "pad_normal_force_N": 3.7,
+     "into_groove_N": 3.7,
      "soft_sleeve_squash_mm": 0.0
     },
-    "total_pad_force_N": 7.36,
-    "total_into_groove_N": 7.36,
+    "total_pad_force_N": 7.4,
+    "total_into_groove_N": 7.4,
     "object_vs_torso_front_mm3": 0.05,
-    "strap_back_face_lift_above_floor_mm": 4.36
+    "strap_back_face_lift_above_floor_mm": 3.51
    }
   ],
   "open": {
    "open_stop_deg": 60,
-   "pad_L_to_belly_mm": 29.04,
-   "pad_R_to_belly_mm": 29.08,
-   "pad_to_belly_at_closed_mm": 0.28,
+   "pad_L_to_belly_mm": 26.05,
+   "pad_R_to_belly_mm": 25.96,
+   "pad_to_belly_at_closed_mm": 0.37,
    "rod15_insertion_path_clear": true,
    "rod15_insertion_path": {
     "approach_deg_from_groove_normal": 0,
@@ -194,8 +194,8 @@
      "-20": true,
      "30": true,
      "-30": true,
-     "45": false,
-     "-45": false,
+     "45": true,
+     "-45": true,
      "60": false,
      "-60": false,
      "75": false,
@@ -216,7 +216,7 @@
  "sweep": {
   "poses": 537,
   "pair_tests": 155730,
-  "booleans": 30086,
+  "booleans": 30037,
   "rigid_overlaps_in_travel": 0,
   "head_tilt_clearance_mm": {
    "t-12": {
@@ -252,11 +252,11 @@
   },
   "arm_min_clearance_mm": {
    "arm_to_shell": -0.0,
-   "pad_to_shell": 0.28,
-   "arm_to_arm": 5.14,
-   "arm_L_closed_vs_arm_R_open": 46.86,
-   "arm_L_open_vs_arm_R_closed": 46.43,
-   "arm_lowest_z_mm": 41.83,
+   "pad_to_shell": 0.37,
+   "arm_to_arm": 7.34,
+   "arm_L_closed_vs_arm_R_open": 44.02,
+   "arm_L_open_vs_arm_R_closed": 43.72,
+   "arm_lowest_z_mm": 63.07,
    "note": "arm_to_shell 0 = the stop lug resting on its relief face (by design); knuckle to ear is 0.4 mm",
    "ok": true
   }
@@ -270,13 +270,13 @@
   "physically_tested": false
  },
  "mass": {
-  "estimate_g": 183.0,
+  "estimate_g": 184.0,
   "solid_upper_bound_g": 276.0,
-  "with_400mAh_battery_g": 194.0,
+  "with_400mAh_battery_g": 195.0,
   "centre_of_mass_mm": [
    -0.9,
-   -3.2,
-   73.7
+   -2.8,
+   74.4
   ]
  },
  "proportions": {
@@ -286,76 +286,76 @@
  },
  "clinging": {
   "no_battery": {
-   "weight_N": 1.79,
+   "weight_N": 1.81,
    "com_mm": [
     -0.9,
-    -3.2,
-    73.7
+    -2.8,
+    74.4
    ],
-   "handle_axis_to_com_mm": 45.8,
-   "handle_angle_from_body_vertical_deg": 5.9,
-   "pad_force_total_N": 6.0,
-   "pad_force_into_groove_N": 3.83,
-   "mean_clamp_height_mm": 51.5,
+   "handle_axis_to_com_mm": 45.5,
+   "handle_angle_from_body_vertical_deg": 1.7,
+   "pad_force_total_N": 6.1,
+   "pad_force_into_groove_N": 3.54,
+   "mean_clamp_height_mm": 66.3,
    "seated_on_bag": {
     "max_backward_tilt_held_deg": 90.0,
-    "hug_moment_over_toppling_moment_at_90deg": 2.34,
+    "hug_moment_over_toppling_moment_at_90deg": 3.01,
     "note": "Mirumi pose: bottom resting on the bag top, both arms round the handle. The bag carries the weight; the springs hold it upright against the handle."
    },
    "free_hang": {
-    "friction_capacity_along_handle_N_mu0p5": 6.0,
-    "slip_safety_factor_vertical_handle": 3.34,
+    "friction_capacity_along_handle_N_mu0p5": 6.1,
+    "slip_safety_factor_vertical_handle": 3.38,
     "roll_to_hang_com_under_handle": true,
     "note": "Hanging free from a vertical handle upright (nothing under it): slip down the handle is resisted only by friction on the pads and the groove; the COM offset from the handle is carried as a moment by the pad / groove couple."
    }
   },
   "with_battery": {
-   "weight_N": 1.9,
+   "weight_N": 1.92,
    "com_mm": [
     -0.8,
-    -2.4,
-    71.2
+    -1.9,
+    71.9
    ],
    "handle_axis_to_com_mm": 46.4,
-   "handle_angle_from_body_vertical_deg": 5.9,
-   "pad_force_total_N": 6.0,
-   "pad_force_into_groove_N": 3.83,
-   "mean_clamp_height_mm": 51.5,
+   "handle_angle_from_body_vertical_deg": 1.7,
+   "pad_force_total_N": 6.1,
+   "pad_force_into_groove_N": 3.54,
+   "mean_clamp_height_mm": 66.3,
    "seated_on_bag": {
     "max_backward_tilt_held_deg": 90.0,
-    "hug_moment_over_toppling_moment_at_90deg": 2.28,
+    "hug_moment_over_toppling_moment_at_90deg": 2.94,
     "note": "Mirumi pose: bottom resting on the bag top, both arms round the handle. The bag carries the weight; the springs hold it upright against the handle."
    },
    "free_hang": {
-    "friction_capacity_along_handle_N_mu0p5": 6.0,
-    "slip_safety_factor_vertical_handle": 3.15,
+    "friction_capacity_along_handle_N_mu0p5": 6.1,
+    "slip_safety_factor_vertical_handle": 3.19,
     "roll_to_hang_com_under_handle": true,
     "note": "Hanging free from a vertical handle upright (nothing under it): slip down the handle is resisted only by friction on the pads and the groove; the COM offset from the handle is carried as a moment by the pad / groove couple."
    }
   },
   "per_handle": {
    "10.0": {
-    "pad_force_total_N": 5.65,
-    "into_groove_N": 3.61,
-    "free_hang_slip_SF_no_battery": 3.15
+    "pad_force_total_N": 5.79,
+    "into_groove_N": 3.33,
+    "free_hang_slip_SF_no_battery": 3.2
    },
    "12.5": {
-    "pad_force_total_N": 6.0,
-    "into_groove_N": 3.83,
-    "free_hang_slip_SF_no_battery": 3.34
+    "pad_force_total_N": 6.1,
+    "into_groove_N": 3.54,
+    "free_hang_slip_SF_no_battery": 3.38
    },
    "15.0": {
-    "pad_force_total_N": 6.39,
-    "into_groove_N": 3.99,
-    "free_hang_slip_SF_no_battery": 3.56
+    "pad_force_total_N": 6.45,
+    "into_groove_N": 3.68,
+    "free_hang_slip_SF_no_battery": 3.57
    },
    "25": {
-    "pad_force_total_N": 7.36,
-    "into_groove_N": 7.36,
-    "free_hang_slip_SF_no_battery": 4.1
+    "pad_force_total_N": 7.4,
+    "into_groove_N": 7.4,
+    "free_hang_slip_SF_no_battery": 4.09
    }
   },
-  "assumption": "Handle Ø12.5 upright on the centre groove floor line (≈6° from the body vertical). μ = 0.5 TPU/fur on a fabric or leather handle (ASSUMED). Pad forces from scripts/sim_v01.py. Not tested."
+  "assumption": "Handle Ø12.5 upright on the centre groove floor line (≈2° from the body vertical). μ = 0.5 TPU/fur on a fabric or leather handle (ASSUMED). Pad forces from scripts/sim_v01.py. Not tested."
  },
  "servo_power": {
   "servos": 2,

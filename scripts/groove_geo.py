@@ -12,13 +12,13 @@ def normal(psi,z):
     dr=(eggr(z+0.2)-eggr(z-0.2))/0.4; p=math.radians(psi)
     n=np.array([math.cos(p),math.sin(p),-dr]); return n/np.linalg.norm(n)
 # Two symmetric Mirumi-style arms meet in front of a near-VERTICAL handle at the front centre (azimuth -90). Floor line
-# through a TOP point (z 64, 4 mm below the skin) and a BOTTOM point (z 32, 2.5 mm below), so it leans only ≈5.9 deg
+# through a TOP point (z 80, 4 mm below the skin) and a BOTTOM point (z 48, 2.5 mm below) (Mirumi polish: raised with the hug), so it leans only ≈1.7 deg
 # from vertical while the belly curves away below the equator. Shallow, so a Ø10 handle stands proud enough for the paws. FL = top end, FR = bottom end (names kept).
-C_TOP=(-90.0,64.0,4.0); C_BOT=(-90.0,32.0,2.5)
+C_TOP=(-90.0,80.0,4.0); C_BOT=(-90.0,48.0,2.5)
 FL=on_egg(*C_TOP[:2])-C_TOP[2]*normal(*C_TOP[:2]); FR=on_egg(*C_BOT[:2])-C_BOT[2]*normal(*C_BOT[:2])
 U=(FL-FR)/np.linalg.norm(FL-FR)
 N=normal(*C_TOP[:2])+normal(*C_BOT[:2]); N-=np.dot(N,U)*U; N/=np.linalg.norm(N)
-MIDT=15.0                                           # handle test objects are centred here along the floor line (paw crossing, z ≈ 49)
+MIDT=22.0                                           # handle test objects are centred here along the floor line (paw meeting, z ≈ 70: upper chest, Mirumi polish pass)
 if __name__=="__main__":
     f=lambda v:"["+",".join(f"{x:.4f}" for x in v)+"]"
     print(f"G_FR={f(FR)}; G_FL={f(FL)};\nG_U={f(U)}; G_N={f(N)}; // {math.degrees(math.acos(U[2])):.1f} deg from vertical, floor span {np.linalg.norm(FL-FR):.2f} mm")

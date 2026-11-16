@@ -18,7 +18,7 @@ out=dict(
   hug=dict(
     mechanism="Mirumi-style passive hug: each arm turns on a vertical M3 shoulder pin just under the face (knuckle z 70–86); a music-wire torsion spring in the knuckle closes it onto a printed rest stop (30° preload); opened by hand to a 60° printed stop; zero power to hold. Two short symmetric arms whose paws nearly meet in front of the handle",
     spring=H["spring"], arm_angle_convention="0 = closed on the rest stop, + = open; rotation about z through each shoulder (x=±44.6, y=−31.2)",
-    groove="R8 channel down the front centre, 5.9° from vertical (for a handle upright), floor 2.5 mm (z 33) to 4 mm (z 64) below the skin, 2.4 mm liner",
+    groove="R8 channel down the front centre, 1.7° from vertical (for a handle upright), floor 2.5 mm (z 48) to 4 mm (z 80) below the skin, capsule z ≈ 36–94 (up to the torso rim), 2.4 mm liner; paws meet at z ≈ 70 (upper chest)",
     grip=H["grip"], open=H["open"], assumption=H["assumption"],
     stops=dict(closed=st["armL_closed_stop"]["armL"], open=st["armL_open_stop"]["armL"])),
   sweep=dict(poses=SW["sweep"]["poses"], pair_tests=SW["sweep"]["pair_tests"], booleans=SW["sweep"]["aabb_passed_to_boolean"],

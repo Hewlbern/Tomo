@@ -270,13 +270,13 @@
   "physically_tested": false
  },
  "mass": {
-  "estimate_g": 174.0,
-  "solid_upper_bound_g": 268.0,
-  "with_400mAh_battery_g": 185.0,
+  "estimate_g": 183.0,
+  "solid_upper_bound_g": 276.0,
+  "with_400mAh_battery_g": 194.0,
   "centre_of_mass_mm": [
    -0.9,
-   -3.3,
-   74.9
+   -3.2,
+   73.7
   ]
  },
  "proportions": {
@@ -286,49 +286,49 @@
  },
  "clinging": {
   "no_battery": {
-   "weight_N": 1.71,
+   "weight_N": 1.79,
    "com_mm": [
     -0.9,
-    -3.3,
-    74.9
+    -3.2,
+    73.7
    ],
-   "handle_axis_to_com_mm": 45.9,
+   "handle_axis_to_com_mm": 45.8,
    "handle_angle_from_body_vertical_deg": 5.9,
    "pad_force_total_N": 6.0,
    "pad_force_into_groove_N": 3.83,
    "mean_clamp_height_mm": 51.5,
    "seated_on_bag": {
     "max_backward_tilt_held_deg": 90.0,
-    "hug_moment_over_toppling_moment_at_90deg": 2.41,
+    "hug_moment_over_toppling_moment_at_90deg": 2.34,
     "note": "Mirumi pose: bottom resting on the bag top, both arms round the handle. The bag carries the weight; the springs hold it upright against the handle."
    },
    "free_hang": {
     "friction_capacity_along_handle_N_mu0p5": 6.0,
-    "slip_safety_factor_vertical_handle": 3.51,
+    "slip_safety_factor_vertical_handle": 3.34,
     "roll_to_hang_com_under_handle": true,
     "note": "Hanging free from a vertical handle upright (nothing under it): slip down the handle is resisted only by friction on the pads and the groove; the COM offset from the handle is carried as a moment by the pad / groove couple."
    }
   },
   "with_battery": {
-   "weight_N": 1.82,
+   "weight_N": 1.9,
    "com_mm": [
     -0.8,
     -2.4,
-    72.2
+    71.2
    ],
-   "handle_axis_to_com_mm": 46.5,
+   "handle_axis_to_com_mm": 46.4,
    "handle_angle_from_body_vertical_deg": 5.9,
    "pad_force_total_N": 6.0,
    "pad_force_into_groove_N": 3.83,
    "mean_clamp_height_mm": 51.5,
    "seated_on_bag": {
     "max_backward_tilt_held_deg": 90.0,
-    "hug_moment_over_toppling_moment_at_90deg": 2.35,
+    "hug_moment_over_toppling_moment_at_90deg": 2.28,
     "note": "Mirumi pose: bottom resting on the bag top, both arms round the handle. The bag carries the weight; the springs hold it upright against the handle."
    },
    "free_hang": {
     "friction_capacity_along_handle_N_mu0p5": 6.0,
-    "slip_safety_factor_vertical_handle": 3.3,
+    "slip_safety_factor_vertical_handle": 3.15,
     "roll_to_hang_com_under_handle": true,
     "note": "Hanging free from a vertical handle upright (nothing under it): slip down the handle is resisted only by friction on the pads and the groove; the COM offset from the handle is carried as a moment by the pad / groove couple."
    }
@@ -337,22 +337,22 @@
    "10.0": {
     "pad_force_total_N": 5.65,
     "into_groove_N": 3.61,
-    "free_hang_slip_SF_no_battery": 3.31
+    "free_hang_slip_SF_no_battery": 3.15
    },
    "12.5": {
     "pad_force_total_N": 6.0,
     "into_groove_N": 3.83,
-    "free_hang_slip_SF_no_battery": 3.51
+    "free_hang_slip_SF_no_battery": 3.34
    },
    "15.0": {
     "pad_force_total_N": 6.39,
     "into_groove_N": 3.99,
-    "free_hang_slip_SF_no_battery": 3.74
+    "free_hang_slip_SF_no_battery": 3.56
    },
    "25": {
     "pad_force_total_N": 7.36,
     "into_groove_N": 7.36,
-    "free_hang_slip_SF_no_battery": 4.31
+    "free_hang_slip_SF_no_battery": 4.1
    }
   },
   "assumption": "Handle Ø12.5 upright on the centre groove floor line (≈6° from the body vertical). μ = 0.5 TPU/fur on a fabric or leather handle (ASSUMED). Pad forces from scripts/sim_v01.py. Not tested."

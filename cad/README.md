@@ -10,6 +10,14 @@ Source: [`evokin_v01.scad`](evokin_v01.scad) (internal file names keep the `evok
 
 Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (opening angle, 0 = closed on the rest stop). STLs are exported at all zeros. Pose a part by hand with `-D yaw=… -D tilt=… -D armL=… -D armR=…`.
 
+## What changed in the closer-to-Mirumi pass (vs 494c22f)
+
+- **Soft body** (`soft_body`, reference only, `stl/reference/soft_body.stl`, soft goods, not printed): the egg profile + `FUR_SKIN` 4 mm + `pear_pad(z)` fibrefill padding (`PEAR_P` 9 mm from z 10 to `PEAR_Z[0]` 28, smoothstep to 0 at `PEAR_Z[1]` 50) revolved, plus `plush_feet()` (two ellipsoids `FOOT_R` [16, 13, 9] at azimuth −90 ± `FOOT_PSI` 34°, z `FOOT_Z` 9, `FOOT_OFF` 15 mm out). The body egg and the groove capsule (swept 30 mm out along the groove normal) are subtracted so the handle path stays open. Widest ≈112 mm before the pile at z ≈ 26; ≈136 × 156 mm over the pile (estimate).
+- **Eyes** moved high and wide: `eye_x` 10.5 → 14, `eye_z` 114 → 121 (Ø5 shank holes in `head_front`; `head_front` and `check/head_front_y30_t10` re-exported and re-lightened, 7 windows).
+- **Printed egg unchanged** (R 46 at z 58, H 148, dome n 3.4): the neck stack and tilt servo fill the dome.
+- `scripts/sim_v01.py` adds `soft_body_squash_mm` (soft body vs arms, pads and the grip rod at 0/30/60°): ≈2.6–2.8 mm (arms) and ≈3.1–3.25 mm (pads) at rest, 0 at 30° and 60°, 0 on the rod. Soft goods compress; the rigid sweep is unchanged.
+- Mass ≈194 g with battery (185 g before): padding + feet fibrefill 1.4 g, heavier shaggy pile + extra skin 7.4 g (assumed 480 g/m²). Seated margin 2.28×, free-hang slip SF 3.15 with battery.
+
 ## What changed in the two-arms pass (vs b458259)
 
 - **Two short, symmetric arms.** `ARM_PATH_L` runs from the left shoulder round its own side to the front (11 samples, ≈55 mm, ending at azimuth −82.5°, z 48, offset 5.3); `ARM_PATH_R` is the same list mirrored (`psi → −180 − psi`). The old long asymmetric paths (82 / 111 mm) crossed over the belly. `PAD_SEC_L = PAD_SEC_R = [7, 10]`: the pads cover the paw ends, 2.2 mm apart at rest.
@@ -23,7 +31,7 @@ Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (
 - **Mass ≈191 g with battery** (was ≈334 g; ASSUMED print profiles, see `results/metrics_v01.json` → `mass.budget_before_after` and the README table).
 - **Lightening windows** (`scripts/lighten_shells.py`, run once by `build_stl.sh` after export): Ø14 holes on a 17.5 mm hex pattern, 3.5 mm land, kept only where the shell is plain 2.4 mm wall (within 1.5 % of a revolved plain shell), not below z 12 and not in the face zone (|x| < 24, z < 128). torso_front 14, torso_back 12, head_front 7, head_back 10 windows (11.5–19.6 % of each shell's volume). The posed head copies in `check/` get the same windows so the sweep's transform check still matches. Windows list: `results/lightening.json`. Not idempotent: re-export before re-running.
 - **Arms** thinner: `ARM_RS` 3.0 (was 3.5), `ARM_HW` 4, root 3.5 / tip 3.0; the band is offset inward by `ARM_THIN` so the inner face (pad contact, grip geometry) is unchanged.
-- **Face**: Pi-camera block and Ø21.6 bezel seats removed. Camera pod at the nose (`nose_z` 110, lens 0.5 mm behind a Ø3.5 window, pocket open to the inside, FPC exit on top, 45° chamfer on the pod's inner lower edge so it clears the collar until +13.5° of nod). Ø5 safety-eye shank holes at x ±10.5, z 114. `bezel` and `shutter` are no longer exported.
+- **Face**: Pi-camera block and Ø21.6 bezel seats removed. Camera pod at the nose (`nose_z` 110, lens 0.5 mm behind a Ø3.5 window, pocket open to the inside, FPC exit on top, 45° chamfer on the pod's inner lower edge so it clears the collar until +13.5° of nod). Ø5 safety-eye shank holes at x ±14, z 121 (were ±10.5, z 114 before the closer-to-Mirumi pass). `bezel` and `shutter` are no longer exported.
 - **Speaker**: Adafruit 3923 (30 × 5 × 20 envelope) in a printed frame on the inside of `torso_back` at (0, 38, 64), 5 × 3 grid of Ø2.2 grille holes; the 3351 bosses and front grille are gone.
 - **Servos**: Feetech FS90 in both seats (same case as the FS90MG drawing per the Feetech spec sheet; 21T spline). Seat geometry unchanged.
 - The egg (R 46, ZEQ 58, H 148, n 3.4) is unchanged: at H 145 / n 3.6 the turret already clears the dome by −0.02 mm, so it cannot be lowered with this neck stack.
@@ -78,7 +86,7 @@ The two paws close on the handle from either side. Pad force = spring torque ÷ 
 
 The rigid arm stays ≈1.40–1.46 mm clear of each object; the 1.5 mm TPU pad makes the contact (the rigid spine alone would open only 1.1° / 4.1° / 6.9° on Ø10 / 12.5 / 15). Holding the arms fully open takes ≈7.7 N at each paw. Open (60°): pads ↔ belly 29.0 / 29.1 mm. Loading: a Ø15 × 50 rod brought in on straight lines perpendicular to its axis reaches the groove floor without touching the rigid arms, pads or shell for every approach within ±30° of the groove normal (not at ±45° or wider); the soft sleeves are not squashed on the way in. Until this pass the check iterated over an empty range (`np.arange` with the wrong step sign) and always passed; with the old 30° stop there is no clear straight path.
 
-**Clinging.** Mass ≈174 g (no battery) / 185 g with the 400 mAh cell, COM (−0.8, −2.4, 72.2) with battery, ≈46 mm from the handle axis. *Seated on the bag* (Mirumi's pose): the bag carries the weight and the hug only resists toppling; at 90° of lean the hug moment is 2.41× (2.35× with battery) the toppling moment. *Free hang* from a vertical handle: slip is held by friction only, 2 × 6.0 N × μ 0.5 (assumed) → safety factor 3.5 (3.3 with the battery).
+**Clinging.** Mass ≈183 g (no battery) / 194 g with the 400 mAh cell, COM (−0.8, −2.4, 71.2) with battery, ≈46 mm from the handle axis. *Seated on the bag* (Mirumi's pose): the bag carries the weight and the hug only resists toppling; at 90° of lean the hug moment is 2.34× (2.28× with battery) the toppling moment. *Free hang* from a vertical handle: slip is held by friction only, 2 × 6.0 N × μ 0.5 (assumed) → safety factor 3.34 (3.15 with the battery).
 
 ### Head tilt
 
@@ -166,7 +174,7 @@ File: [`../datasheets/FS90MG.pdf`](../datasheets/FS90MG.pdf) (edition A/0, model
 
 ## Parts that changed vs the servo clasp (bed94ce)
 
-**New:** `neck_turret`, `tilt_hub`, `paw_pad_L/R` (`hip_cap_L/R` were added in 1b048e5 and removed again in the proportion pass); reference `dummy_servo_tilt`, `dummy_horn_tilt`, `grip_rod`.
+**New:** `neck_turret`, `tilt_hub`, `paw_pad_L/R` (`hip_cap_L/R` were added in 1b048e5 and removed again in the proportion pass); reference `dummy_servo_tilt`, `dummy_horn_tilt`, `grip_rod`, `soft_body` (closer-to-Mirumi pass).
 
 **Changed — reprint:** `torso_front` (egg, diagonal groove, shoulder ears), `torso_back` (egg, pods removed), `head_back`, `head_front` (face cap), `arm_L`, `arm_R`.
 
@@ -199,7 +207,7 @@ python3 scripts/render_v01.py
 - The fur skin needs a vertical channel or slit down the centre groove, two stuffed arm sleeves with pad slots in the mittens, shoulder-knuckle openings, bare TPU pads and a pile-covered seam round the face cap.
 - Horn size and screw radius (assumed Ø24, r = 7), tooth count (20T vs 21T) and the included screws must be measured on arrival.
 - Two FS90s can draw ≈1.4 A at stall, more than the 400 mAh cell (0.8 A) or the U3V16F5 (≈1 A) supply: move one joint at a time (firmware default) and set the INA219 trip below ≈0.6 A.
-- Heavier than Mirumi (≈185 g with battery vs ≈135–155 g; target was 160–180 g) and taller (148 mm egg, ≈160 mm over the pile, vs ≈143 mm). Next ≈5–11 g: sub-micro servos with new seats.
+- Heavier than Mirumi (≈194 g with battery vs ≈135–155 g; target was 160–180 g) and taller (148 mm egg, ≈156 mm over the pile, vs ≈143 mm). The arms hug at z ≈ 48 (mid-body), lower than Mirumi's upper-chest hug. Next ≈5–11 g: sub-micro servos with new seats.
 - Windowed 2.4 mm shells at a 1-perimeter profile are unprinted and undropped.
 - Portable power (400 mAh + U3V16F5) is planned, untested. Not child-ready.
 

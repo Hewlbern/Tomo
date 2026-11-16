@@ -357,12 +357,12 @@ add("Speaker seat (Adafruit 3923 Mini Oval 8 Ω 1 W, on the back wall)",
 
 # camera pod + nose window + safety-eye holes (head_front, Mirumi face)
 nose=hole_radius(M["head_front"],[0,-42.0,110.0],[0,1,0],r_max=4,z_span=1.0)
-eyes=[hole_radius(M["head_front"],[sx*10.5,-40.6,114.0],[0,1,0],r_max=5,z_span=1.0) for sx in (1,-1)]
+eyes=[hole_radius(M["head_front"],[sx*14.0,-37.9,121.0],[0,1,0],r_max=5,z_span=1.0) for sx in (1,-1)]
 cam_hf=vol_int(cam,M["head_front"]); cam_tor=vol_int(cam,M["torso_front"])
 add("Face: camera pod, nose window and 8 mm safety eyes (head_front)",
     "head_front, dummy_cam",
     f"Camera module envelope (ASSUMED 8.5×6×8.5 incl. lens, XIAO ESP32S3 Sense OV3660/OV5640 on a long 24-pin FPC) centred at x 0, z 110, lens 0.5 mm behind the inner skin; "
-    f"nose window (design Ø3.5) {nose}; safety-eye shank holes (design Ø5.0) at x ±10.5, z 114: {eyes}. "
+    f"nose window (design Ø3.5) {nose}; safety-eye shank holes (design Ø5.0) at x ±14, z 121: {eyes}. "
     f"Camera ↔ head_front {cam_hf} mm³, ↔ torso_front at rest {cam_tor} mm³. Eye bezels and the shutter are gone (bought 8 mm safety eyes with push-on washers).",
     "pass" if (cam_hf or 0)<=0.05 and (cam_tor or 0)<=0.05 and nose and 3.2<=nose["dia"]<=3.8 and all(e and 4.7<=e["dia"]<=5.3 for e in eyes) else "fail")
 

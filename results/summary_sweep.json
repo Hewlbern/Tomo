@@ -76,7 +76,7 @@
    10,
    0,
    0,
-   0.0008
+   0.0009
   ],
   [
    "neck_turret",
@@ -99,7 +99,7 @@
   "poses": 537,
   "pair_tests": 155730,
   "aabb_passed_to_boolean": 30086,
-  "seconds": 346.5,
+  "seconds": 563.9,
   "head_yaw_range": [
    -50,
    50,
@@ -1059,6 +1059,22 @@
    "torso_front_into_sleeve_L": 9.75,
    "torso_front_into_sleeve_R": 9.74
   }
+ },
+ "soft_body_squash_mm": {
+  "arm_L_a0": 2.81,
+  "paw_pad_L_a0": 3.1,
+  "arm_R_a0": 2.62,
+  "paw_pad_R_a0": 3.25,
+  "arm_L_a30": 0.0,
+  "paw_pad_L_a30": 0.0,
+  "arm_R_a30": 0.0,
+  "paw_pad_R_a30": 0.0,
+  "arm_L_a60": 0.0,
+  "paw_pad_L_a60": 0.0,
+  "arm_R_a60": 0.0,
+  "paw_pad_R_a60": 0.0,
+  "grip_rod_12p5": 0.0,
+  "note": "mm of soft goods squashed (0 = clear). Fur skin 4 mm everywhere; padding up to 9 mm below z 28, fading out by z 50."
  },
  "static_pair_volumes": [
   {

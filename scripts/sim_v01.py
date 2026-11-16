@@ -278,6 +278,17 @@ for (y,t,aL,aR) in ((0,0,0,0),(0,0,60,60),(42,10,0,0),(-42,10,0,0),(42,-10,0,0),
         if dd>0.05 and sd=="L": row["sleeve_L_vs_sleeve_R"]=round(dd,2)
     ss[f"yaw{y}_tilt{t}_armL{aL}_armR{aR}"]=row
 out["soft_sleeve_squash_mm"]=ss
+# closer-to-Mirumi soft body (fur skin + lower-body fibrefill padding + plush feet, soft goods): how far the rigid arms and
+# pads reach into it, closed and on the open stop. The pads sit in a slot in the skin; the padding is loose fibrefill.
+if os.path.exists("stl/reference/soft_body.stl"):
+    SB=trimesh.load("stl/reference/soft_body.stl"); sb={}
+    for a_ in (0.0,30.0,60.0):
+        for sd in ("L","R"):
+            for hp in ("arm","paw_pad"):
+                sb[f"{hp}_{sd}_a{int(a_)}"]=round(depth_into(SB,side_pose(hp,sd,a_),4000),2)
+    sb["grip_rod_12p5"]=round(depth_into(SB,rod(12.5),4000),2)
+    sb["note"]="mm of soft goods squashed (0 = clear). Fur skin 4 mm everywhere; padding up to 9 mm below z 28, fading out by z 50."
+    out["soft_body_squash_mm"]=sb
 # static checks
 static_rows=[]
 for a,b,why in [("torso_front","torso_back","seam lip/groove should clear 0.25 mm"),

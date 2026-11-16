@@ -116,7 +116,7 @@
   {
    "interface": "Face: camera pod, nose window and 8 mm safety eyes (head_front)",
    "parts": "head_front, dummy_cam",
-   "measured": "Camera module envelope (ASSUMED 8.5\u00d76\u00d78.5 incl. lens, XIAO ESP32S3 Sense OV3660/OV5640 on a long 24-pin FPC) centred at x 0, z 110, lens 0.5 mm behind the inner skin; nose window (design \u00d83.5) {'dia': 3.496, 'n': 360, 'p05': 3.494, 'p95': 3.5}; safety-eye shank holes (design \u00d85.0) at x \u00b110.5, z 114: [{'dia': 4.995, 'n': 344, 'p05': 4.992, 'p95': 5.0}, {'dia': 4.995, 'n': 344, 'p05': 4.992, 'p95': 5.0}]. Camera \u2194 head_front 0.0 mm\u00b3, \u2194 torso_front at rest 0.0 mm\u00b3. Eye bezels and the shutter are gone (bought 8 mm safety eyes with push-on washers).",
+   "measured": "Camera module envelope (ASSUMED 8.5\u00d76\u00d78.5 incl. lens, XIAO ESP32S3 Sense OV3660/OV5640 on a long 24-pin FPC) centred at x 0, z 110, lens 0.5 mm behind the inner skin; nose window (design \u00d83.5) {'dia': 3.496, 'n': 360, 'p05': 3.494, 'p95': 3.5}; safety-eye shank holes (design \u00d85.0) at x \u00b114, z 121: [{'dia': 4.994, 'n': 305, 'p05': 4.992, 'p95': 5.0}, {'dia': 4.994, 'n': 305, 'p05': 4.992, 'p95': 5.0}]. Camera \u2194 head_front 0.0 mm\u00b3, \u2194 torso_front at rest 0.0 mm\u00b3. Eye bezels and the shutter are gone (bought 8 mm safety eyes with push-on washers).",
    "verdict": "pass",
    "fix": ""
   },

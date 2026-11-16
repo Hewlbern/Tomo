@@ -134,7 +134,7 @@ TILT_SOFT=[-10,10];                                    // firmware clamp (deg), 
 pi=[65,8.5,30]; pi_holes=[58,23]; pi_z=43;           // 8.5 mm y-envelope allows a header
 // Lighter Tomo / Mirumi look: small 8 mm safety eyes set lower and closer; the camera (XIAO ESP32S3 Sense OV3660/OV5640 module on a
 // long 24-pin FPC, ASSUMED 8.5 x 8.5 x 6 envelope incl. lens) looks out through a Ø3.5 'nose' window between and below the eyes.
-eye_z=114; eye_x=10.5; EYE_HOLE=5.0; nose_z=110; NOSE_HOLE=3.5;   // v0.1 light: nose 110 (107 put the camera pod into the collar at +9.5° nod)
+eye_z=121; eye_x=14; EYE_HOLE=5.0;   /* closer-to-Mirumi pass: eyes wider apart and higher (were x ±10.5, z 114) */ nose_z=110; NOSE_HOLE=3.5;   // v0.1 light: nose 110 (107 put the camera pod into the collar at +9.5° nod)
 cam=[8.5,6.0,8.5]; cam_y=-(eggr(nose_z)-2.4)+0.5+cam[1]/2;   // lens face 0.5 mm behind the inner skin
 // Adafruit 3351 Mono Enclosed Speaker 3 W 4 Ω (Core A$8.95): 70 x 30 x 17, holes 3.4 on 63 x 24.
 // Matches MAX98357A (3.2 W into 4 Ω at 5 V). The Ø28 placeholder and the 0.5 W 8 Ω mini are retired.
@@ -526,6 +526,20 @@ module dummy_amp() translate([0,6.5,42]) cube([AMP[0],3.0,AMP[1]],center=true);
 module dummy_mic() translate([18,-30.5,80]) cube([MIC[0],MIC[2],MIC[1]],center=true);
 module dummies(){ dummy_servo_yaw(); dummy_horn_yaw(); dummy_servo_tilt(); dummy_horn_tilt();
   dummy_pi(); dummy_cam(); dummy_speaker(); dummy_amp(); dummy_mic(); }
+// Closer-to-Mirumi SOFT BODY (soft goods, not printed): the fur skin (FUR_SKIN) plus loose fibrefill padding sewn into the
+// lower body so the silhouette reads as a pear / bell, wider at the bottom than at the head; and two stubby plush feet
+// splayed at the bottom front. The handle channel is kept clear down the belly. Pile goes on top of this.
+FUR_SKIN=4; PEAR_P=9; PEAR_Z=[28,50];
+FOOT_PSI=34; FOOT_Z=9; FOOT_OFF=15; FOOT_R=[16,13,9];
+function pear_pad(z)= z<10 ? PEAR_P*sqrt(max(z,0)/10) : (z<=PEAR_Z[0] ? PEAR_P : (z>=PEAR_Z[1] ? 0 :
+  let(t=(PEAR_Z[1]-z)/(PEAR_Z[1]-PEAR_Z[0])) PEAR_P*t*t*(3-2*t)));
+module plush_feet() for(sx=[-1,1]) let(ps=-90+sx*FOOT_PSI) translate(on_egg(ps,FOOT_Z,FOOT_OFF)) rotate([0,0,ps])
+  scale(FOOT_R) sphere(r=1,$fn=40);
+module soft_body() difference(){
+  union(){ rotate_extrude($fn=96) polygon(concat([[0,0]],[for(z=[0:2:62]) [eggr(z)+FUR_SKIN+pear_pad(z),z]],[[0,62]])); plush_feet(); }
+  begg(0);
+  hull(){ groove_capsule(0); translate(G_N*30) groove_capsule(0); }      // handle channel stays open
+}
 // torso fur envelope (4 mm), with the belly groove
 module fur_proxy_torso() difference(){ intersection(){ difference(){ tegg(-4); tegg(0); } body_region(); } groove_capsule(0); }
 
@@ -570,6 +584,7 @@ else if(part=="bezel") bezel(); else if(part=="shutter") shutter();
 else if(part=="dummies") dummies();
 else if(part=="sleeve_proxy_L") sleeve_proxy("L"); else if(part=="sleeve_proxy_R") sleeve_proxy("R");
 else if(part=="fur_proxy_torso") fur_proxy_torso();
+else if(part=="soft_body") soft_body();
 else if(part=="coupon") coupon();
 else if(part=="dummy_servo_yaw") dummy_servo_yaw();
 else if(part=="dummy_horn_yaw") dummy_horn_yaw();

@@ -22,7 +22,7 @@ o={"assumptions":dict(material="PLA 1.24 g/cm³ × per-part effective fill (see 
    print_profiles=FILL,
    components="Feetech FS90 9 g each (Feetech spec sheet / Core Electronics CE09376) + horn 1 g; Adafruit 3923 mini oval speaker 3 g (Adafruit listing); "
      "XIAO ESP32S3 Sense with camera 6.6 g (distributor spec) + long-FPC camera allowance 0.9 g; MAX98357A amp 2 g; mic 1 g; INA219 2 g; Pololu U3V16F5 boost 0.4 g (Pololu listing); "
-     "wiring 5 g (ASSUMED, trimmed 30 AWG); fasteners 5.5 g (steel M3 pins and servo/horn screws; nylon M2.5 shell/collar screws); springs 2 × 1 g; 10 mm safety eyes 2 × 0.7 g (ASSUMED); "
+     "wiring 5 g (ASSUMED, trimmed 30 AWG); fasteners 5.5 g (steel M3 pins and servo/horn screws; nylon M2.5 shell/collar screws); springs 2 × 1 g; 8 mm safety eyes 2 × 0.7 g (ASSUMED); "
      "long-pile fur skin 19 g (ASSUMED light knit-backed faux fur ≈380 g/m² over ≈0.050 m²) + feet fibrefill 2 g; battery Core Electronics CE04375 1S 400 mAh 11 g (listing).",
    cad_only=True,physically_tested=False)}
 printed=list(FILL)
@@ -35,7 +35,7 @@ def cen(n): return L(n).center_mass
 comp=[("FS90 pan + horn",10.0,cen("dummy_servo_yaw")),("FS90 tilt + horn",10.0,cen("dummy_servo_tilt")),
       ("speaker (Adafruit 3923)",3.0,cen("dummy_speaker")),("brain + camera (XIAO ESP32S3 Sense)",7.5,cen("dummy_pi")),("amp",2.0,cen("dummy_amp")),
       ("mic",1.0,cen("dummy_mic")),("INA219 + U3V16F5 boost",2.4,np.array([0,10.0,40.0])),("wiring",5.0,np.array([0,0,60.0])),
-      ("fasteners",5.5,np.array([0,-5.0,60.0])),("springs",2.0,np.array([0,-31.2,78.0])),("safety eyes",1.4,np.array([0,-44.0,121.0])),
+      ("fasteners",5.5,np.array([0,-5.0,60.0])),("springs",2.0,np.array([0,-31.2,78.0])),("safety eyes",1.4,np.array([0,-40.0,121.0])),
       ("fur skin (long pile) + feet",21.0,np.array([0,-2.0,68.0]))]
 # thick Mirumi-style soft arm sleeves (soft goods): polyester fibrefill inside (ASSUMED 15 kg/m³ loosely packed) +
 # the extra fur over the larger tube (ASSUMED 380 g/m², same as the body pile) vs the old 2 mm sleeve (7,953 mm² for both arms)
@@ -47,25 +47,28 @@ for sd in ("L","R"):
 stuff=sum(v["stuffing_g"] for v in slv.values()); xfur=max(0.0,(sum(v["area_mm2"] for v in slv.values())-OLD_SLEEVE_AREA)*1e-6*FUR_GM2)
 comp.append(("arm sleeves: fibrefill",stuff,(slv["L"]["centre"]+slv["R"]["centre"])/2))
 comp.append(("arm sleeves: extra fur over the thicker tubes",xfur,(slv["L"]["centre"]+slv["R"]["centre"])/2))
-# closer-to-Mirumi soft body (soft goods, cad soft_body): lower-body fibrefill padding (pear / bell silhouette), bigger
-# splayed plush feet and a longer shaggy pile. Padding volume from the revolved pad profile less the handle channel;
-# feet are ellipsoids. Long shaggy pile ASSUMED 540 g/m² (was 380; 480 at 03bc2f7, longer ≈44 mm locks in the Mirumi polish pass) over the body skin area, plus the extra skin area.
+# likeness-pass soft body (soft goods, cad soft_body): rounder mid-body 'potato' padding, tucked plush feet and a
+# slightly shorter shaggy pile (≈30 mm body / 22 mm head) so the silhouette is more compact. Padding volume from the
+# revolved pad profile less the handle channel; feet are ellipsoids. Pile ASSUMED 480 g/m² (was 540 at the 44 mm polish).
 sys.path.insert(0,"scripts"); import groove_geo as gg
-PEAR_P,PEAR_Z=9.0,(28.0,50.0); FUR_SKIN=4.0; FOOT_R=(16.0,13.0,9.0); PILE_OLD,PILE_NEW=380.0,540.0; SKIN_M2=0.050
-def pear_pad(z):
-    if z<10: return PEAR_P*math.sqrt(max(z,0.0)/10.0)
-    if z<=PEAR_Z[0]: return PEAR_P
-    if z>=PEAR_Z[1]: return 0.0
-    t=(PEAR_Z[1]-z)/(PEAR_Z[1]-PEAR_Z[0]); return PEAR_P*t*t*(3-2*t)
-zz=np.linspace(0,62,311); dz=zz[1]-zz[0]
-r0=np.array([gg.eggr(z)+FUR_SKIN for z in zz]); pp=np.array([pear_pad(z) for z in zz])
+FUR_SKIN=4.0; FOOT_R=(13.0,11.0,7.0); PILE_OLD,PILE_NEW=380.0,480.0; SKIN_M2=0.050
+PAD_MID,PAD_Z1,PAD_Z2,PAD_Z3,PAD_Z4=10.0,12.0,36.0,70.0,92.0
+def body_pad(z):
+    if z<=0 or z>=PAD_Z4: return 0.0
+    if z<PAD_Z1: return 5.5*math.sin(math.radians(90.0*z/PAD_Z1))
+    if z<PAD_Z2:
+        tt=(z-PAD_Z1)/(PAD_Z2-PAD_Z1); return 5.5+4.5*0.5*(1.0-math.cos(math.radians(180.0*tt)))
+    if z<=PAD_Z3: return PAD_MID
+    tt=(z-PAD_Z3)/(PAD_Z4-PAD_Z3); return PAD_MID*(1.0-tt)*(1.0-tt)
+zz=np.linspace(0,PAD_Z4,461); dz=zz[1]-zz[0]
+r0=np.array([gg.eggr(z)+FUR_SKIN for z in zz]); pp=np.array([body_pad(z) for z in zz])
 pad_v=float(np.sum(math.pi*((r0+pp)**2-r0**2))*dz)*(1-18.0/(2*math.pi*45.0))     # less the ≈18 mm handle channel
 pad_a=float(np.sum(2*math.pi*pp)*dz)                                            # extra outer skin area (approx.)
 foot_v=2*4/3*math.pi*FOOT_R[0]*FOOT_R[1]*FOOT_R[2]*0.75                          # ≈¼ of each foot sits inside the skin
 foot_a=2*0.75*4*math.pi*((FOOT_R[0]*FOOT_R[1])**1.6+(FOOT_R[0]*FOOT_R[2])**1.6+(FOOT_R[1]*FOOT_R[2])**1.6)**(1/1.6)/3**(1/1.6)
 soft_fill=(pad_v+foot_v)*RHO_FILL; soft_fur=(pad_a+foot_a)*1e-6*PILE_NEW+SKIN_M2*(PILE_NEW-PILE_OLD)
-comp.append(("soft body: lower-body padding + plush feet (fibrefill)",soft_fill,np.array([0,-4.0,20.0])))
-comp.append(("soft body: longer shaggy pile + extra skin",soft_fur,np.array([0,-2.0,55.0])))
+comp.append(("soft body: mid-body padding + plush feet (fibrefill)",soft_fill,np.array([0,-4.0,48.0])))
+comp.append(("soft body: shaggy pile + extra skin",soft_fur,np.array([0,-2.0,70.0])))
 for c in comp: items.append((c[0],c[1],c[2],c[1]))
 def summ(items,solid=False):
     m=np.array([it[3] if solid else it[1] for it in items]); p=np.array([it[2] for it in items]); return float(m.sum()), (m[:,None]*p).sum(0)/m.sum()
@@ -75,20 +78,20 @@ mtb,cmb=summ(items+[bat])
 # before (v0.1 Mirumi proportions, commit 6ad85c3)
 BEFORE={"shells (torso + head, 4 parts)":106.3,"arms":22.3,"TPU pads":4.0,"tray":11.5,"yaw collar":15.3,"turret + hub + yaw small parts":10.4,
         "eye bezels + shutter":6.0,"servos 2 × FS90MG + horns":28.8,"speaker (Adafruit 3351)":25.0,"brain + camera":8.0,"amp + mic":3.0,
-        "INA219 + XL6009 boost":7.0,"wiring":8.0,"fasteners":8.0,"springs":2.0,"eyes (in bezels)":0.0,"fur skin":30.0,"thick arm sleeves (fibrefill + extra fur)":0.0,"pear padding, feet, shaggy pile":0.0,"battery (2000 mAh)":38.0}
+        "INA219 + XL6009 boost":7.0,"wiring":8.0,"fasteners":8.0,"springs":2.0,"eyes (in bezels)":0.0,"fur skin":30.0,"thick arm sleeves (fibrefill + extra fur)":0.0,"potato padding, feet, shaggy pile":0.0,"battery (2000 mAh)":38.0}
 bd={it[0]:it[1] for it in items}
 AFTER={"shells (torso + head, 4 parts)":sum(bd[k] for k in ("torso_front","torso_back","head_front","head_back")),
        "arms":bd["arm_L"]+bd["arm_R"],"TPU pads":bd["paw_pad_L"]+bd["paw_pad_R"],"tray":bd["tray"],"yaw collar":bd["yaw_collar"],
        "turret + hub + yaw small parts":sum(bd[k] for k in ("neck_turret","tilt_hub","yaw_retainer_A","yaw_retainer_B","yaw_coupler","yaw_thrust_washer")),
        "eye bezels + shutter":0.0,"servos 2 × FS90MG + horns":20.0,"speaker (Adafruit 3351)":3.0,"brain + camera":7.5,"amp + mic":3.0,
-       "INA219 + XL6009 boost":2.4,"wiring":5.0,"fasteners":5.5,"springs":2.0,"eyes (in bezels)":1.4,"fur skin":21.0,"thick arm sleeves (fibrefill + extra fur)":stuff+xfur,"pear padding, feet, shaggy pile":soft_fill+soft_fur,"battery (2000 mAh)":11.0}
+       "INA219 + XL6009 boost":2.4,"wiring":5.0,"fasteners":5.5,"springs":2.0,"eyes (in bezels)":1.4,"fur skin":21.0,"thick arm sleeves (fibrefill + extra fur)":stuff+xfur,"potato padding, feet, shaggy pile":soft_fill+soft_fur,"battery (2000 mAh)":11.0}
 RENAME={"servos 2 × FS90MG + horns":"servos (2 × FS90MG → 2 × FS90, + horns)","speaker (Adafruit 3351)":"speaker (Adafruit 3351 → 3923)",
-        "INA219 + XL6009 boost":"INA219 + boost (XL6009 → Pololu U3V16F5)","eyes (in bezels)":"10 mm safety eyes","fur skin":"fur skin (→ long pile + feet)",
+        "INA219 + XL6009 boost":"INA219 + boost (XL6009 → Pololu U3V16F5)","eyes (in bezels)":"8 mm safety eyes","fur skin":"fur skin (→ long pile + feet)",
         "battery (2000 mAh)":"battery (1S 2000 mAh → 400 mAh)","fasteners":"fasteners (→ nylon M2.5 shell screws)","eye bezels + shutter":"eye bezels + shutter (removed)"}
 budget=[dict(item=RENAME.get(k,k),before_g=round(BEFORE[k],1),after_g=round(AFTER[k],1)) for k in BEFORE]
 o["mass"]=dict(soft_body=dict(padding_volume_cm3=round(pad_v/1000,1),feet_volume_cm3=round(foot_v/1000,1),fibrefill_g=round(soft_fill,2),
                 extra_pile_and_skin_g=round(soft_fur,2),previous_total_with_battery_g_494c22f=185.0,previous_total_with_battery_g_03bc2f7=194.0,
-                note="Closer-to-Mirumi soft goods: fibrefill padding sewn into the lower body (up to 9 mm below z 28, gone by z 50) for a pear / bell silhouette, two splayed plush feet, and a longer shaggy pile (ASSUMED 540 g/m² vs 380; 480 at 03bc2f7). Fibrefill 15 kg/m³ ASSUMED."),
+                note="Likeness-pass soft goods: fibrefill padding sewn into a rounder mid-body potato (peak 10 mm from z 36–70, tucked sit-bottom, gone by z 92), two tucked plush feet, and a shorter shaggy pile (ASSUMED 480 g/m² vs 540 at the 44 mm polish; 30 mm body / 22 mm head). The printed shell stays 148 mm to clear the tilt servo. Fibrefill 15 kg/m³ ASSUMED."),
    arm_sleeves=dict(L={k:v for k,v in slv["L"].items() if k!="centre"},R={k:v for k,v in slv["R"].items() if k!="centre"},
                 stuffing_g=round(stuff,2),extra_fur_g=round(xfur,2),previous_total_with_battery_g_b458259=191.0,
                 note="Soft goods: a stuffed fur tube (Ø16–18 mm before pile, Ø≈26–28 mm with it) round each printed spine, a shoulder cap over the knuckle and a mitten paw. Stuffing 15 kg/m³ and fur 380 g/m² are ASSUMED."),

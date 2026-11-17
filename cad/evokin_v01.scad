@@ -79,6 +79,8 @@ SEAM_LIP_CLR=0.25; SEAM_CHAMFER=0.40;
    tilt axis line, radius SEAM_R): it pans and tilts inside the egg, and because the egg is round in plan the cap
    skin matches the body at every pan angle. tcut / hcut stay as the internal yaw-stack datums. */
 R_EGG=46; ZEQ=58; H_EGG=148; N_UP=3.4; tw=2.4; tcut=85; hcut=98;
+// The printed shell stays 148 mm tall: neck_turret reaches z ≈ 139.9 and the tilt-servo tabs z ≈ 137.7,
+// so a shorter crown would collide. A lower, rounder look is done in soft goods (mid-body padding, shorter pile, tucked feet).
 TD=2*R_EGG; HD=2*R_EGG;
 sb=FS_BODY; s_off=FS_S_OFF; s_tab=FS_TAB; s_tab_t=FS_TAB_T; s_tab_dz=FS_TAB_DZ; s_boss=[FS_BOSS_D,FS_BOSS_H];
 yaw_top=84;
@@ -137,7 +139,7 @@ TILT_SOFT=[-10,10];                                    // firmware clamp (deg), 
 pi=[65,8.5,30]; pi_holes=[58,23]; pi_z=43;           // 8.5 mm y-envelope allows a header
 // Lighter Tomo / Mirumi look: small 8 mm safety eyes set lower and closer; the camera (XIAO ESP32S3 Sense OV3660/OV5640 module on a
 // long 24-pin FPC, ASSUMED 8.5 x 8.5 x 6 envelope incl. lens) looks out through a Ø3.5 'nose' window between and below the eyes.
-eye_z=121; eye_x=14; EYE_HOLE=5.0;   /* closer-to-Mirumi pass: eyes wider apart and higher (were x ±10.5, z 114) */ nose_z=110; NOSE_HOLE=3.5;   // v0.1 light: nose 110 (107 put the camera pod into the collar at +9.5° nod)
+eye_z=121; eye_x=12; EYE_HOLE=5.0;   /* likeness pass: 8 mm beads a little closer (were x ±14, z 121; was ±10.5, z 114) */ nose_z=110; NOSE_HOLE=3.5;   // v0.1 light: nose 110 (107 put the camera pod into the collar at +9.5° nod)
 cam=[8.5,6.0,8.5]; cam_y=-(eggr(nose_z)-2.4)+0.5+cam[1]/2;   // lens face 0.5 mm behind the inner skin
 // Adafruit 3351 Mono Enclosed Speaker 3 W 4 Ω (Core A$8.95): 70 x 30 x 17, holes 3.4 on 63 x 24.
 // Matches MAX98357A (3.2 W into 4 Ω at 5 V). The Ø28 placeholder and the 0.5 W 8 Ω mini are retired.
@@ -529,21 +531,26 @@ module dummy_amp() translate([0,6.5,42]) cube([AMP[0],3.0,AMP[1]],center=true);
 module dummy_mic() translate([18,-30.5,80]) cube([MIC[0],MIC[2],MIC[1]],center=true);
 module dummies(){ dummy_servo_yaw(); dummy_horn_yaw(); dummy_servo_tilt(); dummy_horn_tilt();
   dummy_pi(); dummy_cam(); dummy_speaker(); dummy_amp(); dummy_mic(); }
-// Closer-to-Mirumi SOFT BODY (soft goods, not printed): the fur skin (FUR_SKIN) plus loose fibrefill padding sewn into the
-// lower body so the silhouette reads as a pear / bell, wider at the bottom than at the head; and two stubby plush feet
-// splayed at the bottom front. The handle channel is kept clear down the belly. Pile goes on top of this.
-FUR_SKIN=4; PEAR_P=9; PEAR_Z=[28,50];
-FOOT_PSI=34; FOOT_Z=9; FOOT_OFF=15; FOOT_R=[16,13,9];
-function pear_pad(z)= z<10 ? PEAR_P*sqrt(max(z,0)/10) : (z<=PEAR_Z[0] ? PEAR_P : (z>=PEAR_Z[1] ? 0 :
-  let(t=(PEAR_Z[1]-z)/(PEAR_Z[1]-PEAR_Z[0])) PEAR_P*t*t*(3-2*t)));
+// Likeness-pass SOFT BODY (soft goods, not printed): the fur skin (FUR_SKIN) plus loose fibrefill padding sewn into a
+// rounder, more compact 'potato' silhouette (fatter mid-body, tucked sit-bottom — not a lower-bell pear) and two stubby
+// plush feet tucked under the front. The handle channel is kept clear down the belly. Pile goes on top of this.
+// body_pad(z): 0 at z 0, ≈5.5 mm at z 12, 10 mm from z 36–70, taper to 0 by z 92 (below the face seam).
+FUR_SKIN=4; PAD_MID=10; PAD_Z1=12; PAD_Z2=36; PAD_Z3=70; PAD_Z4=92;
+FOOT_PSI=30; FOOT_Z=8; FOOT_OFF=12; FOOT_R=[13,11,7];
+function body_pad(z)=
+  (z<=0 || z>=PAD_Z4) ? 0 :
+  (z<PAD_Z1) ? 5.5*sin(90*z/PAD_Z1) :
+  (z<PAD_Z2) ? 5.5+4.5*0.5*(1-cos(180*(z-PAD_Z1)/(PAD_Z2-PAD_Z1))) :
+  (z<=PAD_Z3) ? PAD_MID :
+  PAD_MID*pow(1-(z-PAD_Z3)/(PAD_Z4-PAD_Z3),2);
+function pear_pad(z)=body_pad(z);   // alias kept for older scripts
 module plush_feet() for(sx=[-1,1]) let(ps=-90+sx*FOOT_PSI) translate(on_egg(ps,FOOT_Z,FOOT_OFF)) rotate([0,0,ps])
   scale(FOOT_R) sphere(r=1,$fn=40);
 module soft_body() difference(){
-  union(){ rotate_extrude($fn=96) polygon(concat([[0,0]],[for(z=[0:2:62]) [eggr(z)+FUR_SKIN+pear_pad(z),z]],[[0,62]])); plush_feet(); }
+  union(){ rotate_extrude($fn=96) polygon(concat([[0,0]],[for(z=[0:2:PAD_Z4]) [eggr(z)+FUR_SKIN+body_pad(z),z]],[[0,PAD_Z4]])); plush_feet(); }
   begg(0);
   hull(){ groove_capsule(0); translate(G_N*30) groove_capsule(0); }      // handle channel stays open
-  // Mirumi polish: the groove now starts at z ≈ 36, so the handle channel through the padding runs on down to the
-  // bag top (the upright leg passes between the feet)
+  // the handle channel through the padding runs on down to the bag top (the upright leg passes between the feet)
   hull(){ for(t=[-56,G_T0]) for(o=[0,30]) translate(gline(t)+(GR+o)*G_N) sphere(r=GR,$fn=32); }
 }
 // torso fur envelope (4 mm), with the belly groove

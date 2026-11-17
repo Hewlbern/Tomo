@@ -76,7 +76,7 @@
    10,
    0,
    0,
-   0.0009
+   0.0008
   ],
   [
    "neck_turret",
@@ -99,7 +99,7 @@
   "poses": 537,
   "pair_tests": 155730,
   "aabb_passed_to_boolean": 30037,
-  "seconds": 827.1,
+  "seconds": 286.3,
   "head_yaw_range": [
    -50,
    50,
@@ -1061,20 +1061,20 @@
   }
  },
  "soft_body_squash_mm": {
-  "arm_L_a0": 0.0,
-  "paw_pad_L_a0": 0.19,
-  "arm_R_a0": 0.0,
-  "paw_pad_R_a0": 0.24,
-  "arm_L_a30": 0.0,
+  "arm_L_a0": 6.99,
+  "paw_pad_L_a0": 6.97,
+  "arm_R_a0": 6.94,
+  "paw_pad_R_a0": 7.01,
+  "arm_L_a30": 6.06,
   "paw_pad_L_a30": 0.0,
-  "arm_R_a30": 0.0,
+  "arm_R_a30": 6.01,
   "paw_pad_R_a30": 0.0,
-  "arm_L_a60": 0.0,
+  "arm_L_a60": 6.07,
   "paw_pad_L_a60": 0.0,
-  "arm_R_a60": 0.0,
+  "arm_R_a60": 6.07,
   "paw_pad_R_a60": 0.0,
   "grip_rod_12p5": 0.0,
-  "note": "mm of soft goods squashed (0 = clear). Fur skin 4 mm everywhere; padding up to 9 mm below z 28, fading out by z 50."
+  "note": "mm of soft goods squashed (0 = clear). Fur skin 4 mm everywhere; mid-body potato padding peak 10 mm from z 36\u201370, tucked sit-bottom, gone by z 92."
  },
  "static_pair_volumes": [
   {

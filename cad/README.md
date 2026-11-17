@@ -10,6 +10,14 @@ Source: [`evokin_v01.scad`](evokin_v01.scad) (internal file names keep the `evok
 
 Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (opening angle, 0 = closed on the rest stop). STLs are exported at all zeros. Pose a part by hand with `-D yaw=… -D tilt=… -D armL=… -D armR=…`.
 
+## What changed in the likeness pass (vs 57a1bc4)
+
+- **Printed shell stays Ø92 × 148 mm.** `neck_turret` reaches z ≈ 139.9 and the tilt-servo tabs z ≈ 137.7, so a shorter crown would collide. The lower, rounder look is done in soft goods.
+- **Soft body** is now a mid-body 'potato' (`body_pad(z)`: 0 at z 0, ≈5.5 mm at z 12, 10 mm from z 36–70, taper to 0 by z 92), not a lower-bell pear. Feet tucked in: `FOOT_R` [13, 11, 7], `FOOT_Z` 8, `FOOT_OFF` 12, `FOOT_PSI` 30. Soft-body squash at rest is ≈7 mm (the hug sits in the fat mid-body; pads clear at 30°/60°).
+- **Eyes** closer: `eye_x` 14 → 12, still z 121; 8 mm glossy beads (Ø5 shank holes in `head_front`, re-exported and re-lightened, 7 windows).
+- Grip unchanged 5.79 / 6.10 / 6.45 / 7.40 N. Seated margin 2.92×, free-hang slip SF 3.21 with battery. Mass ≈194 g with battery (shorter pile ASSUMED 480 g/m²; mid-body padding + feet 2.9 g, pile + extra skin 7.9 g).
+- Renders: cleaner candy / baby pink (less dusty); handle peels beside the head after the paws, not across the face; TPU pads hidden so they no longer flash a peach speck in the arms-open shot.
+
 ## What changed in the Mirumi polish pass (vs 03bc2f7)
 
 - **Higher hug.** `ARM_PATH_L` now runs nearly level from the shoulder (z 78) to the paw at azimuth −82.5°, z 70 (was z 48); ≈46 mm along the spine; R mirrored.

@@ -17,19 +17,19 @@
    "yaw_thrust_washer": 0.75,
    "tilt_hub": 0.75
   },
-  "components": "Feetech FS90 9 g each (Feetech spec sheet / Core Electronics CE09376) + horn 1 g; Adafruit 3923 mini oval speaker 3 g (Adafruit listing); XIAO ESP32S3 Sense with camera 6.6 g (distributor spec) + long-FPC camera allowance 0.9 g; MAX98357A amp 2 g; mic 1 g; INA219 2 g; Pololu U3V16F5 boost 0.4 g (Pololu listing); wiring 5 g (ASSUMED, trimmed 30 AWG); fasteners 5.5 g (steel M3 pins and servo/horn screws; nylon M2.5 shell/collar screws); springs 2 \u00d7 1 g; 10 mm safety eyes 2 \u00d7 0.7 g (ASSUMED); long-pile fur skin 19 g (ASSUMED light knit-backed faux fur \u2248380 g/m\u00b2 over \u22480.050 m\u00b2) + feet fibrefill 2 g; battery Core Electronics CE04375 1S 400 mAh 11 g (listing).",
+  "components": "Feetech FS90 9 g each (Feetech spec sheet / Core Electronics CE09376) + horn 1 g; Adafruit 3923 mini oval speaker 3 g (Adafruit listing); XIAO ESP32S3 Sense with camera 6.6 g (distributor spec) + long-FPC camera allowance 0.9 g; MAX98357A amp 2 g; mic 1 g; INA219 2 g; Pololu U3V16F5 boost 0.4 g (Pololu listing); wiring 5 g (ASSUMED, trimmed 30 AWG); fasteners 5.5 g (steel M3 pins and servo/horn screws; nylon M2.5 shell/collar screws); springs 2 \u00d7 1 g; 8 mm safety eyes 2 \u00d7 0.7 g (ASSUMED); long-pile fur skin 19 g (ASSUMED light knit-backed faux fur \u2248380 g/m\u00b2 over \u22480.050 m\u00b2) + feet fibrefill 2 g; battery Core Electronics CE04375 1S 400 mAh 11 g (listing).",
   "cad_only": true,
   "physically_tested": false
  },
  "mass": {
   "soft_body": {
-   "padding_volume_cm3": 78.3,
-   "feet_volume_cm3": 11.8,
-   "fibrefill_g": 1.35,
-   "extra_pile_and_skin_g": 10.71,
+   "padding_volume_cm3": 188.2,
+   "feet_volume_cm3": 6.3,
+   "fibrefill_g": 2.92,
+   "extra_pile_and_skin_g": 7.89,
    "previous_total_with_battery_g_494c22f": 185.0,
    "previous_total_with_battery_g_03bc2f7": 194.0,
-   "note": "Closer-to-Mirumi soft goods: fibrefill padding sewn into the lower body (up to 9 mm below z 28, gone by z 50) for a pear / bell silhouette, two splayed plush feet, and a longer shaggy pile (ASSUMED 540 g/m\u00b2 vs 380; 480 at 03bc2f7). Fibrefill 15 kg/m\u00b3 ASSUMED."
+   "note": "Likeness-pass soft goods: fibrefill padding sewn into a rounder mid-body potato (peak 10 mm from z 36\u201370, tucked sit-bottom, gone by z 92), two tucked plush feet, and a shorter shaggy pile (ASSUMED 480 g/m\u00b2 vs 540 at the 44 mm polish; 30 mm body / 22 mm head). The printed shell stays 148 mm to clear the tilt servo. Fibrefill 15 kg/m\u00b3 ASSUMED."
   },
   "arm_sleeves": {
    "L": {
@@ -47,19 +47,19 @@
    "previous_total_with_battery_g_b458259": 191.0,
    "note": "Soft goods: a stuffed fur tube (\u00d816\u201318 mm before pile, \u00d8\u224826\u201328 mm with it) round each printed spine, a shoulder cap over the knuckle and a mitten paw. Stuffing 15 kg/m\u00b3 and fur 380 g/m\u00b2 are ASSUMED."
   },
-  "estimate_g": 184.0,
-  "solid_print_upper_bound_g": 276.0,
-  "with_battery_g": 195.0,
+  "estimate_g": 183.0,
+  "solid_print_upper_bound_g": 275.0,
+  "with_battery_g": 194.0,
   "battery": "Core Electronics CE04375 1S 400 mAh, 11 g",
   "centre_of_mass_mm": [
    -0.9,
    -2.8,
-   74.4
+   75.3
   ],
   "centre_of_mass_with_battery_mm": [
    -0.8,
    -1.9,
-   71.9
+   72.7
   ],
   "breakdown_g": {
    "torso_front": 21.3,
@@ -92,8 +92,8 @@
    "fur skin (long pile) + feet": 21.0,
    "arm sleeves: fibrefill": 0.4,
    "arm sleeves: extra fur over the thicker tubes": 0.6,
-   "soft body: lower-body padding + plush feet (fibrefill)": 1.4,
-   "soft body: longer shaggy pile + extra skin": 10.7
+   "soft body: mid-body padding + plush feet (fibrefill)": 2.9,
+   "soft body: shaggy pile + extra skin": 7.9
   },
   "budget_before_after": [
    {
@@ -172,7 +172,7 @@
     "after_g": 2.0
    },
    {
-    "item": "10 mm safety eyes",
+    "item": "8 mm safety eyes",
     "before_g": 0.0,
     "after_g": 1.4
    },
@@ -187,9 +187,9 @@
     "after_g": 1.0
    },
    {
-    "item": "pear padding, feet, shaggy pile",
+    "item": "potato padding, feet, shaggy pile",
     "before_g": 0.0,
-    "after_g": 12.1
+    "after_g": 10.8
    },
    {
     "item": "battery (1S 2000 mAh \u2192 400 mAh)",
@@ -198,16 +198,16 @@
    }
   ],
   "before_total_with_battery_g": 334.0,
-  "after_total_with_battery_g": 195.0,
+  "after_total_with_battery_g": 194.0,
   "note": "Mirumi is about 135\u2013155 g and about 100 x 118 x 143 mm. Target 160\u2013180 g with battery, ceiling 200 g. Printed masses use the ASSUMED print profiles; weigh the first prints."
  },
  "clinging": {
   "no_battery": {
-   "weight_N": 1.81,
+   "weight_N": 1.8,
    "com_mm": [
     -0.9,
     -2.8,
-    74.4
+    75.3
    ],
    "handle_axis_to_com_mm": 45.5,
    "handle_angle_from_body_vertical_deg": 1.7,
@@ -216,22 +216,22 @@
    "mean_clamp_height_mm": 66.3,
    "seated_on_bag": {
     "max_backward_tilt_held_deg": 90.0,
-    "hug_moment_over_toppling_moment_at_90deg": 3.01,
+    "hug_moment_over_toppling_moment_at_90deg": 2.99,
     "note": "Mirumi pose: bottom resting on the bag top, both arms round the handle. The bag carries the weight; the springs hold it upright against the handle."
    },
    "free_hang": {
     "friction_capacity_along_handle_N_mu0p5": 6.1,
-    "slip_safety_factor_vertical_handle": 3.38,
+    "slip_safety_factor_vertical_handle": 3.4,
     "roll_to_hang_com_under_handle": true,
     "note": "Hanging free from a vertical handle upright (nothing under it): slip down the handle is resisted only by friction on the pads and the groove; the COM offset from the handle is carried as a moment by the pad / groove couple."
    }
   },
   "with_battery": {
-   "weight_N": 1.92,
+   "weight_N": 1.9,
    "com_mm": [
     -0.8,
     -1.9,
-    71.9
+    72.7
    ],
    "handle_axis_to_com_mm": 46.4,
    "handle_angle_from_body_vertical_deg": 1.7,
@@ -240,12 +240,12 @@
    "mean_clamp_height_mm": 66.3,
    "seated_on_bag": {
     "max_backward_tilt_held_deg": 90.0,
-    "hug_moment_over_toppling_moment_at_90deg": 2.94,
+    "hug_moment_over_toppling_moment_at_90deg": 2.92,
     "note": "Mirumi pose: bottom resting on the bag top, both arms round the handle. The bag carries the weight; the springs hold it upright against the handle."
    },
    "free_hang": {
     "friction_capacity_along_handle_N_mu0p5": 6.1,
-    "slip_safety_factor_vertical_handle": 3.19,
+    "slip_safety_factor_vertical_handle": 3.21,
     "roll_to_hang_com_under_handle": true,
     "note": "Hanging free from a vertical handle upright (nothing under it): slip down the handle is resisted only by friction on the pads and the groove; the COM offset from the handle is carried as a moment by the pad / groove couple."
    }
@@ -254,22 +254,22 @@
    "10.0": {
     "pad_force_total_N": 5.79,
     "into_groove_N": 3.33,
-    "free_hang_slip_SF_no_battery": 3.2
+    "free_hang_slip_SF_no_battery": 3.23
    },
    "12.5": {
     "pad_force_total_N": 6.1,
     "into_groove_N": 3.54,
-    "free_hang_slip_SF_no_battery": 3.38
+    "free_hang_slip_SF_no_battery": 3.4
    },
    "15.0": {
     "pad_force_total_N": 6.45,
     "into_groove_N": 3.68,
-    "free_hang_slip_SF_no_battery": 3.57
+    "free_hang_slip_SF_no_battery": 3.59
    },
    "25": {
     "pad_force_total_N": 7.4,
     "into_groove_N": 7.4,
-    "free_hang_slip_SF_no_battery": 4.09
+    "free_hang_slip_SF_no_battery": 4.12
    }
   },
   "assumption": "Handle \u00d812.5 upright on the centre groove floor line (\u22482\u00b0 from the body vertical). \u03bc = 0.5 TPU/fur on a fabric or leather handle (ASSUMED). Pad forces from scripts/sim_v01.py. Not tested."
@@ -327,7 +327,7 @@
     42
    ],
    "hard_stop_deg": 47.0,
-   "moving_inertia_g_mm2": 36682.0,
+   "moving_inertia_g_mm2": 36685.0,
    "accel_torque_60deg_in_0p12s_kgcm": 0.1088,
    "fraction_of_stall_4p8V": 0.0837,
    "note": "Pan now also turns the turret and the tilt servo."
@@ -370,7 +370,7 @@
   "arm_R.stl": "changed (volume 16927 -> 5240 mm\u00b3)",
   "coupon.stl": "geometrically unchanged (bytes differ)",
   "head_back.stl": "changed (volume 25416 -> 16347 mm\u00b3)",
-  "head_front.stl": "changed (volume 17488 -> 15532 mm\u00b3)",
+  "head_front.stl": "changed (volume 17488 -> 15534 mm\u00b3)",
   "neck_turret.stl": "new",
   "paw_pad_L.stl": "new",
   "paw_pad_R.stl": "new",

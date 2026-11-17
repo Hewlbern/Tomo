@@ -6,7 +6,7 @@
  "physically_tested": false,
  "child_ready": false,
  "power": "bench rail only",
- "date_local_australia_sydney": "2026-11-16",
+ "date_local_australia_sydney": "2026-11-17",
  "official_FS90MG": "datasheets/FS90MG.pdf p.5, edition A/0, 2021-04-30, all ±0.1 mm",
  "servos": {
   "count": 2,
@@ -270,27 +270,27 @@
   "physically_tested": false
  },
  "mass": {
-  "estimate_g": 184.0,
-  "solid_upper_bound_g": 276.0,
-  "with_400mAh_battery_g": 195.0,
+  "estimate_g": 183.0,
+  "solid_upper_bound_g": 275.0,
+  "with_400mAh_battery_g": 194.0,
   "centre_of_mass_mm": [
    -0.9,
    -2.8,
-   74.4
+   75.3
   ]
  },
  "proportions": {
-  "shell_mm": "Ø92 x 148 (one egg: R46 at z58, superellipse n=3.4 dome)",
-  "with_fur_mm": "≈106 wide (arm knuckles) x 104 deep x 152 tall",
+  "shell_mm": "Ø92 x 148 (one egg: R46 at z58, superellipse n=3.4 dome; kept at 148 mm to clear the tilt servo / neck_turret at z ≈ 140)",
+  "with_fur_mm": "≈120 wide (padded mid-body + 30 mm pile) x 110 deep x ≈156 tall seated (shorter crown and sit-bottom pile; Mirumi is ≈143)",
   "mirumi_mm": "≈100 x 118 x 143"
  },
  "clinging": {
   "no_battery": {
-   "weight_N": 1.81,
+   "weight_N": 1.8,
    "com_mm": [
     -0.9,
     -2.8,
-    74.4
+    75.3
    ],
    "handle_axis_to_com_mm": 45.5,
    "handle_angle_from_body_vertical_deg": 1.7,
@@ -299,22 +299,22 @@
    "mean_clamp_height_mm": 66.3,
    "seated_on_bag": {
     "max_backward_tilt_held_deg": 90.0,
-    "hug_moment_over_toppling_moment_at_90deg": 3.01,
+    "hug_moment_over_toppling_moment_at_90deg": 2.99,
     "note": "Mirumi pose: bottom resting on the bag top, both arms round the handle. The bag carries the weight; the springs hold it upright against the handle."
    },
    "free_hang": {
     "friction_capacity_along_handle_N_mu0p5": 6.1,
-    "slip_safety_factor_vertical_handle": 3.38,
+    "slip_safety_factor_vertical_handle": 3.4,
     "roll_to_hang_com_under_handle": true,
     "note": "Hanging free from a vertical handle upright (nothing under it): slip down the handle is resisted only by friction on the pads and the groove; the COM offset from the handle is carried as a moment by the pad / groove couple."
    }
   },
   "with_battery": {
-   "weight_N": 1.92,
+   "weight_N": 1.9,
    "com_mm": [
     -0.8,
     -1.9,
-    71.9
+    72.7
    ],
    "handle_axis_to_com_mm": 46.4,
    "handle_angle_from_body_vertical_deg": 1.7,
@@ -323,12 +323,12 @@
    "mean_clamp_height_mm": 66.3,
    "seated_on_bag": {
     "max_backward_tilt_held_deg": 90.0,
-    "hug_moment_over_toppling_moment_at_90deg": 2.94,
+    "hug_moment_over_toppling_moment_at_90deg": 2.92,
     "note": "Mirumi pose: bottom resting on the bag top, both arms round the handle. The bag carries the weight; the springs hold it upright against the handle."
    },
    "free_hang": {
     "friction_capacity_along_handle_N_mu0p5": 6.1,
-    "slip_safety_factor_vertical_handle": 3.19,
+    "slip_safety_factor_vertical_handle": 3.21,
     "roll_to_hang_com_under_handle": true,
     "note": "Hanging free from a vertical handle upright (nothing under it): slip down the handle is resisted only by friction on the pads and the groove; the COM offset from the handle is carried as a moment by the pad / groove couple."
    }
@@ -337,22 +337,22 @@
    "10.0": {
     "pad_force_total_N": 5.79,
     "into_groove_N": 3.33,
-    "free_hang_slip_SF_no_battery": 3.2
+    "free_hang_slip_SF_no_battery": 3.23
    },
    "12.5": {
     "pad_force_total_N": 6.1,
     "into_groove_N": 3.54,
-    "free_hang_slip_SF_no_battery": 3.38
+    "free_hang_slip_SF_no_battery": 3.4
    },
    "15.0": {
     "pad_force_total_N": 6.45,
     "into_groove_N": 3.68,
-    "free_hang_slip_SF_no_battery": 3.57
+    "free_hang_slip_SF_no_battery": 3.59
    },
    "25": {
     "pad_force_total_N": 7.4,
     "into_groove_N": 7.4,
-    "free_hang_slip_SF_no_battery": 4.09
+    "free_hang_slip_SF_no_battery": 4.12
    }
   },
   "assumption": "Handle Ø12.5 upright on the centre groove floor line (≈2° from the body vertical). μ = 0.5 TPU/fur on a fabric or leather handle (ASSUMED). Pad forces from scripts/sim_v01.py. Not tested."

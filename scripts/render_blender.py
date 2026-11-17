@@ -56,7 +56,7 @@ def eggr(z, o=0.0):
 
 SEAM_C, SEAM_Z = 119.0, 101.0
 SEAM_R = math.hypot(eggr(SEAM_Z), SEAM_C - SEAM_Z)   # face-cap seam sphere, centre (0, 0, 119)
-EYE_X, EYE_Z = 14.0, 121.0      # closer to Mirumi: 8 mm safety eyes set wider apart and higher (cad eye_x / eye_z)
+EYE_X, EYE_Z = 12.0, 121.0      # likeness pass: 8 mm beads a little closer (cad eye_x / eye_z; were ±14)
 EYE_SKIN_Y = -math.sqrt(eggr(EYE_Z) ** 2 - EYE_X ** 2)   # ≈ -41.8
 NOSE_Z = 110.0                   # camera 'nose' window (cad nose_z)
 NOSE_SKIN_Y = -eggr(NOSE_Z)
@@ -73,20 +73,28 @@ G_U = Vector((0.0, 0.0300, 0.9996))
 G_N = Vector((0.0, -0.9996, 0.0300))
 G_T0, G_T1, GR = -12.0, 46.0, 8.0
 G_MIDT = 22.0
-# closer-to-Mirumi soft body (cad soft_body): lower-body fibrefill padding (pear / bell silhouette) and splayed plush feet
-PEAR_P, PEAR_Z = 9.0, (28.0, 50.0)
-FOOT_PSI, FOOT_Z, FOOT_OFF, FOOT_R = 34.0, 9.0, 15.0, (16.0, 13.0, 9.0)
+# likeness-pass soft body (cad soft_body): rounder mid-body 'potato' padding and tucked plush feet
+PAD_MID, PAD_Z1, PAD_Z2, PAD_Z3, PAD_Z4 = 10.0, 12.0, 36.0, 70.0, 92.0
+FOOT_PSI, FOOT_Z, FOOT_OFF, FOOT_R = 30.0, 8.0, 12.0, (13.0, 11.0, 7.0)
+
+
+def body_pad(z):
+    """Rounder compact mid-body padding (mm) outside the shell; matches cad body_pad."""
+    if z <= 0 or z >= PAD_Z4:
+        return 0.0
+    if z < PAD_Z1:
+        return 5.5 * math.sin(math.radians(90.0 * z / PAD_Z1))
+    if z < PAD_Z2:
+        tt = (z - PAD_Z1) / (PAD_Z2 - PAD_Z1)
+        return 5.5 + 4.5 * 0.5 * (1.0 - math.cos(math.radians(180.0 * tt)))
+    if z <= PAD_Z3:
+        return PAD_MID
+    tt = (z - PAD_Z3) / (PAD_Z4 - PAD_Z3)
+    return PAD_MID * (1.0 - tt) * (1.0 - tt)
 
 
 def pear_pad(z):
-    if z < 10:
-        return PEAR_P * math.sqrt(max(z, 0.0) / 10.0)
-    if z <= PEAR_Z[0]:
-        return PEAR_P
-    if z >= PEAR_Z[1]:
-        return 0.0
-    t = (PEAR_Z[1] - z) / (PEAR_Z[1] - PEAR_Z[0])
-    return PEAR_P * t * t * (3 - 2 * t)
+    return body_pad(z)   # alias
 HANDLE_D = 12.5             # round bag handle
 try:
     import json as _json
@@ -112,8 +120,11 @@ PALETTES = {
     # closer to Mirumi: one uniform coat colour (undercoat only a shade deeper), no bright tips
     # Mirumi polish: warm cream (sheet2) and a saturated soft candy pink (sheet). Hair multiple-scattering lightens
     # and desaturates the base colour, so the base is set deeper / more saturated than the look.
-    "ivory": dict(fur=(236, 198, 140), tip=(238, 202, 146), root=(226, 186, 128), pad=(222, 186, 132)),
-    "pink":  dict(fur=(255, 146, 158), tip=(255, 152, 164), root=(250, 134, 148), pad=(240, 136, 148)),
+    # likeness pass: cream stays warm (sheet2 ≈ 222,204,186). Candy pink is punched more magenta than the
+    # photographed ~242,206,209 because hair multiple-scattering and AgX otherwise wash it to a dusty mauve.
+    "ivory": dict(fur=(236, 204, 168), tip=(238, 208, 174), root=(226, 192, 154), pad=(236, 204, 168)),
+    # preview of (255,96,148) was a clean but hot magenta; this lands nearer Mirumi's soft candy / baby pink (~242,206,209)
+    "pink":  dict(fur=(255, 138, 166), tip=(255, 150, 176), root=(242, 112, 148), pad=(255, 138, 166)),
 }
 
 # (legacy note) AgX + studio lights wash mid tones out,
@@ -309,14 +320,13 @@ def mat_eye_glass():
 def mat_pad():
     mat = bpy.data.materials.new("PawPad")
     nt, bsdf, out = _principled(mat)
-    bsdf.inputs["Base Color"].default_value = srgb_lin((168, 104, 86))
-    bsdf.inputs["Roughness"].default_value = 0.62
-    bsdf.inputs["Sheen Weight"].default_value = 0.35
-    bsdf.inputs["Sheen Roughness"].default_value = 0.5
+    # same hue as the coat (set_palette overwrites); no peach subsurface, so a pad cannot flash tan
+    bsdf.inputs["Base Color"].default_value = srgb_lin(PALETTES["ivory"]["pad"])
+    bsdf.inputs["Roughness"].default_value = 0.7
+    bsdf.inputs["Sheen Weight"].default_value = 0.15
+    bsdf.inputs["Sheen Roughness"].default_value = 0.6
     try:
-        bsdf.inputs["Subsurface Weight"].default_value = 0.18
-        bsdf.inputs["Subsurface Radius"].default_value = (0.4, 0.15, 0.1)
-        bsdf.inputs["Subsurface Scale"].default_value = 0.008
+        bsdf.inputs["Subsurface Weight"].default_value = 0.0
     except KeyError:
         pass
     return mat
@@ -339,12 +349,12 @@ def mat_fur_hair(name="FurHair", color=None):
         if key in node.inputs:
             node.inputs[key].default_value = val
     _set(hair, "Color", col)
-    _set(hair, "Roughness", 0.36)
-    _set(hair, "Radial Roughness", 0.4)
-    _set(hair, "IOR", 1.42)          # Mirumi polish: weaker white specular so the coat colour stays saturated
-    _set(hair, "Coat", 0.04)
-    _set(hair, "Random Color", 0.06)
-    _set(hair, "Random Roughness", 0.08)
+    _set(hair, "Roughness", 0.32)
+    _set(hair, "Radial Roughness", 0.36)
+    _set(hair, "IOR", 1.37)          # likeness pass: less white specular so candy pink stays clean, not dusty
+    _set(hair, "Coat", 0.0)
+    _set(hair, "Random Color", 0.03)
+    _set(hair, "Random Roughness", 0.06)
     nt.links.new(hair.outputs["BSDF"], out.inputs["Surface"])
     print("HAIR sockets:", [i.name for i in hair.inputs], "param", hair.parametrization, flush=True)
     return mat
@@ -539,14 +549,14 @@ def head_len(pt):
     shorter on the crown so the head reads lower and rounder, full length on the sides (they fall over the seam)."""
     x, y, z = pt
     w = 1.0
-    if z > 128:
-        w = min(w, 1.0 - 0.25 * min(1.0, (z - 128) / 16.0))
+    if z > 126:
+        w = min(w, 1.0 - 0.45 * min(1.0, (z - 126) / 18.0))   # shorter crown so the head reads lower
     if y < -10:
-        e = ((x / 22.0) ** 2 + ((z - 116.0) / 13.0) ** 2) ** 0.5
+        e = ((x / 20.0) ** 2 + ((z - 116.0) / 13.0) ** 2) ** 0.5
         if e < 1.0:
-            w = min(w, 0.7)           # Mirumi polish: short fur over the whole face, no bare patch
+            w = min(w, 0.85)          # face stays furred; only the bead wells part it
         elif e < 1.5:
-            w = min(w, 0.7 + 0.3 * (e - 1.0) / 0.5)
+            w = min(w, 0.85 + 0.15 * (e - 1.0) / 0.5)
     return w
 
 
@@ -560,9 +570,9 @@ def head_len_guard(pt):
         if z > 118.0:
             e = ((x / 24.0) ** 2 + ((z - 118.0) / 26.0) ** 2) ** 0.5     # brow: locks above the eyes stay short
         if e < 1.0:
-            w = min(w, 0.3)
+            w = min(w, 0.55)          # face guard still short enough not to veil the eyes, not a bald patch
         elif e < 1.6:
-            w = min(w, 0.3 + 0.7 * (e - 1.0) / 0.6)
+            w = min(w, 0.55 + 0.45 * (e - 1.0) / 0.6)
     return w
 
 
@@ -572,11 +582,11 @@ def torso_len(pt):
     t, tc, dn, dw, c = _groove_local(pt)
     if (Vector(pt) - c).length < GR + 2.0 and y < -10:
         return 0.5                                    # short pile in the handle channel
-    if z < 20 and y < -8:
-        return 0.35 + 0.65 * max(0.0, (z - 6.0) / 18.0)   # shorter round the feet so the paw bumps show
-    if z < 30:
-        return 0.72 + 0.28 * z / 30.0                 # Mirumi polish: fluffy, not broom-like, round the bottom
-    return 1.0 if z < 45 else max(0.7, 1.0 - 0.3 * (z - 45) / 40.0)
+    if z < 16 and y < -8:
+        return 0.45 + 0.40 * max(0.0, (z - 4.0) / 16.0)   # tucked sit-bottom, not a long skirt
+    if z < 28:
+        return 0.85 + 0.15 * z / 28.0
+    return 1.0 if z < 80 else max(0.75, 1.0 - 0.25 * (z - 80) / 20.0)
 
 
 def head_fur_ok(pt):
@@ -585,7 +595,7 @@ def head_fur_ok(pt):
     w = 1.0
     if y < 5.0:
         # Mirumi polish: only the bead eyes part the fur (no nose dot, no bare skin round them)
-        for (cx, cz, r0, r1) in ((EYE_X, EYE_Z, 4.0, 6.5), (-EYE_X, EYE_Z, 4.0, 6.5)):
+        for (cx, cz, r0, r1) in ((EYE_X, EYE_Z, 3.4, 5.2), (-EYE_X, EYE_Z, 3.4, 5.2)):
             r = ((x - cx) ** 2 + (z - cz) ** 2) ** 0.5
             if r < r0:
                 return 0.0
@@ -777,8 +787,8 @@ def place_eye(name, sx):
     """8 mm glossy black safety eye: a 4 mm-radius dome sitting on the trimmed fur backing."""
     _deselect()
     bpy.ops.mesh.primitive_uv_sphere_add(
-        segments=40, ring_count=20, radius=0.0046,     # Mirumi polish: 10 mm glossy bead (was 8 mm)
-        location=mm(sx * EYE_X, EYE_SKIN_Y - FUR_BASE - 3.2, EYE_Z),
+        segments=40, ring_count=20, radius=0.0040,     # likeness pass: 8 mm glossy bead (was 9.2 / 10 mm)
+        location=mm(sx * EYE_X, EYE_SKIN_Y - FUR_BASE - 2.6, EYE_Z),
     )
     obj = bpy.context.active_object
     obj.name = name
@@ -1005,20 +1015,20 @@ def build_assembly(skip_hair=False, preview=False):
         # children clumped into locks, a gentle wave kink, blunt tips (no bright halo).
         CH = 10 if not preview else 5
         GUARD_AL = (0.0, 0.0, -0.62)                    # Mirumi polish: guard locks stand off, then fall in layers
-        # Mirumi polish: longer, heavier, smoother locks (less frizz: low roughness, thicker strands, tight clumps,
-        # a slow wave). Body guard ≈44 mm, head ≈32 mm, arms ≈25 mm.
-        G = dict(clump=0.95, rough=0.05, kink_amp=0.18, kink_freq=2.0, kink="WAVE", clump_shape=-0.1)
-        U = dict(clump=0.8, rough=0.06, kink_amp=0.12, kink_freq=2.5, kink="WAVE", clump_shape=0.2)
-        add_hair(fur_t, "torso_under", length_m=0.0150, count=int(6000 * mul_c),
+        # likeness pass: still shaggy and clumped, but a shorter coat so the silhouette is compact (closer to
+        # Mirumi's ≈143 mm) rather than a long bell-skirt. Body guard ≈30 mm, head ≈22 mm, arms ≈22 mm.
+        G = dict(clump=0.97, rough=0.045, kink_amp=0.22, kink_freq=1.7, kink="WAVE", clump_shape=-0.15)
+        U = dict(clump=0.85, rough=0.05, kink_amp=0.14, kink_freq=2.2, kink="WAVE", clump_shape=0.15)
+        add_hair(fur_t, "torso_under", length_m=0.0120, count=int(6000 * mul_c),
                  children=CH, material=mats["fur_under"],
                  density_vg=vg_t, length_vg=vl_t, root_m=0.00026, tip_m=0.00013, **U)
-        add_hair(fur_t, "torso_guard", length_m=0.0440, count=int(2400 * mul_c),
+        add_hair(fur_t, "torso_guard", length_m=0.0300, count=int(2600 * mul_c),
                  children=CH, material=mats["fur_guard"],
                  density_vg=vg_t, length_vg=vl_t, root_m=0.00032, tip_m=0.00016, align=GUARD_AL, **G)
-        add_hair(fur_h, "head_under", length_m=0.0120, count=int(4800 * mul_c),
+        add_hair(fur_h, "head_under", length_m=0.0100, count=int(5000 * mul_c),
                  children=CH, material=mats["fur_under"],
                  density_vg=vg_h, length_vg=vl_h, root_m=0.00024, tip_m=0.00012, **U)
-        add_hair(fur_h, "head_guard", length_m=0.0320, count=int(1900 * mul_c),
+        add_hair(fur_h, "head_guard", length_m=0.0220, count=int(2100 * mul_c),
                  children=CH, material=mats["fur_guard"],
                  density_vg=vg_h, length_vg=vlg_h, root_m=0.00030, tip_m=0.00015, align=GUARD_AL, **G)
         for side in ("L", "R"):
@@ -1026,17 +1036,17 @@ def build_assembly(skip_hair=False, preview=False):
             vg = em.vertex_groups["fur_density"]
             # groom: lay the locks along the arm toward the mitten paw (plus a droop)
             al = ARM_FLOW[side]
-            add_hair(em, f"arm_{side}_under", length_m=0.0110, count=int(4500 * mul_c),
+            add_hair(em, f"arm_{side}_under", length_m=0.0100, count=int(4500 * mul_c),
                      children=CH, material=mats["fur_under"],
                      density_vg=vg, root_m=0.00024, tip_m=0.00012, align=al, **U)
-            add_hair(em, f"arm_{side}_guard", length_m=0.0250, count=int(1900 * mul_c),
+            add_hair(em, f"arm_{side}_guard", length_m=0.0220, count=int(2000 * mul_c),
                      children=CH, material=mats["fur_guard"],
                      density_vg=vg, root_m=0.00028, tip_m=0.00014, align=al, **G)
         for side in ("L", "R"):
             ft = objs[f"fur_foot_{side}"]
-            add_hair(ft, f"foot_{side}", length_m=0.0170, count=int(1400 * mul_c),
+            add_hair(ft, f"foot_{side}", length_m=0.0120, count=int(1400 * mul_c),
                      children=CH, material=mats["fur_guard"], root_m=0.00026, tip_m=0.00013,
-                     **dict(G, clump=0.85))
+                     **dict(G, clump=0.9))
 
     return objs, mats
 
@@ -1217,6 +1227,7 @@ HERO_HIDE = {
     "neck_turret", "tilt_hub",
     "arm_L", "arm_R", "sleeve_proxy_L", "sleeve_proxy_R",
     "fur_proxy_torso",
+    "paw_pad_L", "paw_pad_R",          # likeness pass: hide TPU pads so no peach speck shows on the mittens
     "dummy_servo_yaw", "dummy_servo_tilt", "dummy_horn_yaw", "dummy_horn_tilt",
     "dummy_pi", "dummy_cam", "dummy_speaker", "dummy_amp", "dummy_mic",
 }
@@ -1373,21 +1384,27 @@ def seat_matrix():
 
 def handle_points():
     """Robot-frame centre line of a Ø12.5 bag handle: its upright leg rises out of the bag top straight up the centre
-    belly groove between the two paws, then (above the paws) bends away over the robot's right shoulder (-x), bowing
-    forward to clear the face, arches over and drops back into the bag on the far side, like Mirumi on a tote."""
+    belly groove between the two paws (under the chin), then bends away over the robot's right shoulder (-x) and
+    slightly back (+y) so it passes beside the head, never in front of the face, then arches over into the bag."""
     pts = []
     r = HANDLE_D / 2.0 + 0.15
-    T1 = 34.0                                           # leave the groove line here (z ≈ 82, just above the paws)
+    T1 = 36.0                                           # leave the groove just above the paws, still under the face seam (z ≈ 84)
     for k in range(0, 41):
         t = -52.0 + (T1 + 52.0) * k / 40.0
         pts.append(G_FR + G_U * t + G_N * r)
     p0 = pts[-1]
-    y0 = p0.y
-    # Mirumi on a tote (sheet2): just above the paws the handle bends away over the critter's right shoulder, rises
-    # beside the head (clear of the face) and arches over to the far side. Catmull-Rom through control points.
-    ctrl = [pts[-2], p0, Vector((-20.0, y0 - 3.0, 93.0)), Vector((-44.0, y0 + 4.0, 108.0)), Vector((-63.0, y0 + 16.0, 130.0)),
-            Vector((-76.0, y0 + 28.0, 154.0)), Vector((-96.0, y0 + 34.0, 176.0)), Vector((-132.0, y0 + 36.0, 182.0)),
-            Vector((-166.0, y0 + 34.0, 158.0)), Vector((-180.0, y0 + 34.0, 110.0)), Vector((-182.0, y0 + 34.0, 60.0))]
+    # After the paws the handle peels to the creature's right and back, rising beside the cheek (Mirumi: the
+    # upright is hugged at the chest and continues beside the head, not across the face). Catmull-Rom.
+    ctrl = [pts[-2], p0,
+            Vector((-16.0, p0.y + 8.0, 92.0)),
+            Vector((-30.0, p0.y + 18.0, 102.0)),
+            Vector((-42.0, p0.y + 28.0, 118.0)),
+            Vector((-54.0, p0.y + 36.0, 140.0)),
+            Vector((-78.0, p0.y + 42.0, 168.0)),
+            Vector((-110.0, p0.y + 44.0, 182.0)),
+            Vector((-148.0, p0.y + 42.0, 176.0)),
+            Vector((-176.0, p0.y + 38.0, 140.0)),
+            Vector((-184.0, p0.y + 36.0, 80.0))]
     for i in range(1, len(ctrl) - 2):
         a, b, c, d = ctrl[i - 1], ctrl[i], ctrl[i + 1], ctrl[i + 2]
         for k in range(1, 13):
@@ -1500,7 +1517,7 @@ def main():
             o.hide_render = not on
             o.hide_viewport = not on
 
-    HERO = ((-6, -20, BAG_TOP + 72), (230, -520, 18), 60)        # front 3/4, camera a little below the face
+    HERO = ((-4, -16, BAG_TOP + 70), (180, -540, 24), 58)        # front 3/4, face clear, handle beside the head
     def set_palette(name):
         P = PALETTES[name]
         for key, col in (("fur_under", P["root"]), ("fur_guard", P["fur"])):
@@ -1538,7 +1555,7 @@ def main():
                 path = OUT / ("01_hero_hug_handle_preview.png" if preview else "01_hero_hug_handle.png")
             else:
                 # roughly the framing of Mirumi's product photo: front-on, slightly from its left, at chest height
-                set_camera((-12, -10, BAG_TOP + 72), (150, -560, -6), 58)
+                set_camera((-8, -8, BAG_TOP + 68), (90, -580, 8), 56)
                 path = OUT / ("03_mirumi_angle_preview.png" if preview else "03_mirumi_angle.png")
             shift_lights(BAG_TOP)
             render_shot(path)

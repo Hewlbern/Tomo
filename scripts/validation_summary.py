@@ -9,7 +9,7 @@ out=dict(
   project="Tomo by DreamMachina (formerly evoKin V.01)",
   repository="https://github.com/Hewlbern/Tomo",
   cad_only=True, physically_tested=False, child_ready=False, power="bench rail only",
-  date_local_australia_sydney="2026-11-16",
+  date_local_australia_sydney="2026-11-17",
   official_FS90MG="datasheets/FS90MG.pdf p.5, edition A/0, 2021-04-30, all ±0.1 mm",
   servos=dict(count=2,
     head_pan="Feetech FS90 in yaw_collar, software ±42°, hard stop ±47°",
@@ -27,7 +27,7 @@ out=dict(
   fit_audit=FA["summary"] if "summary" in FA else None,
   mass=dict(estimate_g=ME["mass"]["estimate_g"], solid_upper_bound_g=ME["mass"]["solid_print_upper_bound_g"],
             with_400mAh_battery_g=ME["mass"]["with_battery_g"], centre_of_mass_mm=ME["mass"]["centre_of_mass_mm"]),
-  proportions=dict(shell_mm="Ø92 x 148 (one egg: R46 at z58, superellipse n=3.4 dome)", with_fur_mm="≈106 wide (arm knuckles) x 104 deep x 152 tall", mirumi_mm="≈100 x 118 x 143"),
+  proportions=dict(shell_mm="Ø92 x 148 (one egg: R46 at z58, superellipse n=3.4 dome; kept at 148 mm to clear the tilt servo / neck_turret at z ≈ 140)", with_fur_mm="≈120 wide (padded mid-body + 30 mm pile) x 110 deep x ≈156 tall seated (shorter crown and sit-bottom pile; Mirumi is ≈143)", mirumi_mm="≈100 x 118 x 143"),
   clinging=ME["clinging"],
   servo_power=ME["servo_power"])
 json.dump(out,open("results/validation_summary.json","w"),indent=1,ensure_ascii=False); print("wrote results/validation_summary.json")

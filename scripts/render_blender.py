@@ -589,8 +589,7 @@ def torso_len(pt):
     """Body pile: longest and shaggiest round the lower body (bell silhouette), a little shorter toward the shoulders."""
     x, y, z = pt
     t, tc, dn, dw, c = _groove_local(pt)
-    if (Vector(pt) - c).length < GR + 2.0 and y < -10:
-        return 0.5                                    # short pile in the handle channel
+    # no-slot pass: full pile over the handle channel (the coat is continuous)
     if z < 16 and y < -8:
         return 0.45 + 0.40 * max(0.0, (z - 4.0) / 16.0)   # tucked sit-bottom, not a long skirt
     if z < 28:
@@ -887,9 +886,7 @@ def pear_fur_emitter(obj):
                     t = c + d / L * R
             else:
                 continue
-        w = 1.0
-        if p.y < -15:
-            w = min(1.0, max(0.0, (abs(p.x) - 9.0) / 9.0))   # handle channel stays open
+        w = 1.0          # no-slot pass: the coat runs continuously over the belly (skin flap / combed-over slit)
         if (t - c).length > L:
             q = p + (t - p) * w
             v.co = q * S
@@ -1046,8 +1043,7 @@ def build_assembly(skip_hair=False, preview=False):
 
     # ---- fur emitters: the one egg (begg(-4)) split at the face-cap seam sphere. The cap coat rides with the head.
     fur_t = make_egg_fur("fur_torso", -FUR_BASE, "body", segments=160 if not preview else 112, rings=110 if not preview else 70)
-    groove_fur_emitter(fur_t)
-    pear_fur_emitter(fur_t)
+    pear_fur_emitter(fur_t)             # no-slot pass: no channel pressed into the coat (groove_fur_emitter not used)
     assign(fur_t, mats["fur_clay"])
     vg_t = density_group(fur_t, "fur_density", torso_fur_ok)
     vl_t = density_group(fur_t, "fur_length", torso_len)

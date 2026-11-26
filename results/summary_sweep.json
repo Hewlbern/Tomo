@@ -99,7 +99,7 @@
   "poses": 537,
   "pair_tests": 155730,
   "aabb_passed_to_boolean": 30039,
-  "seconds": 949.0,
+  "seconds": 1095.0,
   "head_yaw_range": [
    -50,
    50,
@@ -1074,7 +1074,9 @@
   "arm_R_a60": 4.71,
   "paw_pad_R_a60": 0.0,
   "grip_rod_12p5": 0.0,
-  "note": "mm of soft goods squashed (0 = clear). v3-bear pass: fur skin 4 mm everywhere; fibrefill padding to a round ball torso (sphere R60 about z 48, cut flat at z 0), gone by z \u2248 81."
+  "grip_rod_10": 0.0,
+  "grip_rod_15": 0.39,
+  "note": "mm of soft goods squashed (0 = clear). v3-bear pass: fur skin 4 mm everywhere; fibrefill padding to a round ball torso (sphere R60 about z 48, cut flat at z 0), gone by z \u2248 81. No-slot pass: a 2 mm skin + pile flap closes over the handle channel below z 58 (handle slides under the fur); above it a combed-over slit lets the pads reach the handle. grip_rod_* = how far each handle size lifts the flap / skin."
  },
  "soft_head_squash_mm": {
   "yaw0_tilt0_armL0_armR0": {},

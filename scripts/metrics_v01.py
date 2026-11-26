@@ -71,6 +71,10 @@ soft_fill=(pad_v+head_v+foot_v)*RHO_FILL; soft_fur=(pad_a+head_a+foot_a)*1e-6*PI
 comp.append(("soft body: ball-torso padding (fibrefill)",pad_v*RHO_FILL,np.array([0,-4.0,40.0])))
 comp.append(("soft head: head-ball padding + ears (fibrefill)",(head_v+foot_v)*RHO_FILL,np.array([0,-2.0,125.0])))
 comp.append(("soft goods: extra skin + short pile over the padding and ears",soft_fur,np.array([0,-2.0,80.0])))
+# no-slot pass: 2 mm skin + pile flap over the handle channel below z 58 (≈18 mm wide x ≈62 mm along the belly, ASSUMED 380 g/m² pile + fabric)
+FLAP_A=18.0*62.0; flap_g=FLAP_A*1e-6*PILE_NEW
+comp.append(("soft goods: belly flap over the handle channel",flap_g,np.array([0,-58.0,30.0])))
+soft_fur+=flap_g
 for c in comp: items.append((c[0],c[1],c[2],c[1]))
 def summ(items,solid=False):
     m=np.array([it[3] if solid else it[1] for it in items]); p=np.array([it[2] for it in items]); return float(m.sum()), (m[:,None]*p).sum(0)/m.sum()

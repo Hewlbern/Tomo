@@ -287,7 +287,8 @@ if os.path.exists("stl/reference/soft_body.stl"):
             for hp in ("arm","paw_pad"):
                 sb[f"{hp}_{sd}_a{int(a_)}"]=round(depth_into(SB,side_pose(hp,sd,a_),4000),2)
     sb["grip_rod_12p5"]=round(depth_into(SB,rod(12.5),4000),2)
-    sb["note"]="mm of soft goods squashed (0 = clear). v3-bear pass: fur skin 4 mm everywhere; fibrefill padding to a round ball torso (sphere R60 about z 48, cut flat at z 0), gone by z ≈ 81."
+    sb["grip_rod_10"]=round(depth_into(SB,rod(10.0),4000),2); sb["grip_rod_15"]=round(depth_into(SB,rod(15.0),4000),2)
+    sb["note"]="mm of soft goods squashed (0 = clear). v3-bear pass: fur skin 4 mm everywhere; fibrefill padding to a round ball torso (sphere R60 about z 48, cut flat at z 0), gone by z ≈ 81. No-slot pass: a 2 mm skin + pile flap closes over the handle channel below z 58 (handle slides under the fur); above it a combed-over slit lets the pads reach the handle. grip_rod_* = how far each handle size lifts the flap / skin."
     out["soft_body_squash_mm"]=sb
 # v3-bear soft head (head-ball padding + round ears, rides with the head): does anything rigid or the sleeves / soft body
 # press into it across the head and arm corner poses? (mm, 0 = clear)

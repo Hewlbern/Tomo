@@ -542,13 +542,27 @@ function pear_pad(z)=body_pad(z);   // alias kept for older scripts
 FOOT_PSI=30; FOOT_Z=8; FOOT_OFF=12; FOOT_R=[13,11,7];   // (feet dropped in the v3-bear pass; kept for older scripts)
 module plush_feet() for(sx=[-1,1]) let(ps=-90+sx*FOOT_PSI) translate(on_egg(ps,FOOT_Z,FOOT_OFF)) rotate([0,0,ps])
   scale(FOOT_R) sphere(r=1,$fn=40);
-module soft_body() difference(){
-  rotate_extrude($fn=96) polygon(concat([[0,0]],[for(z=[0:2:PAD_Z4]) [eggr(z)+FUR_SKIN+body_pad(z),z]],[[0,PAD_Z4]]));
-  begg(0);
-  hull(){ groove_capsule(0); translate(G_N*30) groove_capsule(0); }      // handle channel stays open
-  // the handle channel through the padding runs on down to the bag top
+module soft_body_profile(inset=0) rotate_extrude($fn=96) polygon(concat([[0,0]],[for(z=[0:2:PAD_Z4]) [max(0.1,eggr(z)+FUR_SKIN+body_pad(z)-inset),z]],[[0,PAD_Z4]]));
+module handle_channel() {
+  hull(){ groove_capsule(0); translate(G_N*30) groove_capsule(0); }
   hull(){ for(t=[-56,G_T0]) for(o=[0,30]) translate(gline(t)+(GR+o)*G_N) sphere(r=GR,$fn=32); }
 }
+module soft_body_open() difference(){
+  soft_body_profile();
+  begg(0);
+  handle_channel();      // handle channel stays open inside the padding
+}
+// No-slot pass: the fur coat is continuous over the belly. Below the paw pads (z < FLAP_Z) a 2 mm skin + pile FLAP
+// (the outer skin of the ball) closes over the padding channel, so the handle slides up UNDER the fur. From FLAP_Z to the
+// torso rim the skin has a vertical slit whose pile from both sides is combed over it (≈8 mm pile covers the ≈16 mm
+// channel), so the TPU pads still reach the handle directly and the grip is unchanged.
+FLAP_T=2; FLAP_Z=58;
+module belly_flap() intersection(){
+  difference(){ soft_body_profile(); soft_body_profile(FLAP_T); }
+  handle_channel();
+  below(FLAP_Z);
+}
+module soft_body() union(){ soft_body_open(); belly_flap(); }
 // v3-bear-look SOFT HEAD (soft goods on the face cap, rides with the head): skin + padding to a round head BALL, an
 // ellipse of revolution HB_A wide (radius) x HB_B tall about (0,0,HB_Z), top at z 155 (shell top 148 + 7 mm skin and crown padding),
 // plus two small round stuffed bear ears (fleece, sewn on). Starts at the face-cap seam (z 101).

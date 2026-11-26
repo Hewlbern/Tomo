@@ -287,8 +287,26 @@ if os.path.exists("stl/reference/soft_body.stl"):
             for hp in ("arm","paw_pad"):
                 sb[f"{hp}_{sd}_a{int(a_)}"]=round(depth_into(SB,side_pose(hp,sd,a_),4000),2)
     sb["grip_rod_12p5"]=round(depth_into(SB,rod(12.5),4000),2)
-    sb["note"]="mm of soft goods squashed (0 = clear). Fur skin 4 mm everywhere; mid-body potato padding peak 10 mm from z 36–70, tucked sit-bottom, gone by z 92."
+    sb["note"]="mm of soft goods squashed (0 = clear). v3-bear pass: fur skin 4 mm everywhere; fibrefill padding to a round ball torso (sphere R60 about z 48, cut flat at z 0), gone by z ≈ 81."
     out["soft_body_squash_mm"]=sb
+# v3-bear soft head (head-ball padding + round ears, rides with the head): does anything rigid or the sleeves / soft body
+# press into it across the head and arm corner poses? (mm, 0 = clear)
+if os.path.exists("stl/reference/soft_head.stl"):
+    SH=trimesh.load("stl/reference/soft_head.stl"); sh={}; worst=0.0
+    SBm=trimesh.load("stl/reference/soft_body.stl") if os.path.exists("stl/reference/soft_body.stl") else None
+    for (y,t,aL,aR) in ((0,0,0,0),(42,10,0,0),(-42,10,0,0),(42,-10,0,0),(-42,-10,0,0),(42,10,60,60),(-42,10,60,60),(0,10,60,60),(0,-10,60,60)):
+        shp=SH.copy(); shp.apply_transform(T("head_front",y,t,aL,aR)); row={}
+        for hp in ("torso_front","torso_back","arm_L","arm_R","paw_pad_L","paw_pad_R","sleeve_proxy_L","sleeve_proxy_R"):
+            hm=pose(hp,y,t,aL,aR) if hp in MOV else M[hp]
+            dd=depth_into(shp,hm,3000)
+            if dd>0.05: row[f"{hp}_into_soft_head"]=round(dd,2); worst=max(worst,dd)
+        if SBm is not None:
+            dd=depth_into(shp,SBm,3000)
+            if dd>0.05: row["soft_body_vs_soft_head"]=round(dd,2); worst=max(worst,dd)
+        sh[f"yaw{y}_tilt{t}_armL{aL}_armR{aR}"]=row
+    sh["worst_mm"]=round(worst,2)
+    sh["note"]="Head-ball padding (ellipse of revolution 55 x 41 about z 114) and two ears, posed with the head; soft goods. Contacts listed only above 0.05 mm."
+    out["soft_head_squash_mm"]=sh
 # static checks
 static_rows=[]
 for a,b,why in [("torso_front","torso_back","seam lip/groove should clear 0.25 mm"),

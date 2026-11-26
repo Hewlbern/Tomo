@@ -27,7 +27,7 @@ run_os() {
 export_part() { run_os -D "part=\"$1\"" -D yaw=0 -D tilt=0 -D armL=0 -D armR=0 -o "$2" "$SCAD"; }
 
 PRINT="torso_front torso_back tray yaw_collar yaw_retainer_A yaw_retainer_B yaw_coupler yaw_thrust_washer neck_turret tilt_hub head_back head_front arm_L arm_R paw_pad_L paw_pad_R coupon"
-REFERENCE="dummies dummy_servo_yaw dummy_horn_yaw dummy_servo_tilt dummy_horn_tilt dummy_pi dummy_cam dummy_speaker dummy_amp dummy_mic fur_proxy_torso sleeve_proxy_L sleeve_proxy_R grip_rod soft_body"
+REFERENCE="dummies dummy_servo_yaw dummy_horn_yaw dummy_servo_tilt dummy_horn_tilt dummy_pi dummy_cam dummy_speaker dummy_amp dummy_mic fur_proxy_torso sleeve_proxy_L sleeve_proxy_R grip_rod soft_body soft_head"
 
 pids=()
 for p in $PRINT; do export_part "$p" "stl/$p.stl" & pids+=($!); done

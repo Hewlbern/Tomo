@@ -139,7 +139,7 @@ TILT_SOFT=[-10,10];                                    // firmware clamp (deg), 
 pi=[65,8.5,30]; pi_holes=[58,23]; pi_z=43;           // 8.5 mm y-envelope allows a header
 // Lighter Tomo / Mirumi look: small 8 mm safety eyes set lower and closer; the camera (XIAO ESP32S3 Sense OV3660/OV5640 module on a
 // long 24-pin FPC, ASSUMED 8.5 x 8.5 x 6 envelope incl. lens) looks out through a Ø3.5 'nose' window between and below the eyes.
-eye_z=121; eye_x=12; EYE_HOLE=5.0;   /* likeness pass: 8 mm beads a little closer (were x ±14, z 121; was ±10.5, z 114) */ nose_z=110; NOSE_HOLE=3.5;   // v0.1 light: nose 110 (107 put the camera pod into the collar at +9.5° nod)
+eye_z=120; eye_x=13; EYE_HOLE=5.0;   /* v3-bear pass: 10 mm glossy eyes, x ±13, z 120 */   /* likeness pass: 8 mm beads a little closer (were x ±14, z 121; was ±10.5, z 114) */ nose_z=110; NOSE_HOLE=3.5;   // v0.1 light: nose 110 (107 put the camera pod into the collar at +9.5° nod)
 cam=[8.5,6.0,8.5]; cam_y=-(eggr(nose_z)-2.4)+0.5+cam[1]/2;   // lens face 0.5 mm behind the inner skin
 // Adafruit 3351 Mono Enclosed Speaker 3 W 4 Ω (Core A$8.95): 70 x 30 x 17, holes 3.4 on 63 x 24.
 // Matches MAX98357A (3.2 W into 4 Ω at 5 V). The Ø28 placeholder and the 0.5 W 8 Ω mini are retired.
@@ -494,7 +494,7 @@ module paw_pad(side) arm_pose(side) difference(){ arm_band(side,PAD_T,padsec(sid
 // adds bulk outward and sideways only: the pads (1.5 mm below the band) still make the handle contact and the
 // grip geometry is unchanged. A shoulder cap centred on the hinge axis hides the knuckle and blends into the
 // body; a rounded mitten closes the tip. Body egg subtracted at rest. Pile (≈5–8 mm) goes on top of this.
-SLV_R=9.0; SLV_ROOT=8.0; SLV_CAP_R=11.0; SLV_CAP_Z=[68,90]; MIT_R=10.5; MIT_FWD=3.0;
+SLV_R=9.5; SLV_ROOT=8.0; SLV_CAP_R=11.0; SLV_CAP_Z=[68,90]; MIT_R=12.0;   /* v3-bear pass: plumper mitten paws (were SLV_R 9, MIT_R 10.5) */ MIT_FWD=3.0;
 function sc(side,i,r)=ac(side,i)+an(side,i)*(r-ARM_RS);
 function slv_r(side,i)= i<=1 ? SLV_ROOT : SLV_R;
 module ssec(side,i) let(r=slv_r(side,i)) translate(sc(side,i,r)) sphere(r=r,$fn=32);
@@ -531,28 +531,43 @@ module dummy_amp() translate([0,6.5,42]) cube([AMP[0],3.0,AMP[1]],center=true);
 module dummy_mic() translate([18,-30.5,80]) cube([MIC[0],MIC[2],MIC[1]],center=true);
 module dummies(){ dummy_servo_yaw(); dummy_horn_yaw(); dummy_servo_tilt(); dummy_horn_tilt();
   dummy_pi(); dummy_cam(); dummy_speaker(); dummy_amp(); dummy_mic(); }
-// Likeness-pass SOFT BODY (soft goods, not printed): the fur skin (FUR_SKIN) plus loose fibrefill padding sewn into a
-// rounder, more compact 'potato' silhouette (fatter mid-body, tucked sit-bottom — not a lower-bell pear) and two stubby
-// plush feet tucked under the front. The handle channel is kept clear down the belly. Pile goes on top of this.
-// body_pad(z): 0 at z 0, ≈5.5 mm at z 12, 10 mm from z 36–70, taper to 0 by z 92 (below the face seam).
-FUR_SKIN=4; PAD_MID=10; PAD_Z1=12; PAD_Z2=36; PAD_Z3=70; PAD_Z4=92;
-FOOT_PSI=30; FOOT_Z=8; FOOT_OFF=12; FOOT_R=[13,11,7];
-function body_pad(z)=
-  (z<=0 || z>=PAD_Z4) ? 0 :
-  (z<PAD_Z1) ? 5.5*sin(90*z/PAD_Z1) :
-  (z<PAD_Z2) ? 5.5+4.5*0.5*(1-cos(180*(z-PAD_Z1)/(PAD_Z2-PAD_Z1))) :
-  (z<=PAD_Z3) ? PAD_MID :
-  PAD_MID*pow(1-(z-PAD_Z3)/(PAD_Z4-PAD_Z3),2);
+// v3-bear-look SOFT BODY (soft goods, not printed): the fur skin (FUR_SKIN) plus loose fibrefill padding sewn into the
+// round BALL torso of the v3 bear: outer soft surface = sphere TB_R about (0,0,TB_Z), wherever that is outside the egg + skin.
+// The ball is cut flat at z 0 (Ø≈72 sit-pad on the bag top). Padding is gone by z ≈ 81, so above that the egg + skin forms
+// a short 'neck' (r ≈ 49.8) under the head ball. No feet (v3 had none). The handle channel is kept clear down the belly.
+FUR_SKIN=4; TB_Z=48; TB_R=60; PAD_Z4=92;
+function ball_r(z)=(abs(z-TB_Z)>=TB_R)?0:sqrt(TB_R*TB_R-(z-TB_Z)*(z-TB_Z));
+function body_pad(z)=(z<0||z>=PAD_Z4)?0:max(0,ball_r(z)-eggr(z)-FUR_SKIN);
 function pear_pad(z)=body_pad(z);   // alias kept for older scripts
+FOOT_PSI=30; FOOT_Z=8; FOOT_OFF=12; FOOT_R=[13,11,7];   // (feet dropped in the v3-bear pass; kept for older scripts)
 module plush_feet() for(sx=[-1,1]) let(ps=-90+sx*FOOT_PSI) translate(on_egg(ps,FOOT_Z,FOOT_OFF)) rotate([0,0,ps])
   scale(FOOT_R) sphere(r=1,$fn=40);
 module soft_body() difference(){
-  union(){ rotate_extrude($fn=96) polygon(concat([[0,0]],[for(z=[0:2:PAD_Z4]) [eggr(z)+FUR_SKIN+body_pad(z),z]],[[0,PAD_Z4]])); plush_feet(); }
+  rotate_extrude($fn=96) polygon(concat([[0,0]],[for(z=[0:2:PAD_Z4]) [eggr(z)+FUR_SKIN+body_pad(z),z]],[[0,PAD_Z4]]));
   begg(0);
   hull(){ groove_capsule(0); translate(G_N*30) groove_capsule(0); }      // handle channel stays open
-  // the handle channel through the padding runs on down to the bag top (the upright leg passes between the feet)
+  // the handle channel through the padding runs on down to the bag top
   hull(){ for(t=[-56,G_T0]) for(o=[0,30]) translate(gline(t)+(GR+o)*G_N) sphere(r=GR,$fn=32); }
 }
+// v3-bear-look SOFT HEAD (soft goods on the face cap, rides with the head): skin + padding to a round head BALL, an
+// ellipse of revolution HB_A wide (radius) x HB_B tall about (0,0,HB_Z), top at z 155 (shell top 148 + 7 mm skin and crown padding),
+// plus two small round stuffed bear ears (fleece, sewn on). Starts at the face-cap seam (z 101).
+HB_A=55; HB_B=41; HB_Z=114;
+function head_ball_r(z)=(abs(z-HB_Z)>=HB_B)?0:HB_A*sqrt(1-pow((z-HB_Z)/HB_B,2));
+function head_soft_r(z)=max(z<H_EGG?eggr(z)+FUR_SKIN:0, head_ball_r(z));
+function head_pad(z)=max(0,head_ball_r(z)-(z<H_EGG?eggr(z):0)-FUR_SKIN);
+EAR_R=[12,5.5,11]; EAR_C=[32.5,-3,146]; EAR_ROLL=28;     // ear disc (x wide, y thick, z tall), centre, outward roll (deg)
+module plush_ears() for(sx=[-1,1]) translate([sx*EAR_C[0],EAR_C[1],EAR_C[2]]) rotate([0,-sx*EAR_ROLL,0]) scale(EAR_R) sphere(r=1,$fn=40);
+// The lower edge is a soft brim: inside it is undercut to r = neck skin + 1 mm up to z 107, then back to the egg by z 118,
+// so when the head nods ±10° the brim swings over the neck fur and never pinches against the rigid torso rim.
+NECK_CLR_R=eggr(SEAM_Z)+FUR_SKIN+1.0;
+module soft_head_rest() difference(){
+  union(){ rotate_extrude($fn=96) polygon(concat([[0,SEAM_Z]],[for(z=[SEAM_Z:1:HB_Z+HB_B]) [head_soft_r(z),z]],[[0,HB_Z+HB_B]])); plush_ears(); }
+  begg(0);
+  rotate_extrude($fn=96) polygon([[0,SEAM_Z-1],[NECK_CLR_R,SEAM_Z-1],[NECK_CLR_R,SEAM_Z+6],[eggr(SEAM_Z+17)+0.2,SEAM_Z+17],[0,SEAM_Z+17]]);
+  below(SEAM_Z+2);   // brim hem 2 mm above the seam: clears the shoulder-ear tops (z 92.4) at yaw ±42 + nod 10
+}
+module soft_head() head_pose() soft_head_rest();
 // torso fur envelope (4 mm), with the belly groove
 module fur_proxy_torso() difference(){ intersection(){ difference(){ tegg(-4); tegg(0); } body_region(); } groove_capsule(0); }
 
@@ -598,6 +613,7 @@ else if(part=="dummies") dummies();
 else if(part=="sleeve_proxy_L") sleeve_proxy("L"); else if(part=="sleeve_proxy_R") sleeve_proxy("R");
 else if(part=="fur_proxy_torso") fur_proxy_torso();
 else if(part=="soft_body") soft_body();
+else if(part=="soft_head") soft_head();
 else if(part=="coupon") coupon();
 else if(part=="dummy_servo_yaw") dummy_servo_yaw();
 else if(part=="dummy_horn_yaw") dummy_horn_yaw();

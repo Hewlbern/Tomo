@@ -10,6 +10,11 @@ Source: [`evokin_v01.scad`](evokin_v01.scad) (internal file names keep the `evok
 
 Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (opening angle, 0 = closed on the rest stop). STLs are exported at all zeros. Pose a part by hand with `-D yaw=… -D tilt=… -D armL=… -D armR=…`.
 
+## What changed in the no-slot pass (vs d0e05e0)
+
+- **Continuous coat.** `soft_body()` = `soft_body_open()` (the old padding with its handle channel) ∪ `belly_flap()`: the outer 2 mm (`FLAP_T`) of the soft-body profile, inside the handle channel, below z `FLAP_Z` 58 (just under the paw pads, z 61.6–79.8). The handle slides up under the flap; from z 58 to the rim the skin has a slit with the pile combed over it, so the pads still meet the handle. Renders emit fur continuously over the belly (no channel pressed into the coat).
+- **Checks:** the flap / skin lifts 0 / 0 / 0.39 mm on Ø10 / 12.5 / 15 handles (`soft_body_squash_mm.grip_rod_*`); arm / pad squash unchanged (5.6–5.9 mm at rest); grip 5.79 / 6.10 / 6.45 / 7.39 N; 537 poses, 0 rigid overlaps; audit 27/27. Mass ≈194 g with battery (+0.4 g flap); seated margin 2.91×, free-hang slip SF 3.21.
+
 ## What changed in the v3-bear-look pass (vs a5e3067)
 
 Back to the v3 bear look with the Mirumi clasp. **No printed part changed shape** except `head_front` (eye holes moved); all changes are soft goods.
@@ -230,7 +235,7 @@ python3 scripts/render_v01.py
 - Free hanging from a handle rolls the body ≈35° until the COM is under the handle; the seated Mirumi pose is the intended one.
 - Tilt margin is 3.5° nodding down (+10° clamp, +13.5° contact: the camera pod on the collar). Keep the firmware clamp.
 - The tilt servo lead now crosses the pan joint beside the FPC.
-- The fur skin needs a vertical channel or slit down the centre groove, two stuffed arm sleeves with pad slots in the mittens, shoulder-knuckle openings, bare TPU pads and a pile-covered seam round the face cap.
+- The fur skin needs a 2 mm flap over the handle channel below the paws (`belly_flap`) and a combed-over slit at the paws, so no slot shows, two stuffed arm sleeves with pad slots in the mittens, shoulder-knuckle openings, bare TPU pads and a pile-covered seam round the face cap.
 - Horn size and screw radius (assumed Ø24, r = 7), tooth count (20T vs 21T) and the included screws must be measured on arrival.
 - Two FS90s can draw ≈1.4 A at stall, more than the 400 mAh cell (0.8 A) or the U3V16F5 (≈1 A) supply: move one joint at a time (firmware default) and set the INA219 trip below ≈0.6 A.
 - Heavier than Mirumi (≈195 g with battery vs ≈135–155 g; target was 160–180 g) and taller (148 mm egg, ≈156 mm over the pile, vs ≈143 mm). The arms now hug at z ≈ 70, just under the face; the groove runs up to the torso rim to allow it. Next ≈5–11 g: sub-micro servos with new seats.

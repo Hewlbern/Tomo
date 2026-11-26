@@ -1,4 +1,4 @@
-# Tomo by DreamMachina (formerly evoKin V.01) — CAD note: Mirumi-style passive spring hug, head pan + tilt
+# Tomo by DreamMachina (formerly evoKin V.01) — CAD note: v3 bear look, Mirumi-style passive spring hug, head pan + tilt
 
 This is the detailed engineering note for the OpenSCAD model in this folder. The project README is one level up. Repository: [github.com/Hewlbern/Tomo](https://github.com/Hewlbern/Tomo).
 
@@ -9,6 +9,18 @@ Do not treat these STLs as a fit-check or a print-ready kit.**
 Source: [`evokin_v01.scad`](evokin_v01.scad) (internal file names keep the `evokin_` prefix; the servo-clasp V.01 is in git history at `bed94ce`, v4 at `d8b6367`, v3 at `237c37d`).
 
 Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (opening angle, 0 = closed on the rest stop). STLs are exported at all zeros. Pose a part by hand with `-D yaw=… -D tilt=… -D armL=… -D armR=…`.
+
+## What changed in the v3-bear-look pass (vs a5e3067)
+
+Back to the v3 bear look with the Mirumi clasp. **No printed part changed shape** except `head_front` (eye holes moved); all changes are soft goods.
+
+- **Ball torso** (`soft_body`, `stl/reference/soft_body.stl`): outer soft surface = sphere `TB_R` 60 about z `TB_Z` 48 wherever it is outside egg + `FUR_SKIN` 4; cut flat at z 0 (Ø≈72 sit pad); padding gone by z ≈ 81, so the egg + skin forms a short neck (r ≈ 49.8). `body_pad(z)` keeps its name. Feet dropped (`plush_feet` kept for older scripts, not used).
+- **Head ball** (`soft_head` = `head_pose() soft_head_rest()`, `stl/reference/soft_head.stl`, new): `head_soft_r(z) = max(egg + skin, HB_A·√(1−((z−HB_Z)/HB_B)²))`, `HB_A` 55, `HB_B` 41, `HB_Z` 114 (top z 155), from the seam (z 101) up; inside, undercut to `NECK_CLR_R` = egg(101) + skin + 1 up to z 107, coned back to the egg by z 118, and hemmed at z 103 (`below(SEAM_Z+2)`) so the brim overhangs the neck and clears the torso rim and the shoulder-ear tops (z 92.4) at pan ±42° with nod ±10°.
+- **Ears** (`plush_ears`): two ellipsoids `EAR_R` [12, 5.5, 11] at (±32.5, −3, 146), rolled 28° outward; stuffed fleece, part of `soft_head`.
+- **Sleeves:** `SLV_R` 9 → 9.5, `MIT_R` 10.5 → 12 (plumper mittens; still cut flat at x = ±`SLV_MEET` so they never overlap).
+- **Eyes:** `eye_x` 13, `eye_z` 120, 10 mm safety eyes (Ø5 shank holes; the eyes lock to the head skin). `head_front` and `check/head_front_y30_t10` re-exported and re-lightened.
+- **Checks:** `sim_v01.py` adds `soft_head_squash_mm` (pan ±42, nod ±10, arms 0/60 against torso_front/back, both arms, pads, sleeves and soft_body): **0 mm** everywhere. Soft-body squash at rest 5.6–5.9 mm (arms/pads), 4.6–4.7 mm (arms) and 0 (pads) at 30°/60°, 0 on the grip rod. Rigid sweep 537 poses, 0 overlaps; audit 27/27 (the face-check probe moved to x ±13, z 120).
+- Grip 5.79 / 6.10 / 6.45 / 7.39 N; seated margin 2.91×, free-hang slip SF 3.22 with battery. Mass ≈193 g with battery (fibrefill 5.6 g, extra skin + short pile 4.1 g, short pile ASSUMED 380 g/m²). Size over the pile ≈137 (torso) / 125 (head) × ≈162 mm tall seated.
 
 ## What changed in the likeness pass (vs 57a1bc4)
 

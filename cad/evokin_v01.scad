@@ -589,8 +589,8 @@ module soft_head() head_pose() soft_head_rest();
 /* ================= FOLITOMO skin variant (soft goods, NOT printed) =================
    Grass-type Tomo: the same printed shell, head mechanism and passive clasp; only the soft goods change.
    * LEAF EARS replace the round fleece ears: 1.2 mm green wool-blend felt, two layers sewn round a 0.6 mm spring-steel or
-     brass wire rib and a pale midrib seam, 3 mm thick, 38 x 26 mm, base tucked 5 mm inside the head-ball skin and tilted 42 deg
-     outward. They ride with the head (pan +-42, nod +-10).
+     brass wire rib and a pale midrib seam, 3 mm thick, 46 x 31 mm, base tucked 5 mm inside the head-ball skin, tilted 40 deg
+     outward and rolled 32 deg so the faces turn toward the front. They ride with the head (pan +-42, nod +-10).
    * CROWN SPROUT on the head crown: a felt-covered 1.2 mm wire stem (16 mm, one S-bend), two 15 mm leaves, three small sepals
      and a closed cream-pink bud (stuffed felt 10 x 10 x 16 mm). Rides with the head.
    * TAIL LEAF at the back-left of the ball torso (azimuth +55 deg, z 30), 36 x 22 mm, sewn to the body skin, well behind and
@@ -601,7 +601,7 @@ function leafw(u,W)= (W/2)*pow(sin(180*pow(u,0.7)),0.9);
 // one leaf along +z (length L), width along x, thickness T along y, curled toward +y by CURL mm at the tip
 module leaf(L=38,W=26,T=3,CURL=5,N=14) for(i=[0:N-1]) hull() for(k=[i,i+1]) let(u=max(0.02,k/N))
   translate([0,CURL*u*u,u*L]) cube([max(0.3,2*leafw(u,W)),T,0.2],center=true);
-FEAR_L=38; FEAR_W=26; FEAR_B=[27,-4,147]; FEAR_TILT=42; FEAR_ROLL=14;
+FEAR_L=46; FEAR_W=31; FEAR_B=[26,-4,146]; FEAR_TILT=40; FEAR_ROLL=32;
 module fol_ear(sx) translate([sx*FEAR_B[0],FEAR_B[1],FEAR_B[2]]) rotate([0,sx*FEAR_TILT,0]) rotate([0,0,sx*FEAR_ROLL]) leaf(FEAR_L,FEAR_W,3,5);
 SPR_B=[0,4,153.5]; SPR_H=16;                                         // sprout base (3 mm inside the crown skin) and stem height
 function spr_p(s)=[SPR_B[0]+2.5*sin(180*s),SPR_B[1]-4*s*s,SPR_B[2]+SPR_H*s];
@@ -612,9 +612,9 @@ module fol_sprout_leaves(){
 }
 module fol_sprout() { fol_stem(); fol_sprout_leaves(); }
 module fol_bud() translate(spr_p(1)+[0,0,5.5]) scale([5,5,8]) sphere(r=1,$fn=32);
-TAIL_AZ=55; TAIL_Z=30; TAIL_L=36; TAIL_W=22; TAIL_TILT=55;
+TAIL_AZ=55; TAIL_Z=30; TAIL_L=36; TAIL_W=22; TAIL_TILT=55; TAIL_ROLL=35;
 function tail_r()=ball_r(TAIL_Z)-3;
-module fol_tail() rotate([0,0,TAIL_AZ]) translate([tail_r(),0,TAIL_Z]) rotate([0,TAIL_TILT,0]) leaf(TAIL_L,TAIL_W,3,4);
+module fol_tail() rotate([0,0,TAIL_AZ]) translate([tail_r(),0,TAIL_Z]) rotate([0,TAIL_TILT,0]) rotate([0,0,TAIL_ROLL]) leaf(TAIL_L,TAIL_W,3,4);
 // everything the variant adds, posed with the head (ears + sprout + bud) or fixed (tail), for checks and renders
 module fol_head_parts() head_pose() { fol_ear(1); fol_ear(-1); fol_sprout(); fol_bud(); }
 // torso fur envelope (4 mm), with the belly groove

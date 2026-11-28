@@ -26,17 +26,30 @@ from mathutils import Matrix, Vector
 # Paths and constants
 # -----------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 STL = ROOT / "stl"
-OUT = ROOT / "renders" / "blender"
+
+
+def _early_variant():
+    a = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    return a[a.index("--variant") + 1] if "--variant" in a and a.index("--variant") + 1 < len(a) else "orange"
+
+
+# Skin variant: "orange" (default v3 bear) or "folitomo" (grass-type skin, see cad/evokin_v01.scad). Printed parts, clasp and
+# head mechanism are identical; the variant only swaps the soft goods (STLs from stl/variants/<variant>/) and the colourway.
+VARIANT = _early_variant()
+FOL = VARIANT == "folitomo"
+OUT = ROOT / "renders" / "blender" / (f"variants/{VARIANT}" if VARIANT != "orange" else "")
+
 
 def resolve_stl(filename):
     name = Path(filename).name
-    for folder in (STL, STL / "templates", STL / "reference"):
+    for folder in ((STL / "variants" / VARIANT,) if VARIANT != "orange" else ()) + (STL, STL / "templates", STL / "reference"):
         candidate = folder / name
         if candidate.is_file():
             return candidate
     raise FileNotFoundError(f"{name} not found under {STL}")
-BLEND = OUT / "evokin_v01_fur.blend"
+BLEND = OUT / ("evokin_v01_fur.blend" if not FOL else "folitomo_fur.blend")
 S = 0.001  # mm -> m
 
 # Official / CAD numbers (mm)
@@ -114,6 +127,7 @@ except Exception:
 HEAD_PARTS = {
     "head_back", "head_front", "tilt_hub", "dummy_cam", "dummy_horn_tilt",
     "eye_L", "eye_R", "eye_rim_L", "eye_rim_R", "nose", "fur_head", "fur_ear_L", "fur_ear_R", "soft_head",
+    "fol_ear_L", "fol_ear_R", "fol_sprout", "fol_bud",     # Folitomo leaf ears + crown sprout ride with the head
 }
 TURRET_PARTS = {"neck_turret", "yaw_coupler", "yaw_retainer_A", "yaw_retainer_B",
                 "dummy_servo_tilt", "dummy_horn_yaw"}
@@ -134,6 +148,10 @@ PALETTES = {
     "pink":  dict(fur=(255, 138, 166), tip=(255, 150, 176), root=(242, 112, 148), pad=(255, 138, 166)),
     # v3-bear pass: the v3 critter's orange (albedo set deep/red because AgX + hair scattering lift and wash it)
     "orange": dict(fur=(208, 66, 0), tip=(238, 98, 8), root=(124, 32, 0), pad=(208, 66, 0)),
+    # Folitomo: soft leaf-green plush (albedo set deeper than the look: hair scattering + AgX lift greens toward lime/grey) and a
+    # warm cream leaf-belly patch (cream_* are the patch pile colours)
+    "green": dict(fur=(118, 172, 62), tip=(146, 190, 84), root=(76, 122, 38), pad=(118, 172, 62),
+                  cream_fur=(240, 224, 150), cream_root=(214, 192, 112)),
 }
 
 # (legacy note) AgX + studio lights wash mid tones out,
@@ -155,7 +173,8 @@ def parse_args():
     p.add_argument("--preview", action="store_true")
     p.add_argument("--final", action="store_true")
     p.add_argument("--shot", default="all",
-                   choices=["all", "hero_hug", "arms_open", "clasp_closeup", "cutaway"])
+                   choices=["all", "hero_hug", "arms_open", "clasp_closeup", "cutaway", "back_view"])
+    p.add_argument("--variant", default="orange", choices=["orange", "folitomo"])
     p.add_argument("--samples", type=int, default=0)
     p.add_argument("--width", type=int, default=0)
     p.add_argument("--skip-hair", action="store_true")
@@ -972,6 +991,151 @@ def make_solid_arm_emitter(src, name, inflate=0.0020):
     return em
 
 
+
+# -----------------------------------------------------------------------------
+# Folitomo skin variant helpers (felt leaves, crown sprout, cream belly patch)
+# -----------------------------------------------------------------------------
+FOL_PARTS = {"fol_ear_L": "fol_ear_L.stl", "fol_ear_R": "fol_ear_R.stl", "fol_sprout": "fol_sprout.stl",
+             "fol_bud": "fol_bud.stl", "fol_tail": "fol_tail.stl"}
+PATCH_C, PATCH_HW, PATCH_HH = (0.0, 30.0), 33.0, 30.0          # cream leaf-belly patch: centre (x, z) mm, half-width, half-height
+
+
+def leaf_uv(obj, name="veinuv"):
+    """PCA frame of a (convex, leaf-shaped) mesh -> UV = (width / half-width, length / full length). Pose independent."""
+    import numpy as np
+    me = obj.data
+    P = np.array([v.co[:] for v in me.vertices])
+    c = P.mean(0)
+    w, V = np.linalg.eigh(np.cov((P - c).T))
+    a, b = V[:, 2], V[:, 1]                            # longest axis = leaf length, next = width
+    s_, w_ = (P - c) @ a, (P - c) @ b
+    smin, smax, wmax = s_.min(), s_.max(), max(abs(w_.min()), abs(w_.max()))
+    uvl = me.uv_layers.new(name=name)
+    for poly in me.polygons:
+        for li in poly.loop_indices:
+            vi = me.loops[li].vertex_index
+            uvl.data[li].uv = (float(w_[vi] / wmax), float((s_[vi] - smin) / (smax - smin)))
+    me.update()
+
+
+def mat_felt_leaf(name, base, vein, veins=True):
+    """Matte wool-blend felt: fibre bump, darker side veins and a pale stitched midrib (UV from leaf_uv)."""
+    mat = bpy.data.materials.new(name)
+    nt, bsdf, out = _principled(mat)
+    N = nt.nodes
+    bsdf.inputs["Roughness"].default_value = 0.92
+    bsdf.inputs["Specular IOR Level"].default_value = 0.12
+    for k, v in (("Sheen Weight", 0.25), ("Sheen Roughness", 0.6)):
+        try:
+            bsdf.inputs[k].default_value = v
+        except KeyError:
+            pass
+    mix = N.new("ShaderNodeMix"); mix.data_type = "RGBA"; mix.name = "FeltMix"
+    mix.inputs["A"].default_value = srgb_lin(base)
+    mix.inputs["B"].default_value = srgb_lin(vein)
+    if veins:
+        uv = N.new("ShaderNodeUVMap"); uv.uv_map = "veinuv"
+        sep = N.new("ShaderNodeSeparateXYZ"); nt.links.new(uv.outputs["UV"], sep.inputs["Vector"])
+        def M(op, a=None, b=None, clamp=False):
+            n = N.new("ShaderNodeMath"); n.operation = op; n.use_clamp = clamp
+            for i, x in enumerate((a, b)):
+                if x is None:
+                    continue
+                if isinstance(x, (int, float)):
+                    n.inputs[i].default_value = x
+                else:
+                    nt.links.new(x, n.inputs[i])
+            return n.outputs[0]
+        au = M("ABSOLUTE", sep.outputs["X"])
+        diag = M("SUBTRACT", M("MULTIPLY", sep.outputs["Y"], 6.0), M("MULTIPLY", au, 1.7))
+        fr = M("FRACT", diag)
+        dist = M("MINIMUM", fr, M("SUBTRACT", 1.0, fr))
+        side = M("SUBTRACT", 1.0, M("MULTIPLY", M("SUBTRACT", dist, 0.03), 14.0), True)
+        edge = M("SUBTRACT", 1.0, M("MULTIPLY", M("SUBTRACT", au, 0.78), 8.0), True)
+        base_cut = M("MULTIPLY", M("SUBTRACT", sep.outputs["Y"], 0.10), 8.0, True)
+        side = M("MULTIPLY", M("MULTIPLY", side, edge), base_cut)
+        mid = M("SUBTRACT", 1.0, M("MULTIPLY", M("SUBTRACT", au, 0.02), 40.0), True)
+        mid = M("MULTIPLY", mid, base_cut)
+        vmask = M("MAXIMUM", M("MULTIPLY", side, 0.55), mid)
+        nt.links.new(vmask, mix.inputs["Factor"])
+        # pale stitched midrib: lighten instead of darken
+        pale = N.new("ShaderNodeMix"); pale.data_type = "RGBA"
+        pale.inputs["B"].default_value = srgb_lin((196, 224, 150))
+        nt.links.new(mix.outputs["Result"], pale.inputs["A"])
+        nt.links.new(M("MULTIPLY", mid, 0.55), pale.inputs["Factor"])
+        col = pale.outputs["Result"]
+    else:
+        col = mix.outputs["Result"]
+    nt.links.new(col, bsdf.inputs["Base Color"])
+    # felt fibres: fine noise bump
+    tc = N.new("ShaderNodeTexCoord"); noise = N.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 2200.0; noise.inputs["Detail"].default_value = 6.0
+    nt.links.new(tc.outputs["Object"], noise.inputs["Vector"])
+    bump = N.new("ShaderNodeBump"); bump.inputs["Strength"].default_value = 0.35; bump.inputs["Distance"].default_value = 0.0004
+    nt.links.new(noise.outputs["Fac"], bump.inputs["Height"])
+    nt.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    return mat
+
+
+def patch_uv(obj, name="patchuv"):
+    """Front planar UV (x, z in mm) for the cream belly patch; the back half is shifted far outside the patch."""
+    me = obj.data
+    uvl = me.uv_layers.new(name=name)
+    for poly in me.polygons:
+        for li in poly.loop_indices:
+            co = me.vertices[me.loops[li].vertex_index].co
+            x, y, z = co.x / S, co.y / S, co.z / S
+            uvl.data[li].uv = (x + (0.0 if y < 0.0 else 5000.0), z)
+    me.update()
+
+
+def patch_mask_socket(nt):
+    """Cream-patch mask (1 inside the belly oval, soft noisy edge) from the 'patchuv' map."""
+    N = nt.nodes
+    uv = N.new("ShaderNodeUVMap"); uv.uv_map = "patchuv"
+    sep = N.new("ShaderNodeSeparateXYZ"); nt.links.new(uv.outputs["UV"], sep.inputs["Vector"])
+    def M(op, a=None, b=None, clamp=False):
+        n = N.new("ShaderNodeMath"); n.operation = op; n.use_clamp = clamp
+        for i, x in enumerate((a, b)):
+            if x is None:
+                continue
+            if isinstance(x, (int, float)):
+                n.inputs[i].default_value = x
+            else:
+                nt.links.new(x, n.inputs[i])
+        return n.outputs[0]
+    dx = M("DIVIDE", M("SUBTRACT", sep.outputs["X"], PATCH_C[0]), PATCH_HW)
+    dz = M("DIVIDE", M("SUBTRACT", sep.outputs["Z" if False else "Y"], PATCH_C[1]), PATCH_HH)
+    e = M("ADD", M("POWER", dx, 2.0), M("POWER", dz, 2.0))
+    return M("SUBTRACT", 1.0, M("MULTIPLY", M("SUBTRACT", e, 0.80), 7.0), True)
+
+
+def wire_patch_color(mat, node_type, input_name, base_key, cream_key):
+    """Drive a hair / principled colour input with Mix(base, cream, patch mask); colours are set by set_palette_fol."""
+    nt = mat.node_tree
+    tgt = next(n for n in nt.nodes if n.type == node_type)
+    mix = nt.nodes.new("ShaderNodeMix"); mix.data_type = "RGBA"; mix.name = "PatchMix"
+    nt.links.new(patch_mask_socket(nt), mix.inputs["Factor"])
+    nt.links.new(mix.outputs["Result"], tgt.inputs[input_name])
+    mix["base_key"] = base_key; mix["cream_key"] = cream_key
+    return mix
+
+
+def build_folitomo(objs, mats, preview):
+    """Felt leaves + sprout (imported from the variant STLs) and the belly-patch colour wiring."""
+    for name, fn in FOL_PARTS.items():
+        objs[name] = import_stl(resolve_stl(fn), name)
+    leaf_mat = mat_felt_leaf("FeltLeaf", (84, 150, 42), (50, 108, 28))
+    mats["felt_leaf"] = leaf_mat
+    mats["felt_stem"] = mat_felt_leaf("FeltStem", (78, 142, 40), (50, 108, 28), veins=False)
+    mats["felt_bud"] = mat_felt_leaf("FeltBud", (246, 214, 196), (236, 170, 170), veins=False)
+    for n in ("fol_ear_L", "fol_ear_R", "fol_tail"):
+        leaf_uv(objs[n]); assign(objs[n], leaf_mat)
+    assign(objs["fol_sprout"], mats["felt_stem"])
+    assign(objs["fol_bud"], mats["felt_bud"])
+    # the sprout's two leaves share the leaf shader without veins (small); the stem/leaves read as one green felt piece
+
+
 def build_assembly(skip_hair=False, preview=False):
     objs = {}
     for name, fn in PART_FILES.items():
@@ -982,8 +1146,9 @@ def build_assembly(skip_hair=False, preview=False):
     objs["nose"] = place_nose("nose")
     objs["eye_rim_L"] = place_eye_rim("eye_rim_L", +1)
     objs["eye_rim_R"] = place_eye_rim("eye_rim_R", -1)
-    objs["fur_ear_L"] = place_ear("fur_ear_L", +1)
-    objs["fur_ear_R"] = place_ear("fur_ear_R", -1)
+    if not FOL:                         # Folitomo has leaf ears instead of the round fleece ears
+        objs["fur_ear_L"] = place_ear("fur_ear_L", +1)
+        objs["fur_ear_R"] = place_ear("fur_ear_R", -1)
 
     # ---- materials (hero defaults; cutaway swaps later)
     mats = {}
@@ -1023,8 +1188,9 @@ def build_assembly(skip_hair=False, preview=False):
     assign(objs["paw_pad_L"], mats["pad"])
     assign(objs["paw_pad_R"], mats["pad"])
     assign(objs["nose"], mats["nose"])
-    assign(objs["fur_ear_L"], mats["fur_clay"])
-    assign(objs["fur_ear_R"], mats["fur_clay"])
+    if not FOL:
+        assign(objs["fur_ear_L"], mats["fur_clay"])
+        assign(objs["fur_ear_R"], mats["fur_clay"])
     mats["rim"] = mat_plastic("EyeRim", srgb_lin((14, 11, 10)), rough=0.3, spec=0.45)
     assign(objs["eye_rim_L"], mats["rim"])
     assign(objs["eye_rim_R"], mats["rim"])
@@ -1058,6 +1224,12 @@ def build_assembly(skip_hair=False, preview=False):
     vl_h = density_group(fur_h, "fur_length", head_len)
     vlg_h = density_group(fur_h, "fur_length_guard", head_len_guard)
     objs["fur_head"] = fur_h
+    if FOL:
+        build_folitomo(objs, mats, preview)
+        patch_uv(fur_t)
+        wire_patch_color(mats["fur_under"], "BSDF_HAIR_PRINCIPLED", "Color", "root", "cream_root")
+        wire_patch_color(mats["fur_guard"], "BSDF_HAIR_PRINCIPLED", "Color", "fur", "cream_fur")
+        wire_patch_color(mats["fur_clay"], "BSDF_PRINCIPLED", "Base Color", "clayfur", "claycream")
 
     # arm fur: use a slightly inflated copy of sleeve + a paw-region sphere-ish
     # by emitting from the sleeve proxies and the arm solids with a density
@@ -1131,7 +1303,7 @@ def build_assembly(skip_hair=False, preview=False):
             add_hair(em, f"arm_{side}_guard", length_m=0.0070, count=int(4500 * mul_c),
                      children=CH, material=mats["fur_guard"],
                      density_vg=vg, root_m=0.00011, tip_m=0.00003, align=al, **G)
-        for side in ("L", "R"):
+        for side in (("L", "R") if not FOL else ()):
             ft = objs[f"fur_ear_{side}"]
             add_hair(ft, f"ear_{side}", length_m=0.0045, count=int(1600 * mul_c),
                      children=CH, material=mats["fur_guard"], root_m=0.00011, tip_m=0.00003,
@@ -1476,38 +1648,11 @@ def seat_matrix():
 
 
 def handle_points():
-    """Robot-frame centre line of a Ø12.5 bag handle: its upright leg rises out of the bag top straight up the centre
-    belly groove between the two paws (under the chin), then bends away over the robot's right shoulder (-x) and
-    slightly back (+y) so it passes beside the head, never in front of the face, then arches over into the bag."""
-    pts = []
-    r = HANDLE_D / 2.0 + 0.15
-    T1 = 36.0                                           # leave the groove just above the paws, still under the face seam (z ≈ 84)
-    for k in range(0, 41):
-        t = -52.0 + (T1 + 52.0) * k / 40.0
-        pts.append(G_FR + G_U * t + G_N * r)
-    p0 = pts[-1]
-    # After the paws the handle peels to the creature's right and back, rising beside the cheek (Mirumi: the
-    # upright is hugged at the chest and continues beside the head, not across the face). Catmull-Rom.
-    # v3-bear pass: the head is now a padded ball (r 52), so the handle swings wider round the right cheek
-    ctrl = [pts[-2], p0,
-            Vector((-6.0, p0.y - 4.0, 95.0)),
-            Vector((-28.0, p0.y - 10.0, 106.0)),
-            Vector((-56.0, p0.y - 4.0, 120.0)),
-            Vector((-72.0, p0.y + 14.0, 138.0)),
-            Vector((-86.0, p0.y + 34.0, 160.0)),
-            Vector((-112.0, p0.y + 46.0, 180.0)),
-            Vector((-150.0, p0.y + 48.0, 178.0)),
-            Vector((-180.0, p0.y + 44.0, 142.0)),
-            Vector((-188.0, p0.y + 42.0, 80.0))]
-    for i in range(1, len(ctrl) - 2):
-        a, b, c, d = ctrl[i - 1], ctrl[i], ctrl[i + 1], ctrl[i + 2]
-        for k in range(1, 13):
-            u = k / 12.0
-            pts.append(0.5 * ((2 * b) + (-a + c) * u + (2 * a - 5 * b + 4 * c - d) * u * u + (-a + 3 * b - 3 * c + d) * u ** 3))
-    last = pts[-1]
-    for k in range(1, 13):
-        pts.append(Vector((last.x, last.y, last.z - (last.z + 8.0) * k / 12.0)))
-    return pts
+    """Robot-frame centre line of a Ø12.5 bag handle (shared with scripts/folitomo_check.py via scripts/handle_path.py): its upright
+    leg rises out of the bag top straight up the centre belly groove between the two paws (under the chin), then bends away
+    over the robot's right shoulder (-x) and slightly back (+y) so it passes beside the head, never in front of the face."""
+    import handle_path
+    return [Vector(p) for p in handle_path.handle_points(VARIANT)]
 
 
 def make_handle_and_bag():
@@ -1602,7 +1747,7 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     # save an unposed-ready blend once the studio is up (will re-save after)
     tag = "preview" if preview else "final"
-    shots = ["hero_hug", "arms_open", "clasp_closeup", "cutaway"] if args.shot == "all" else [args.shot]
+    shots = (["hero_hug", "arms_open", "back_view", "clasp_closeup"] if FOL else ["hero_hug", "arms_open", "clasp_closeup", "cutaway"]) if args.shot == "all" else [args.shot]
     props = make_handle_and_bag()
     CAM0 = ((0, -10, 72), (240, -460, 158), 80)
 
@@ -1612,6 +1757,9 @@ def main():
             o.hide_viewport = not on
 
     HERO = ((-4, -22, BAG_TOP + 76), (230, -560, 60), 56)        # front 3/4 from the left, paws clasped under the chin
+    if FOL:                                                       # leaves + sprout reach z ≈ 183: aim higher, a touch wider
+        HERO = ((-4, -22, BAG_TOP + 86), (230, -560, 60), 54)
+    BACKV = ((10, 10, BAG_TOP + 88), (380, 300, 90), 56)         # Folitomo: side/back 3/4 from the critter's left-rear (bud, ears, tail leaf)
     CLASP = ((0, -56, BAG_TOP + 84), (210, -300, 30), 70)        # clasp close-up: paws round the handle, face above
     def set_palette(name):
         P = PALETTES[name]
@@ -1630,13 +1778,33 @@ def main():
         pb = mats["pad"].node_tree.nodes.get("Principled BSDF")
         if pb:
             pb.inputs["Base Color"].default_value = srgb_lin(P["pad"])
+        if FOL and "cream_fur" in P:
+            cols = {"root": P["root"], "cream_root": P["cream_root"], "fur": P["fur"], "cream_fur": P["cream_fur"],
+                    "clayfur": tuple(int(c * 0.86) for c in P["fur"]), "claycream": tuple(int(c * 0.86) for c in P["cream_fur"])}
+            for mk in ("fur_under", "fur_guard", "fur_clay"):
+                mx = mats[mk].node_tree.nodes["PatchMix"]
+                mx.inputs["A"].default_value = srgb_lin(cols[mx["base_key"]])
+                mx.inputs["B"].default_value = srgb_lin(cols[mx["cream_key"]])
 
-    SHOT_PALETTE = {"hero_hug": "orange", "arms_open": "orange", "clasp_closeup": "orange", "cutaway": "orange"}
+    _PAL = "green" if FOL else "orange"
+    SHOT_PALETTE = {"hero_hug": _PAL, "arms_open": _PAL, "clasp_closeup": _PAL, "cutaway": _PAL, "back_view": _PAL}
     for shot in shots:
         set_palette(SHOT_PALETTE[shot])
         show_props(False)
         GLOBAL[0] = None
         set_camera(*CAM0)
+        if shot == "back_view":
+            GLOBAL[0] = seat_matrix()
+            apply_pose_v2(objs, yaw=24, arm_l=HUG_OPEN_L, arm_r=HUG_OPEN_R, tilt=4)
+            show_props(True)
+            set_cutters(objs, False)
+            set_mode_hero(objs)
+            set_camera(*BACKV)
+            path = OUT / ("03_back_view_bud_preview.png" if preview else "03_back_view_bud.png")
+            shift_lights(BAG_TOP)
+            render_shot(path)
+            shift_lights(-BAG_TOP)
+            continue
         if shot in ("hero_hug", "clasp_closeup"):
             # sitting on the tote, both arms closed round the upright Ø12.5 handle leg in the centre belly groove
             GLOBAL[0] = seat_matrix()
@@ -1661,7 +1829,7 @@ def main():
             apply_pose_v2(objs, yaw=20, arm_l=ARM_OPEN, arm_r=ARM_OPEN, tilt=0)
             set_cutters(objs, False)
             set_mode_hero(objs)
-            set_camera((0, -18, 76), (230, -470, 150), 66)
+            set_camera((0, -18, 86 if FOL else 76), (230, -500 if FOL else -470, 160 if FOL else 150), 62 if FOL else 66)
             path = OUT / ("02_arms_open_preview.png" if preview else "02_arms_open.png")
         else:
             apply_pose_v2(objs, yaw=0, arm_l=0, arm_r=0, tilt=8)
@@ -1672,7 +1840,7 @@ def main():
         render_shot(path)
 
     # save the blend in the seated hero pose
-    set_palette("orange")
+    set_palette(_PAL)
     GLOBAL[0] = seat_matrix()
     show_props(True)
     apply_pose_v2(objs, yaw=-14, arm_l=HUG_OPEN_L, arm_r=HUG_OPEN_R, tilt=4)

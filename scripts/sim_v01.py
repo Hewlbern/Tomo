@@ -10,7 +10,7 @@ import numpy as np, trimesh, json, csv, itertools, time, os, sys, math
 from trimesh.transformations import rotation_matrix as Rm
 os.chdir(os.path.dirname(os.path.abspath(__file__))+"/..")
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__))))
-from stl_paths import stl_path
+from stl_paths import stl_path, RES
 TOL=0.05
 # ---- geometry constants (must match cad/evokin_v01.scad)
 import groove_geo as gg
@@ -112,7 +112,7 @@ out["sweep"]=dict(poses=len(poses),pair_tests=npairs,aabb_passed_to_boolean=nboo
   head_yaw_range=[-50,50,1.0],head_tilt_range=[-25,25,0.5],arm_range=[-5,70,0.5],
   cross_grid="yaw {-42,-21,0,21,42} x tilt {-12,-6,0,6,12}; arms {0,30,60}² at (yaw,tilt) = (-42,12), (42,-12), (0,0)",
   excluded_pairs={f"{a}|{b}":v for (a,b),v in excluded.items()},compliant_pairs={f"{a}|{b}":v for (a,b),v in compliant.items()})
-with open("results/interference_events.csv","w",newline="") as f:
+with open(RES+"interference_events.csv","w",newline="") as f:
     w=csv.DictWriter(f,fieldnames=["yaw","tilt","armL","armR","a","b","vol_mm3","compliant"]); w.writeheader(); w.writerows(rows)
 inT=lambda r:(YAW_SOFT[0]<=r["yaw"]<=YAW_SOFT[1] and TILT_SOFT[0]<=r["tilt"]<=TILT_SOFT[1]
               and ARM_TRAVEL[0]<=r["armL"]<=ARM_TRAVEL[1] and ARM_TRAVEL[0]<=r["armR"]<=ARM_TRAVEL[1])
@@ -281,7 +281,7 @@ out["soft_sleeve_squash_mm"]=ss
 # likeness-pass soft body (fur skin + mid-body potato padding + tucked plush feet, soft goods): how far the rigid arms and
 # pads reach into it, closed and on the open stop. The pads sit in a slot in the skin; the padding is loose fibrefill.
 if os.path.exists("stl/reference/soft_body.stl"):
-    SB=trimesh.load("stl/reference/soft_body.stl"); sb={}
+    SB=trimesh.load(stl_path("soft_body")); sb={}
     for a_ in (0.0,30.0,60.0):
         for sd in ("L","R"):
             for hp in ("arm","paw_pad"):
@@ -293,8 +293,8 @@ if os.path.exists("stl/reference/soft_body.stl"):
 # v3-bear soft head (head-ball padding + round ears, rides with the head): does anything rigid or the sleeves / soft body
 # press into it across the head and arm corner poses? (mm, 0 = clear)
 if os.path.exists("stl/reference/soft_head.stl"):
-    SH=trimesh.load("stl/reference/soft_head.stl"); sh={}; worst=0.0
-    SBm=trimesh.load("stl/reference/soft_body.stl") if os.path.exists("stl/reference/soft_body.stl") else None
+    SH=trimesh.load(stl_path("soft_head")); sh={}; worst=0.0
+    SBm=trimesh.load(stl_path("soft_body")) if os.path.exists("stl/reference/soft_body.stl") else None
     for (y,t,aL,aR) in ((0,0,0,0),(42,10,0,0),(-42,10,0,0),(42,-10,0,0),(-42,-10,0,0),(42,10,60,60),(-42,10,60,60),(0,10,60,60),(0,-10,60,60)):
         shp=SH.copy(); shp.apply_transform(T("head_front",y,t,aL,aR)); row={}
         for hp in ("torso_front","torso_back","arm_L","arm_R","paw_pad_L","paw_pad_R","sleeve_proxy_L","sleeve_proxy_R"):
@@ -322,5 +322,5 @@ for a,b,why in [("torso_front","torso_back","seam lip/groove should clear 0.25 m
     static_rows.append(dict(a=a,b=b,vol_mm3=round(v,4),note=why,ok=v<=TOL))
 out["static_pair_volumes"]=static_rows
 out["static_ok"]=all(r["ok"] for r in static_rows)
-json.dump(out,open("results/summary_sweep.json","w"),indent=1,default=float)
+json.dump(out,open(RES+"summary_sweep.json","w"),indent=1,default=float)
 print(json.dumps({k:out[k] for k in ["transform_validation_max_dev_mm","sweep","rigid_overlaps_in_travel","stop_engagement","arm_min_clearance_mm","head_tilt_clearance_mm","hug","static_pair_volumes"]},indent=1,default=float))

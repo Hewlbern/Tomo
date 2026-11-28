@@ -4,7 +4,7 @@ import numpy as np, trimesh, json, csv, os, math
 os.chdir(os.path.dirname(os.path.abspath(__file__))+"/..")
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__))))
-from stl_paths import stl_path
+from stl_paths import stl_path, RES
 
 def load(n): return trimesh.load(stl_path(n))
 M={n:load(n) for n in
@@ -159,7 +159,7 @@ add("Yaw servo seat (Feetech FS90, FS90MG-drawing case, official 27.7 span, 1.7 
     "pass" if ok_pil(yaw_holes[0][1]) and ok_pil(yaw_holes[1][1]) else "fail",
     "Included M2.5x4 horn screw is too short for horn+coupler; use a longer M2.5 and confirm on arrival.")
 
-sw_=json.load(open("results/summary_sweep.json")) if os.path.exists("results/summary_sweep.json") else None
+sw_=json.load(open(RES+"summary_sweep.json")) if os.path.exists(RES+"summary_sweep.json") else None
 st=sw_["stop_engagement"] if sw_ else {}
 add("Arm hard stops (printed lug in the knuckle relief)",
     "torso_front (stop lug), arm_L/R (relief sector)",
@@ -413,7 +413,7 @@ add("Pi envelope",
     "pass" if all((v or 0)<=0.05 for v in (vol_int(M['tray'],pi),vol_int(M['torso_front'],pi))) else "fail")
 
 # ---------- 6. Joints: head pan + tilt, neck cabling, passive hug ----------
-SW=json.load(open("results/summary_sweep.json")) if os.path.exists("results/summary_sweep.json") else None
+SW=json.load(open(RES+"summary_sweep.json")) if os.path.exists(RES+"summary_sweep.json") else None
 nov=SW is not None and len(SW["rigid_overlaps_in_travel"])==0
 st=SW["stop_engagement"] if SW else {}
 add("Head pan joint (motorised yaw, FS90 in the collar)",
@@ -522,8 +522,8 @@ out=dict(assumptions=dict(
     fastener_scheme="M2.5 clearance 2.8 / pilot 2.1 (front=clearance, back=pilot). Servo self-tap pilots 1.7. Retainer M2 clearance 2.3 / pilot 1.7.",
     running_fit="Journal radial and blade side 0.35 mm (tight end of 0.35–0.4 FDM). Axial washer gap 0.30 mm. Retainer play 0.35 mm.",
 ), official_FS90MG=FS, rows=rows, summary=summary)
-json.dump(out,open("results/fit_audit.json","w"),indent=1)
-with open("results/fit_audit_table.csv","w",newline="") as f:
+json.dump(out,open(RES+"fit_audit.json","w"),indent=1)
+with open(RES+"fit_audit_table.csv","w",newline="") as f:
     w=csv.DictWriter(f,fieldnames=["interface","parts","verdict","measured","fix"]); w.writeheader(); w.writerows(rows)
 print(json.dumps(summary,indent=1))
 for r in rows:

@@ -24,6 +24,9 @@
 // angle in deg (0 = closed on the rest stop, ARM_OPEN = open stop). STLs export at yaw=0, tilt=0, armL=armR=0.
 // openscad -D 'part="arm_L"' -o x.stl evokin_v01.scad
 part = "assembly";
+// SKIN VARIANT (soft goods only; printed shell, head mechanism and clasp are identical): "orange" = default v3 bear,
+// "folitomo" = grass-type skin: leaf ears + crown sprout + tail leaf in felt (see the FOLITOMO section below).
+variant = "orange";
 yaw = 0;
 tilt = 0;     // deg, + = nose down (nod)
 armL = 0;     // deg opening, 0 = hugging (rest stop)
@@ -571,7 +574,7 @@ function head_ball_r(z)=(abs(z-HB_Z)>=HB_B)?0:HB_A*sqrt(1-pow((z-HB_Z)/HB_B,2));
 function head_soft_r(z)=max(z<H_EGG?eggr(z)+FUR_SKIN:0, head_ball_r(z));
 function head_pad(z)=max(0,head_ball_r(z)-(z<H_EGG?eggr(z):0)-FUR_SKIN);
 EAR_R=[12,5.5,11]; EAR_C=[32.5,-3,146]; EAR_ROLL=28;     // ear disc (x wide, y thick, z tall), centre, outward roll (deg)
-module plush_ears() for(sx=[-1,1]) translate([sx*EAR_C[0],EAR_C[1],EAR_C[2]]) rotate([0,-sx*EAR_ROLL,0]) scale(EAR_R) sphere(r=1,$fn=40);
+module plush_ears() if(variant!="folitomo") for(sx=[-1,1]) translate([sx*EAR_C[0],EAR_C[1],EAR_C[2]]) rotate([0,-sx*EAR_ROLL,0]) scale(EAR_R) sphere(r=1,$fn=40);
 // The lower edge is a soft brim: inside it is undercut to r = neck skin + 1 mm up to z 107, then back to the egg by z 118,
 // so when the head nods ±10° the brim swings over the neck fur and never pinches against the rigid torso rim.
 NECK_CLR_R=eggr(SEAM_Z)+FUR_SKIN+1.0;
@@ -582,6 +585,38 @@ module soft_head_rest() difference(){
   below(SEAM_Z+2);   // brim hem 2 mm above the seam: clears the shoulder-ear tops (z 92.4) at yaw ±42 + nod 10
 }
 module soft_head() head_pose() soft_head_rest();
+
+/* ================= FOLITOMO skin variant (soft goods, NOT printed) =================
+   Grass-type Tomo: the same printed shell, head mechanism and passive clasp; only the soft goods change.
+   * LEAF EARS replace the round fleece ears: 1.2 mm green wool-blend felt, two layers sewn round a 0.6 mm spring-steel or
+     brass wire rib and a pale midrib seam, 3 mm thick, 38 x 26 mm, base tucked 5 mm inside the head-ball skin and tilted 42 deg
+     outward. They ride with the head (pan +-42, nod +-10).
+   * CROWN SPROUT on the head crown: a felt-covered 1.2 mm wire stem (16 mm, one S-bend), two 15 mm leaves, three small sepals
+     and a closed cream-pink bud (stuffed felt 10 x 10 x 16 mm). Rides with the head.
+   * TAIL LEAF at the back-left of the ball torso (azimuth +55 deg, z 30), 36 x 22 mm, sewn to the body skin, well behind and
+     below the arms and the handle. No effect on the clasp.
+   * Cream LEAF-BELLY PATCH is a colour change of the pile on the lower belly (z 8..58), not geometry.
+   Keep every leaf stiff only at its rib: the tips are floppy felt, so a handle or strap that brushes one just bends it. */
+function leafw(u,W)= (W/2)*pow(sin(180*pow(u,0.7)),0.9);
+// one leaf along +z (length L), width along x, thickness T along y, curled toward +y by CURL mm at the tip
+module leaf(L=38,W=26,T=3,CURL=5,N=14) for(i=[0:N-1]) hull() for(k=[i,i+1]) let(u=max(0.02,k/N))
+  translate([0,CURL*u*u,u*L]) cube([max(0.3,2*leafw(u,W)),T,0.2],center=true);
+FEAR_L=38; FEAR_W=26; FEAR_B=[27,-4,147]; FEAR_TILT=42; FEAR_ROLL=14;
+module fol_ear(sx) translate([sx*FEAR_B[0],FEAR_B[1],FEAR_B[2]]) rotate([0,sx*FEAR_TILT,0]) rotate([0,0,sx*FEAR_ROLL]) leaf(FEAR_L,FEAR_W,3,5);
+SPR_B=[0,4,153.5]; SPR_H=16;                                         // sprout base (3 mm inside the crown skin) and stem height
+function spr_p(s)=[SPR_B[0]+2.5*sin(180*s),SPR_B[1]-4*s*s,SPR_B[2]+SPR_H*s];
+module fol_stem() for(i=[0:7]) hull(){ translate(spr_p(i/8)) sphere(r=1.3,$fn=16); translate(spr_p((i+1)/8)) sphere(r=1.3,$fn=16); }
+module fol_sprout_leaves(){
+  for(sx=[-1,1]) translate(spr_p(0.5)) rotate([0,sx*58,0]) rotate([0,0,sx*10]) leaf(15,9,1.6,2,10);
+  for(a=[0,120,240]) translate(spr_p(1)+[0,0,-1]) rotate([0,0,a]) rotate([0,48,0]) leaf(9,5.5,1.2,1,8);          // sepals
+}
+module fol_sprout() { fol_stem(); fol_sprout_leaves(); }
+module fol_bud() translate(spr_p(1)+[0,0,5.5]) scale([5,5,8]) sphere(r=1,$fn=32);
+TAIL_AZ=55; TAIL_Z=30; TAIL_L=36; TAIL_W=22; TAIL_TILT=55;
+function tail_r()=ball_r(TAIL_Z)-3;
+module fol_tail() rotate([0,0,TAIL_AZ]) translate([tail_r(),0,TAIL_Z]) rotate([0,TAIL_TILT,0]) leaf(TAIL_L,TAIL_W,3,4);
+// everything the variant adds, posed with the head (ears + sprout + bud) or fixed (tail), for checks and renders
+module fol_head_parts() head_pose() { fol_ear(1); fol_ear(-1); fol_sprout(); fol_bud(); }
 // torso fur envelope (4 mm), with the belly groove
 module fur_proxy_torso() difference(){ intersection(){ difference(){ tegg(-4); tegg(0); } body_region(); } groove_capsule(0); }
 
@@ -628,6 +663,8 @@ else if(part=="sleeve_proxy_L") sleeve_proxy("L"); else if(part=="sleeve_proxy_R
 else if(part=="fur_proxy_torso") fur_proxy_torso();
 else if(part=="soft_body") soft_body();
 else if(part=="soft_head") soft_head();
+else if(part=="fol_ear_L") fol_ear(1); else if(part=="fol_ear_R") fol_ear(-1);
+else if(part=="fol_sprout") fol_sprout(); else if(part=="fol_bud") fol_bud(); else if(part=="fol_tail") fol_tail();
 else if(part=="coupon") coupon();
 else if(part=="dummy_servo_yaw") dummy_servo_yaw();
 else if(part=="dummy_horn_yaw") dummy_horn_yaw();

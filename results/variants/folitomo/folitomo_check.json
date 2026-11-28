@@ -4,7 +4,7 @@
  "poses": 145,
  "pair_tests": 20900,
  "aabb_passed_to_boolean": 1348,
- "seconds": 129.9,
+ "seconds": 54.7,
  "pose_grid": "yaw -50..50 step 2 and tilt -15..15 step 2.5 singly; yaw {-47,-42,-21,0,21,42,47} x tilt {-12,-10,-5,0,5,10,12}; arms {0,30,60}^2 at 5 head corners; tail leaf: both arms -5..70 step 5",
  "head_leaf_overlaps_in_soft_travel": [],
  "head_leaf_overlaps_all": [],
@@ -130,7 +130,7 @@
  },
  "size": {
   "total_height_mm": 183.6,
-  "default_bear_height_mm": 155.0,
+  "default_bear_height_mm": 162.0,
   "width_across_leaf_ears_mm": 108.6
  },
  "tail_clearance_mm": {

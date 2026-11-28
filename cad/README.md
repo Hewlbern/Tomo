@@ -10,6 +10,10 @@ Source: [`evokin_v01.scad`](evokin_v01.scad) (internal file names keep the `evok
 
 Pose variables: `yaw` (pan, deg), `tilt` (deg, + = nose down), `armL` / `armR` (opening angle, 0 = closed on the rest stop). STLs are exported at all zeros. Pose a part by hand with `-D yaw=… -D tilt=… -D armL=… -D armR=…`.
 
+## Skin variants (soft goods only)
+
+`variant = "orange"` (default) is the v3 bear. `variant = "folitomo"` swaps the soft goods for the grass-type skin: `plush_ears()` is dropped from `soft_head`, and the `fol_*` parts are added (leaf ears `fol_ear_L/R` at head-ball (±26, −4, 146), tilt 40° / roll 32°, 46 × 31 × 3 mm; `fol_sprout` stem + two leaves + sepals and `fol_bud` on the crown at (0, 4, 153.5); `fol_tail` on the ball torso at azimuth +55°, z 30). They are felt on wire, not printed; they ride with the head (`fol_head_parts()`), except the tail. Printed shell, hinge, arms, springs, groove and the head mechanism are the same files. Export: `bash scripts/build_variant.sh folitomo` → `stl/variants/folitomo/`; check: `python3 scripts/folitomo_check.py` (results/variants/folitomo/folitomo_check.json).
+
 ## What changed in the no-slot pass (vs d0e05e0)
 
 - **Continuous coat.** `soft_body()` = `soft_body_open()` (the old padding with its handle channel) ∪ `belly_flap()`: the outer 2 mm (`FLAP_T`) of the soft-body profile, inside the handle channel, below z `FLAP_Z` 58 (just under the paw pads, z 61.6–79.8). The handle slides up under the flap; from z 58 to the rim the skin has a slit with the pile combed over it, so the pads still meet the handle. Renders emit fur continuously over the belly (no channel pressed into the coat).

@@ -42,6 +42,31 @@ CAD, shoulder hinge and pan/tilt neck exploded:
 
 Full-resolution PNGs live in [`renders/blender/`](renders/blender/) and [`renders/cad/`](renders/cad/). The Blender scene is [`renders/blender/evokin_v01_fur.blend`](renders/blender/evokin_v01_fur.blend). A landing page with the video inline is in [`docs/index.html`](docs/index.html), served by GitHub Pages at [hewlbern.github.io/Tomo](https://hewlbern.github.io/Tomo/).
 
+## Folitomo: grass-type skin (variant)
+
+**Folitomo** is an optional *skin* for the same Tomo (picked from the Gemini concept sheet): leaf-green plush, two leaf ears, a little sprout with a closed bud on the crown, a cream leaf-shaped belly patch and a tail leaf. The printed shell, the head mechanism and the Mirumi spring clasp are **unchanged**; only soft goods differ, so the default orange bear is untouched (`variant = "orange"` in the SCAD).
+
+[![Folitomo hugging a bag handle](renders/web/folitomo_01_hero_hug_handle.jpg)](renders/blender/variants/folitomo/01_hero_hug_handle.png)
+
+Arms pulled open to the 60° stop, head panned 20°:
+
+[![Folitomo with its arms open](renders/web/folitomo_02_arms_open.jpg)](renders/blender/variants/folitomo/02_arms_open.png)
+
+Side / back view from its left-rear (leaf ears, sprout and bud, tail leaf):
+
+[![Folitomo from the back, showing the sprout](renders/web/folitomo_03_back_view_bud.jpg)](renders/blender/variants/folitomo/03_back_view_bud.png)
+
+Clasp close-up: [`renders/blender/variants/folitomo/04_clasp_closeup.png`](renders/blender/variants/folitomo/04_clasp_closeup.png). Blender scene: [`folitomo_fur.blend`](renders/blender/variants/folitomo/folitomo_fur.blend).
+
+- **Leaf ears** (2): 46 × 31 mm green felt (two 1.2 mm layers round a 0.6 mm wire rib, stitched midrib), base tucked 5 mm into the head-ball skin, tilted 40° outward and rolled 32° so the faces turn forward. They ride with the head.
+- **Crown sprout:** felt-covered 1.2 mm wire stem (16 mm, one S-bend), two 15 mm leaves, three sepals and a closed cream-pink felt bud (10 × 10 × 16 mm). Rides with the head. Tip at z ≈ 184 mm.
+- **Tail leaf:** 36 × 22 mm, sewn to the back-left of the ball torso (z 30), far below and behind the arms and the handle.
+- **Leaf-belly patch:** cream pile on the lower belly (z 8–58), a colour change only. Not modelled: the vine accents and the leaf collar of the concept art (a collar would sit in the neck brim that must clear the nodding head).
+- **Soft goods in the SCAD:** `variant="folitomo"` drops the round fleece ears from `soft_head` and adds `fol_ear_L/R`, `fol_sprout`, `fol_bud`, `fol_tail` (all `part=` exports; `bash scripts/build_variant.sh folitomo` writes them to [`stl/variants/folitomo/`](stl/variants/folitomo/)). Felt leaves are not printed.
+- **Checks** ([`results/variants/folitomo/`](results/variants/folitomo/)): `scripts/folitomo_check.py` sweeps the leaf parts through pan ±50°, nod ±15° and both arms 0/30/60° (145 poses, the head corners × arm corners included): **0 mm³ overlap** with any rigid part, sleeve, soft body or the Ø12.5 bag handle; handle ≥ 26.5 mm clear of the leaf ears inside the ±42° / ±10° travel; tail leaf ≥ 10 mm from the shell and clear of both arms through 0–60°. The standard sweep and fit audit were re-run with `TOMO_VARIANT=folitomo` (537 poses, 155,730 pair tests, **0 rigid overlaps**; audit **27/27**; soft-head squash 0 mm). Grip numbers are identical to the default bear (5.79 / 6.10 / 6.45 / 7.40 N on Ø10 / 12.5 / 15 mm handles and a 25 mm strap).
+- **Weight and size:** ≈ **196 g with battery** (+2 g: ≈ 2.2 g of felt, wire and thread added, ≈ 0.2 g of round ears removed; ASSUMED densities, not weighed). Height with the sprout ≈ 184 mm (≈ 162 mm for the orange bear); width across the leaf ears ≈ 109 mm.
+- **Trade-offs:** taller than Mirumi (the sprout and ears are floppy felt, so it is only the soft tips that stand proud); the leaves are hand-stitched pieces (a wire end that works loose would be a pin hazard for small children, so cover and tuck every end); the bud sits inside the sepals by design (the two share a stitched seam); the render's leaf veins are a shader, the real leaves have a stitched midrib and printed or embroidered veins are not planned. BOM rows F1–F4 are planned, not purchased.
+
 ## How it works
 
 ### Lighter Tomo: weight budget
@@ -277,6 +302,7 @@ python3 scripts/validation_summary.py
 python3 scripts/render_v01.py
 # or all of the above: bash scripts/run_all.sh
 # Blender fur renders: blender -b -P scripts/render_blender.py -- --final
+# Folitomo skin: bash scripts/build_variant.sh folitomo && python3 scripts/folitomo_check.py && blender -b -P scripts/render_blender.py -- --final --variant folitomo
 ```
 
 Set `OPENSCAD=/path/to/openscad` if it is not on your `PATH`.
@@ -304,6 +330,10 @@ Measurements and an imposed-motion collision sweep on the exported STLs. **Nothi
 Full tables: [`results/fit_audit_table.csv`](results/fit_audit_table.csv), [`results/fit_audit.json`](results/fit_audit.json), [`results/summary_sweep.json`](results/summary_sweep.json), [`results/metrics_v01.json`](results/metrics_v01.json).
 
 ## Changelog
+
+### V.01 — Folitomo skin variant
+
+- New optional **Folitomo** grass-type skin (`variant="folitomo"`): leaf ears, crown sprout + bud, tail leaf and a cream belly patch, all soft goods. Printed parts, clasp and head mechanism unchanged. `scripts/build_variant.sh`, `scripts/folitomo_check.py`, `TOMO_VARIANT=folitomo` for `sim_v01.py` / `fit_audit.py` (results under `results/variants/folitomo/`), `render_blender.py --variant folitomo`; new renders in `renders/blender/variants/folitomo/`. ≈196 g with battery (+2 g), 184 mm tall. 0 mm³ leaf overlaps, standard sweep 0 rigid overlaps in 537 poses, audit 27/27. BOM F1–F4 (planned, not purchased).
 
 ### V.01 — no fur slot
 

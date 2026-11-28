@@ -1819,7 +1819,8 @@ def main():
             else:
                 # close-up of the clasp from the robot's left-front: both mitten paws meeting round the handle
                 set_camera(*CLASP)
-                path = OUT / ("03_clasp_closeup_preview.png" if preview else "03_clasp_closeup.png")
+                _cn = "04_clasp_closeup" if FOL else "03_clasp_closeup"
+                path = OUT / (f"{_cn}_preview.png" if preview else f"{_cn}.png")
             shift_lights(BAG_TOP)
             render_shot(path)
             shift_lights(-BAG_TOP)

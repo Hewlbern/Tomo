@@ -1,0 +1,1188 @@
+{
+ "tolerance_mm3": 0.05,
+ "naming": "arm_L = critter's own LEFT = +x; arm_R = -x",
+ "arm_angle": "opening angle about the vertical shoulder hinge (left axis x=44.58, y=-31.21, knuckle z 70-86; right mirrored); 0 = closed on the rest stop, + = open; printed open stop 60\u00b0",
+ "head": "yaw about z (\u00b1 = CCW/CW from above); tilt about x through y=6.0, z=119.0, + = nose down",
+ "travel": "yaw (-42, 42), tilt (-10, 10) (firmware), arms (0, 60) (printed stops, passive)",
+ "note": "Washer is fixed on the collar journal (does not yaw). Seam lips are NOT excluded: any front/back overlap is a defect.",
+ "transform_validation_max_dev_mm": [
+  [
+   "arm_L",
+   0,
+   0,
+   15.0,
+   0,
+   0.0001
+  ],
+  [
+   "arm_L",
+   0,
+   0,
+   30.0,
+   0,
+   0.0001
+  ],
+  [
+   "arm_R",
+   0,
+   0,
+   0,
+   15.0,
+   0.0001
+  ],
+  [
+   "arm_R",
+   0,
+   0,
+   0,
+   30.0,
+   0.0001
+  ],
+  [
+   "dummy_cam",
+   30,
+   10,
+   0,
+   0,
+   0.0001
+  ],
+  [
+   "dummy_horn_tilt",
+   30,
+   10,
+   0,
+   0,
+   0.0007
+  ],
+  [
+   "dummy_servo_tilt",
+   30,
+   10,
+   0,
+   0,
+   0.0
+  ],
+  [
+   "head_back",
+   30,
+   10,
+   0,
+   0,
+   0.0008
+  ],
+  [
+   "head_front",
+   30,
+   10,
+   0,
+   0,
+   0.0008
+  ],
+  [
+   "neck_turret",
+   30,
+   10,
+   0,
+   0,
+   0.0001
+  ],
+  [
+   "tilt_hub",
+   30,
+   10,
+   0,
+   0,
+   0.0007
+  ]
+ ],
+ "sweep": {
+  "poses": 537,
+  "pair_tests": 155730,
+  "aabb_passed_to_boolean": 30039,
+  "seconds": 453.1,
+  "head_yaw_range": [
+   -50,
+   50,
+   1.0
+  ],
+  "head_tilt_range": [
+   -25,
+   25,
+   0.5
+  ],
+  "arm_range": [
+   -5,
+   70,
+   0.5
+  ],
+  "cross_grid": "yaw {-42,-21,0,21,42} x tilt {-12,-6,0,6,12}; arms {0,30,60}\u00b2 at (yaw,tilt) = (-42,12), (42,-12), (0,0)",
+  "excluded_pairs": {
+   "sleeve_proxy_L|arm_L": "sleeve envelope contains own arm",
+   "sleeve_proxy_R|arm_R": "sleeve envelope contains own arm",
+   "paw_pad_L|arm_L": "TPU pad bonded on the paw",
+   "paw_pad_R|arm_R": "TPU pad bonded on the paw",
+   "paw_pad_L|sleeve_proxy_L": "same arm",
+   "paw_pad_R|sleeve_proxy_R": "same arm",
+   "fur_proxy_torso|torso_front": "fur on shell (shoulder brackets poke through the 4 mm fur skin)",
+   "fur_proxy_torso|torso_back": "fur on shell",
+   "fur_proxy_torso|arm_L": "knuckle sits in the fur skin opening",
+   "fur_proxy_torso|arm_R": "knuckle sits in the fur skin opening",
+   "yaw_coupler|neck_turret": "blade in slot",
+   "yaw_retainer_A|yaw_collar": "retainer under lip",
+   "yaw_retainer_B|yaw_collar": "retainer under lip",
+   "yaw_retainer_A|neck_turret": "screwed to the turret skirt",
+   "yaw_retainer_B|neck_turret": "screwed to the turret skirt",
+   "yaw_thrust_washer|yaw_collar": "washer sits on journal top",
+   "yaw_coupler|dummy_horn_yaw": "coupler on horn",
+   "dummy_horn_yaw|dummy_servo_yaw": "horn on boss",
+   "yaw_coupler|dummy_servo_yaw": "coupler above servo (spline in the coupler bore)",
+   "dummy_servo_tilt|neck_turret": "tilt servo seated in the turret cradle",
+   "dummy_horn_tilt|dummy_servo_tilt": "horn on its own spline/boss",
+   "dummy_horn_tilt|tilt_hub": "hub screwed to the horn",
+   "tilt_hub|dummy_servo_tilt": "spline tip in the hub clearance bore (facet sliver)",
+   "tilt_hub|head_back": "hub key in the head socket",
+   "dummy_cam|head_front": "camera mount",
+   "dummy_cam|head_back": "camera mount",
+   "dummy_speaker|torso_front": "speaker in pocket",
+   "dummy_amp|tray": "amp in pocket",
+   "dummy_mic|torso_front": "mic in pocket",
+   "dummy_mic|dummy_speaker": "mic breakout beside speaker (pre-existing placeholder overlap)",
+   "dummy_mic|yaw_collar": "pre-existing placeholder overlap (unchanged since v3)",
+   "dummy_servo_yaw|yaw_collar": "yaw servo seated under hangers",
+   "dummy_pi|tray": "Pi on standoffs"
+  },
+  "compliant_pairs": {
+   "sleeve_proxy_L|sleeve_proxy_R": "sleeve fur on sleeve fur",
+   "sleeve_proxy_L|fur_proxy_torso": "2 mm sleeve fur on 4 mm torso fur",
+   "sleeve_proxy_R|fur_proxy_torso": "2 mm sleeve fur on 4 mm torso fur",
+   "paw_pad_L|fur_proxy_torso": "TPU pad pressing torso fur",
+   "paw_pad_R|fur_proxy_torso": "TPU pad pressing torso fur",
+   "paw_pad_L|paw_pad_R": "pads touching",
+   "sleeve_proxy_L|torso_front": "sleeve fur on shell",
+   "sleeve_proxy_R|torso_front": "sleeve fur on shell"
+  }
+ },
+ "rigid_overlaps_in_travel": [],
+ "compliant_contacts_in_travel": [
+  {
+   "yaw": -42.0,
+   "tilt": -6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_L",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": -6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_R",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": -6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": -6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": -6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": -6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_L",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_R",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_L",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_R",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -42.0,
+   "tilt": 6.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -41.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_L",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -41.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_R",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -41.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -41.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -41.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -41.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -40.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_L",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -40.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_R",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -40.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -40.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -40.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -40.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -39.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_L",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -39.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_R",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -39.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -39.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -39.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -39.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -38.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_L",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -38.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_R",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -38.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -38.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -38.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -38.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -37.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_L",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -37.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_R",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -37.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -37.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "paw_pad_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 223.588,
+   "compliant": "TPU pad pressing torso fur"
+  },
+  {
+   "yaw": -37.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_L",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -37.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "sleeve_proxy_R",
+   "b": "fur_proxy_torso",
+   "vol_mm3": 1280.059,
+   "compliant": "2 mm sleeve fur on 4 mm torso fur"
+  },
+  {
+   "yaw": -36.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_L",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  },
+  {
+   "yaw": -36.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "sleeve_proxy_R",
+   "vol_mm3": 505.063,
+   "compliant": "sleeve fur on shell"
+  }
+ ],
+ "stop_engagement": {
+  "yaw_pos": {
+   "yaw": 47.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "yaw_collar",
+   "b": "neck_turret",
+   "vol_mm3": 0.619,
+   "compliant": ""
+  },
+  "yaw_neg": {
+   "yaw": -47.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "yaw_collar",
+   "b": "neck_turret",
+   "vol_mm3": 0.619,
+   "compliant": ""
+  },
+  "tilt_down": {
+   "yaw": 0.0,
+   "tilt": 13.5,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "yaw_collar",
+   "b": "dummy_cam",
+   "vol_mm3": 0.181,
+   "compliant": ""
+  },
+  "tilt_up": {
+   "yaw": 0.0,
+   "tilt": -23.5,
+   "armL": 0.0,
+   "armR": 0.0,
+   "a": "yaw_collar",
+   "b": "head_back",
+   "vol_mm3": 0.492,
+   "compliant": ""
+  },
+  "armL_closed_stop": {
+   "yaw": 0.0,
+   "tilt": 0.0,
+   "armL": -0.5,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "arm_L",
+   "vol_mm3": 0.257,
+   "compliant": ""
+  },
+  "armL_open_stop": {
+   "yaw": 0.0,
+   "tilt": 0.0,
+   "armL": 60.5,
+   "armR": 0.0,
+   "a": "torso_front",
+   "b": "arm_L",
+   "vol_mm3": 0.257,
+   "compliant": ""
+  },
+  "armR_closed_stop": {
+   "yaw": 0.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": -0.5,
+   "a": "torso_front",
+   "b": "arm_R",
+   "vol_mm3": 0.257,
+   "compliant": ""
+  },
+  "armR_open_stop": {
+   "yaw": 0.0,
+   "tilt": 0.0,
+   "armL": 0.0,
+   "armR": 60.5,
+   "a": "torso_front",
+   "b": "arm_R",
+   "vol_mm3": 0.257,
+   "compliant": ""
+  }
+ },
+ "arm_min_clearance_by_angle_mm": {
+  "a0": {
+   "arm_L_to_torso_front": -0.0,
+   "pad_L_to_torso_front": 0.37,
+   "arm_R_to_torso_front": -0.0,
+   "pad_R_to_torso_front": 0.37,
+   "arm_L_to_arm_R_both_at_angle": 7.35
+  },
+  "a10": {
+   "arm_L_to_torso_front": 0.4,
+   "pad_L_to_torso_front": 6.62,
+   "arm_R_to_torso_front": 0.4,
+   "pad_R_to_torso_front": 6.62,
+   "arm_L_to_arm_R_both_at_angle": 15.19
+  },
+  "a20": {
+   "arm_L_to_torso_front": 0.4,
+   "pad_L_to_torso_front": 12.47,
+   "arm_R_to_torso_front": 0.4,
+   "pad_R_to_torso_front": 12.47,
+   "arm_L_to_arm_R_both_at_angle": 25.88
+  },
+  "a30": {
+   "arm_L_to_torso_front": 0.4,
+   "pad_L_to_torso_front": 17.7,
+   "arm_R_to_torso_front": 0.4,
+   "pad_R_to_torso_front": 17.71,
+   "arm_L_to_arm_R_both_at_angle": 37.16
+  },
+  "a45": {
+   "arm_L_to_torso_front": 0.4,
+   "pad_L_to_torso_front": 24.36,
+   "arm_R_to_torso_front": 0.4,
+   "pad_R_to_torso_front": 24.35,
+   "arm_L_to_arm_R_both_at_angle": 56.83
+  },
+  "a60": {
+   "arm_L_to_torso_front": -0.0,
+   "pad_L_to_torso_front": 26.07,
+   "arm_R_to_torso_front": -0.0,
+   "pad_R_to_torso_front": 26.02,
+   "arm_L_to_arm_R_both_at_angle": 73.22
+  }
+ },
+ "arm_min_clearance_mm": {
+  "arm_to_shell": -0.0,
+  "pad_to_shell": 0.37,
+  "arm_to_arm": 7.35,
+  "arm_L_closed_vs_arm_R_open": 44.02,
+  "arm_L_open_vs_arm_R_closed": 43.72,
+  "arm_lowest_z_mm": 63.07,
+  "note": "arm_to_shell 0 = the stop lug resting on its relief face (by design); knuckle to ear is 0.4 mm",
+  "ok": true
+ },
+ "head_tilt_clearance_mm": {
+  "t-12": {
+   "head_to_turret": 0.6,
+   "head_to_collar": 6.24,
+   "camera_to_tilt_servo": 34.92,
+   "head_to_tilt_servo": 1.5
+  },
+  "t-6": {
+   "head_to_turret": 0.6,
+   "head_to_collar": 6.89,
+   "camera_to_tilt_servo": 35.16,
+   "head_to_tilt_servo": 1.5
+  },
+  "t0": {
+   "head_to_turret": 0.6,
+   "head_to_collar": 7.0,
+   "camera_to_tilt_servo": 34.83,
+   "head_to_tilt_servo": 1.5
+  },
+  "t6": {
+   "head_to_turret": 0.6,
+   "head_to_collar": 5.63,
+   "camera_to_tilt_servo": 33.95,
+   "head_to_tilt_servo": 1.5
+  },
+  "t12": {
+   "head_to_turret": 0.6,
+   "head_to_collar": 1.7,
+   "camera_to_tilt_servo": 33.15,
+   "head_to_tilt_servo": 1.5
+  }
+ },
+ "hug": {
+  "spring": {
+   "part": "music-wire torsion spring, 0.048 in (1.22 mm) wire, 3/8 in (9.5 mm) OD, 90\u00b0 legs (trim to ~6 mm); catalogue 3HPG6 (LH) / 3HPD1 (RH)",
+   "rate_Nmm_per_deg": 3.363,
+   "rated_torque_Nmm_at_90deg": 302.7,
+   "preload_deg": 30.0,
+   "max_windup_deg": 90.0,
+   "torque_at_rest_Nmm": 100.9,
+   "torque_at_open_stop_Nmm": 302.7
+  },
+  "grip": [
+   {
+    "object": "round \u00d810.0 upright in the centre groove (1.7\u00b0 from the body vertical)",
+    "d_mm": 10.0,
+    "L": {
+     "open_deg": 3.37,
+     "rigid_arm_only_open_deg": 1.04,
+     "rigid_arm_clear_of_object_mm": 1.46,
+     "spring_torque_Nmm": 112.2,
+     "contact_point": [
+      4.1,
+      -50.2,
+      66.3
+     ],
+     "lever_mm": 38.8,
+     "pad_normal_force_N": 2.89,
+     "into_groove_N": 1.66,
+     "soft_sleeve_squash_mm": 0.71
+    },
+    "R": {
+     "open_deg": 3.37,
+     "rigid_arm_only_open_deg": 1.04,
+     "rigid_arm_clear_of_object_mm": 1.45,
+     "spring_torque_Nmm": 112.2,
+     "contact_point": [
+      -4.1,
+      -50.2,
+      66.3
+     ],
+     "lever_mm": 38.8,
+     "pad_normal_force_N": 2.89,
+     "into_groove_N": 1.66,
+     "soft_sleeve_squash_mm": 0.7
+    },
+    "total_pad_force_N": 5.79,
+    "total_into_groove_N": 3.33,
+    "object_vs_torso_front_mm3": 0.0
+   },
+   {
+    "object": "round \u00d812.5 upright in the centre groove (1.7\u00b0 from the body vertical)",
+    "d_mm": 12.5,
+    "L": {
+     "open_deg": 6.24,
+     "rigid_arm_only_open_deg": 3.99,
+     "rigid_arm_clear_of_object_mm": 1.46,
+     "spring_torque_Nmm": 121.9,
+     "contact_point": [
+      5.1,
+      -52.2,
+      66.3
+     ],
+     "lever_mm": 40.0,
+     "pad_normal_force_N": 3.05,
+     "into_groove_N": 1.77,
+     "soft_sleeve_squash_mm": 0.61
+    },
+    "R": {
+     "open_deg": 6.24,
+     "rigid_arm_only_open_deg": 3.99,
+     "rigid_arm_clear_of_object_mm": 1.45,
+     "spring_torque_Nmm": 121.9,
+     "contact_point": [
+      -5.1,
+      -52.2,
+      66.3
+     ],
+     "lever_mm": 40.0,
+     "pad_normal_force_N": 3.05,
+     "into_groove_N": 1.77,
+     "soft_sleeve_squash_mm": 0.65
+    },
+    "total_pad_force_N": 6.1,
+    "total_into_groove_N": 3.54,
+    "object_vs_torso_front_mm3": 0.0
+   },
+   {
+    "object": "round \u00d815.0 upright in the centre groove (1.7\u00b0 from the body vertical)",
+    "d_mm": 15.0,
+    "L": {
+     "open_deg": 9.05,
+     "rigid_arm_only_open_deg": 6.85,
+     "rigid_arm_clear_of_object_mm": 1.45,
+     "spring_torque_Nmm": 131.3,
+     "contact_point": [
+      6.2,
+      -54.1,
+      66.3
+     ],
+     "lever_mm": 40.7,
+     "pad_normal_force_N": 3.23,
+     "into_groove_N": 1.84,
+     "soft_sleeve_squash_mm": 0.66
+    },
+    "R": {
+     "open_deg": 9.05,
+     "rigid_arm_only_open_deg": 6.85,
+     "rigid_arm_clear_of_object_mm": 1.45,
+     "spring_torque_Nmm": 131.3,
+     "contact_point": [
+      -6.2,
+      -54.1,
+      66.3
+     ],
+     "lever_mm": 40.7,
+     "pad_normal_force_N": 3.23,
+     "into_groove_N": 1.84,
+     "soft_sleeve_squash_mm": 0.65
+    },
+    "total_pad_force_N": 6.45,
+    "total_into_groove_N": 3.68,
+    "object_vs_torso_front_mm3": 0.0
+   },
+   {
+    "object": "flat strap 25 x 2.5 across the groove mouth, along the groove line",
+    "d_mm": 25,
+    "L": {
+     "open_deg": 5.35,
+     "rigid_arm_only_open_deg": 2.93,
+     "rigid_arm_clear_of_object_mm": 1.37,
+     "spring_torque_Nmm": 118.9,
+     "contact_point": [
+      12.4,
+      -48.2,
+      65.9
+     ],
+     "lever_mm": 32.2,
+     "pad_normal_force_N": 3.69,
+     "into_groove_N": 3.69,
+     "soft_sleeve_squash_mm": 0.0
+    },
+    "R": {
+     "open_deg": 5.35,
+     "rigid_arm_only_open_deg": 2.93,
+     "rigid_arm_clear_of_object_mm": 1.37,
+     "spring_torque_Nmm": 118.9,
+     "contact_point": [
+      -12.4,
+      -48.2,
+      66.0
+     ],
+     "lever_mm": 32.2,
+     "pad_normal_force_N": 3.7,
+     "into_groove_N": 3.7,
+     "soft_sleeve_squash_mm": 0.0
+    },
+    "total_pad_force_N": 7.39,
+    "total_into_groove_N": 7.39,
+    "object_vs_torso_front_mm3": 0.05,
+    "strap_back_face_lift_above_floor_mm": 3.51
+   }
+  ],
+  "assumption": "Spring rate from the catalogue (2.679 lbf\u00b7in at 90\u00b0), linear; no hinge friction; the two symmetric arms close from either side and their paws press on the front quarters of the handle; pad normal force = spring torque / |(r x n)_z| at the deepest pad contact. TPU pads assumed rigid for the angle (real pads add ~1 mm of squash). Not measured.",
+  "open": {
+   "open_stop_deg": 60,
+   "pad_L_to_belly_mm": 26.07,
+   "pad_R_to_belly_mm": 26.02,
+   "pad_to_belly_at_closed_mm": 0.37,
+   "rod15_insertion_path_clear": true,
+   "rod15_insertion_path": {
+    "approach_deg_from_groove_normal": 0,
+    "clear_by_approach": {
+     "0": true,
+     "10": true,
+     "-10": true,
+     "20": true,
+     "-20": true,
+     "30": true,
+     "-30": true,
+     "45": true,
+     "-45": true,
+     "60": false,
+     "-60": false,
+     "75": false,
+     "-75": false,
+     "90": false,
+     "-90": false
+    }
+   },
+   "rod15_soft_sleeve_squash_mm": 0.0,
+   "note": "\u00d815 x 50 rod brought in on a straight line perpendicular to its axis (90 mm travel) onto the groove floor, both arms on the open stop; checked against both rigid arms, both pads and torso_front. NOTE: until the thick-arm pass this check iterated over an empty range (np.arange with the wrong step sign) and so always passed; with the old 30 deg stop no straight path exists."
+  },
+  "ok": true
+ },
+ "soft_sleeve_squash_mm": {
+  "yaw0_tilt0_armL0_armR0": {
+   "torso_front_into_sleeve_L": 9.6,
+   "torso_front_into_sleeve_R": 9.74
+  },
+  "yaw0_tilt0_armL60_armR60": {
+   "torso_front_into_sleeve_L": 9.76,
+   "torso_front_into_sleeve_R": 9.74
+  },
+  "yaw42_tilt10_armL0_armR0": {
+   "torso_front_into_sleeve_L": 9.6,
+   "torso_front_into_sleeve_R": 9.74
+  },
+  "yaw-42_tilt10_armL0_armR0": {
+   "torso_front_into_sleeve_L": 9.6,
+   "torso_front_into_sleeve_R": 9.74
+  },
+  "yaw42_tilt-10_armL0_armR0": {
+   "torso_front_into_sleeve_L": 9.6,
+   "torso_front_into_sleeve_R": 9.74
+  },
+  "yaw-42_tilt-10_armL60_armR60": {
+   "torso_front_into_sleeve_L": 9.76,
+   "torso_front_into_sleeve_R": 9.74
+  },
+  "yaw0_tilt0_armL60_armR0": {
+   "torso_front_into_sleeve_L": 9.76,
+   "torso_front_into_sleeve_R": 9.74
+  },
+  "yaw0_tilt0_armL0_armR60": {
+   "torso_front_into_sleeve_L": 9.6,
+   "torso_front_into_sleeve_R": 9.74
+  }
+ },
+ "soft_body_squash_mm": {
+  "arm_L_a0": 5.61,
+  "paw_pad_L_a0": 5.92,
+  "arm_R_a0": 5.62,
+  "paw_pad_R_a0": 5.94,
+  "arm_L_a30": 4.71,
+  "paw_pad_L_a30": 0.0,
+  "arm_R_a30": 4.7,
+  "paw_pad_R_a30": 0.0,
+  "arm_L_a60": 4.62,
+  "paw_pad_L_a60": 0.0,
+  "arm_R_a60": 4.71,
+  "paw_pad_R_a60": 0.0,
+  "grip_rod_12p5": 0.0,
+  "grip_rod_10": 0.0,
+  "grip_rod_15": 0.39,
+  "note": "mm of soft goods squashed (0 = clear). v3-bear pass: fur skin 4 mm everywhere; fibrefill padding to a round ball torso (sphere R60 about z 48, cut flat at z 0), gone by z \u2248 81. No-slot pass: a 2 mm skin + pile flap closes over the handle channel below z 58 (handle slides under the fur); above it a combed-over slit lets the pads reach the handle. grip_rod_* = how far each handle size lifts the flap / skin."
+ },
+ "soft_head_squash_mm": {
+  "yaw0_tilt0_armL0_armR0": {},
+  "yaw42_tilt10_armL0_armR0": {},
+  "yaw-42_tilt10_armL0_armR0": {},
+  "yaw42_tilt-10_armL0_armR0": {},
+  "yaw-42_tilt-10_armL0_armR0": {},
+  "yaw42_tilt10_armL60_armR60": {},
+  "yaw-42_tilt10_armL60_armR60": {},
+  "yaw0_tilt10_armL60_armR60": {},
+  "yaw0_tilt-10_armL60_armR60": {},
+  "worst_mm": 0.0,
+  "note": "Head-ball padding (ellipse of revolution 55 x 41 about z 114) and two ears, posed with the head; soft goods. Contacts listed only above 0.05 mm."
+ },
+ "static_pair_volumes": [
+  {
+   "a": "torso_front",
+   "b": "torso_back",
+   "vol_mm3": 0.0,
+   "note": "seam lip/groove should clear 0.25 mm",
+   "ok": true
+  },
+  {
+   "a": "head_front",
+   "b": "head_back",
+   "vol_mm3": 0.0,
+   "note": "seam lip/groove should clear 0.25 mm",
+   "ok": true
+  },
+  {
+   "a": "yaw_thrust_washer",
+   "b": "neck_turret",
+   "vol_mm3": 0.0,
+   "note": "designed 0.30 mm axial gap",
+   "ok": true
+  },
+  {
+   "a": "tray",
+   "b": "torso_front",
+   "vol_mm3": 0.0,
+   "note": "tabs in pockets",
+   "ok": true
+  },
+  {
+   "a": "tray",
+   "b": "torso_back",
+   "vol_mm3": 0.0,
+   "note": "tabs in pockets",
+   "ok": true
+  },
+  {
+   "a": "arm_L",
+   "b": "arm_R",
+   "vol_mm3": 0.0,
+   "note": "arms at rest must not touch",
+   "ok": true
+  },
+  {
+   "a": "arm_L",
+   "b": "torso_front",
+   "vol_mm3": 0.0001,
+   "note": "knuckle under the ear",
+   "ok": true
+  },
+  {
+   "a": "arm_R",
+   "b": "torso_front",
+   "vol_mm3": 0.0001,
+   "note": "knuckle under the ear",
+   "ok": true
+  },
+  {
+   "a": "head_front",
+   "b": "torso_front",
+   "vol_mm3": 0.0,
+   "note": "face cap vs body at rest",
+   "ok": true
+  },
+  {
+   "a": "head_back",
+   "b": "torso_back",
+   "vol_mm3": 0.0,
+   "note": "face cap vs body at rest",
+   "ok": true
+  },
+  {
+   "a": "dummy_servo_tilt",
+   "b": "neck_turret",
+   "vol_mm3": 0.0,
+   "note": "tilt servo in the cradle window",
+   "ok": true
+  },
+  {
+   "a": "dummy_servo_tilt",
+   "b": "head_back",
+   "vol_mm3": 0.0,
+   "note": "static",
+   "ok": true
+  },
+  {
+   "a": "tilt_hub",
+   "b": "dummy_horn_tilt",
+   "vol_mm3": -0.0,
+   "note": "hub on horn face",
+   "ok": true
+  }
+ ],
+ "static_ok": true
+}

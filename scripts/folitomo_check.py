@@ -104,13 +104,30 @@ for a in (0, 60):
     for p in ("arm_L", "arm_R", "sleeve_proxy_L", "sleeve_proxy_R", "torso_back"):
         tail_clr[f"{p}_at_arms_{a}"] = round(mindist(TAIL, pose(M[p], p, 0, 0, a, a)), 2)
 tail_clr["tail_to_handle"] = round(handle_clear(TAIL, 1), 2)
+# ---- weight change vs the default orange bear (soft goods, ASSUMED densities, not weighed)
+FELT_G_MM2 = 180e-6        # 1.2 mm craft felt, ~180 g/m2 (ASSUMED)
+WIRE_G_MM = {"ear": 0.0022, "stem": 0.0088}   # 0.6 mm steel 2.2 mg/mm, 1.2 mm steel/brass 8.8 mg/mm (ASSUMED)
+FLEECE_G_MM2 = 380e-6      # the round fleece ears of the default bear, same fur backing density as the body skin (ASSUMED)
+def face(m): return m.area / 2.0
+mass = {}
+for n in ("fol_ear_L", "fol_ear_R"): mass[n] = 2 * face(HEADV[n]) * FELT_G_MM2 + 55 * WIRE_G_MM["ear"] + 0.1
+mass["fol_sprout"] = 2 * face(HEADV["fol_sprout"]) * 0.45 * FELT_G_MM2 + 24 * WIRE_G_MM["stem"] + 0.1
+mass["fol_bud"] = HEADV["fol_bud"].area * FELT_G_MM2 + HEADV["fol_bud"].volume * 15e-6 + 0.05
+mass["fol_tail"] = 2 * face(TAIL) * FELT_G_MM2 + 30 * WIRE_G_MM["ear"] + 0.1
+added = sum(mass.values())
+removed = 2 * 2 * math.pi * ((12 * 5.5) ** 1.6 + (12 * 11) ** 1.6 + (5.5 * 11) ** 1.6) ** (1 / 1.6) / 3 * FLEECE_G_MM2 / 2 + 2 * (4 / 3 * math.pi * 12 * 5.5 * 11) * 15e-6   # 2 ellipsoid ears: fleece (one layer) + fill
+mass_out = dict(added_g={k: round(v, 2) for k, v in mass.items()}, added_total_g=round(added, 2), removed_round_ears_g=round(removed, 2),
+                net_change_g=round(added - removed, 2), default_bear_with_battery_g=194.0, folitomo_with_battery_g=round(194.0 + added - removed, 1),
+                note="ASSUMED densities (felt 180 g/m2 at 1.2 mm, wire 2.2 / 8.8 mg/mm); cream belly patch is a pile colour change, no mass; weigh the first build.")
+size = dict(total_height_mm=round(float(max(HEADV[n].bounds[1][2] for n in HEADV)), 1), default_bear_height_mm=162.0,
+            width_across_leaf_ears_mm=round(float(max(HEADV['fol_ear_L'].bounds[1][0], -HEADV['fol_ear_R'].bounds[0][0]) * 2), 1))
 inT = lambda r: YAW_SOFT[0] <= r["yaw"] <= YAW_SOFT[1] and TILT_SOFT[0] <= r["tilt"] <= TILT_SOFT[1] and ARM_TRAVEL[0] <= r["armL"] <= ARM_TRAVEL[1] and ARM_TRAVEL[0] <= r["armR"] <= ARM_TRAVEL[1]
 all_in = [r for r in rows if inT(r)]
 out = dict(variant=VAR, tolerance_mm3=TOL, poses=len(poses), pair_tests=npairs, aabb_passed_to_boolean=nbool, seconds=round(time.time() - t0, 1),
            pose_grid="yaw -50..50 step 2 and tilt -15..15 step 2.5 singly; yaw {-47,-42,-21,0,21,42,47} x tilt {-12,-10,-5,0,5,10,12}; arms {0,30,60}^2 at 5 head corners; tail leaf: both arms -5..70 step 5",
            head_leaf_overlaps_in_soft_travel=all_in, head_leaf_overlaps_all=rows, tail_leaf_overlaps=tail_rows,
            tail_leaf_vs_soft_body_mm3_by_design=round(sb_tail, 3), leaf_vs_leaf_mm3=lv,
-           min_clearance_mm=clr, tail_clearance_mm=tail_clr,
+           min_clearance_mm=clr, mass=mass_out, size=size, tail_clearance_mm=tail_clr,
            worst_handle_clearance_mm=dict(value=round(worst_handle, 2), at=dict(zip(("yaw", "tilt", "armL", "armR", "part"), worst_handle_pose))),
            note="Leaves are 1.2 mm felt on a 0.6 mm wire rib: a brush would only bend them. The handle is the Ø12.5 tube of the renders (scripts/handle_path.py). Leaf bases are tucked into the head-ball / body skin on purpose (not counted).")
 out["ok"] = (not all_in) and (not tail_rows) and worst_handle >= MIN_CLR

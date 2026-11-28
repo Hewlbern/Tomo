@@ -4,7 +4,7 @@
  "poses": 145,
  "pair_tests": 20900,
  "aabb_passed_to_boolean": 1348,
- "seconds": 72.9,
+ "seconds": 129.9,
  "pose_grid": "yaw -50..50 step 2 and tilt -15..15 step 2.5 singly; yaw {-47,-42,-21,0,21,42,47} x tilt {-12,-10,-5,0,5,10,12}; arms {0,30,60}^2 at 5 head corners; tail leaf: both arms -5..70 step 5",
  "head_leaf_overlaps_in_soft_travel": [],
  "head_leaf_overlaps_all": [],
@@ -112,6 +112,26 @@
    "fol_sprout_to_handle": 67.36,
    "fol_bud_to_handle": 71.73
   }
+ },
+ "mass": {
+  "added_g": {
+   "fol_ear_L": 0.63,
+   "fol_ear_R": 0.63,
+   "fol_sprout": 0.38,
+   "fol_bud": 0.14,
+   "fol_tail": 0.41
+  },
+  "added_total_g": 2.19,
+  "removed_round_ears_g": 0.23,
+  "net_change_g": 1.96,
+  "default_bear_with_battery_g": 194.0,
+  "folitomo_with_battery_g": 196.0,
+  "note": "ASSUMED densities (felt 180 g/m2 at 1.2 mm, wire 2.2 / 8.8 mg/mm); cream belly patch is a pile colour change, no mass; weigh the first build."
+ },
+ "size": {
+  "total_height_mm": 183.6,
+  "default_bear_height_mm": 155.0,
+  "width_across_leaf_ears_mm": 108.6
  },
  "tail_clearance_mm": {
   "arm_L_at_arms_0": 99.0,
